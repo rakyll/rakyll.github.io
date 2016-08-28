@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>go bits</title>
+    <link>http://golang.rakyll.org/</link>
+    <description>Recent content on go bits</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sat, 27 Aug 2016 11:27:27 -0400</lastBuildDate>
+    <atom:link href="http://golang.rakyll.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>eg to apply transformations to Go code</title>
+      <link>http://golang.rakyll.org/eg/</link>
+      <pubDate>Sat, 27 Aug 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/eg/</guid>
+      <description>&lt;p&gt;If you are willing to make large scale refactoring in your
+Go programs, automating the refactoring tasks is more desirable than
+manual editing. &lt;code&gt;eg&lt;/code&gt; is a program that allows you to perform transformations
+based on template Go files.&lt;/p&gt;
+
+&lt;p&gt;To install the tool, run the following:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go get golang.org/x/tools/cmd/eg
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;&lt;code&gt;eg&lt;/code&gt; requires a template file to look for which transformation it should
+apply to your source code. What&amp;rsquo;s nice is that the template file is a Go file
+with little annotations.&lt;/p&gt;
+
+&lt;p&gt;Consider the following Go program:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;$ cat $GOPATH/src/hello/hello.go
+package hello
+
+import &amp;quot;time&amp;quot;
+
+// ExtendWith50000ns adds 50000ns to t.
+func ExtendWith50000ns(t time.Time) time.Time {
+	return t.Add(time.Duration(50000))
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Assume you want to eliminate the unnecessary time.Duration casting at ExtendWith50000ns.
+And as a good practice, you would also like to add a unit to the duration rather than
+just passing 50000.&lt;/p&gt;
+
+&lt;p&gt;&lt;code&gt;eg&lt;/code&gt; requires a template file where you define before and afters that represents the
+transformation.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;$ cat T.template
+package template
+
+import (
+    &amp;quot;time&amp;quot;
+)
+
+func before(t time.Time, d time.Duration) time.Time {
+    // if already time.Duration, do not cast.
+    return t.Add(time.Duration(d))
+}
+
+func after(t time.Time, d time.Duration) time.Time  {
+    return t.Add(d * time.Nanosecond)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;And run the &lt;code&gt;eg&lt;/code&gt; command on your hello package to apply it at every occurrence of this pattern.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ eg -w -t T.template hello
+=== /Users/jbd/src/hello/hello.go (1 matches)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Voila!&lt;/p&gt;
+
+&lt;p&gt;The file now contains a duration that is not casted unnecessarily and it has a unit.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;$ cat $GOPATH/src/hello/hello.go
+package hello
+
+import &amp;quot;time&amp;quot;
+
+// ExtendWith50000ns adds 50000ns to t.
+func ExtendWith50000ns(t time.Time) time.Time {
+	return t.Add(50000 * time.Nanosecond)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Note: There are many &lt;a href=&#34;https://github.com/golang/tools/tree/master/refactor/eg/testdata&#34;&gt;.template files&lt;/a&gt;
+underneath the package for testing purposes but they can also be used as a
+reference how to write other transformation templates.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
