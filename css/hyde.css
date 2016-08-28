@@ -45,13 +45,16 @@ html {
   }
 }
 
-
 /*
  * Sidebar
  *
  * Flexible banner for housing site name, intro, and "footer" content. Starts
  * out above content in mobile and later moves to the side with wider viewports.
  */
+
+.small {
+  font-size: 70%;
+}
 
 .sidebar {
   text-align: center;
