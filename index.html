@@ -118,15 +118,15 @@ will immediately push the buffer to the service.</p>
             return // nothing else to pipe, kill this goroutine
         }
         if err != nil {
-            log.Printf(&quot;reading stdin error: %v&quot;, err)
-            continue
+            // TODO: handle the error
+            continue 
         }
         if err = stream.Send(&amp;speech.StreamingRecognizeRequest{
             StreamingRequest: &amp;speech.StreamingRecognizeRequest_AudioContent{
                 AudioContent: buf[:n],
             },
         }); err != nil {
-            log.Printf(&quot;sending audio error: %v&quot;, err)
+            // TODO: handle the error
         }
     }
 }()
