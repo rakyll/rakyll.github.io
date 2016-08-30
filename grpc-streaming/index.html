@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
 <head>
   <link href="http://gmpg.org/xfn/11" rel="profile">
@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
   
-  <title>go bits</title>
+  <title>Bidirectional gRPC streaming for Go &middot; go bits</title>
   
 
   
@@ -23,12 +23,11 @@
   <link rel="shortcut icon" href="/favicon.png">
 
   
-  <link href="http://golang.rakyll.org/index.xml" rel="alternate" type="application/rss+xml" title="go bits" />
+  <link href="" rel="alternate" type="application/rss+xml" title="go bits" />
 </head>
 
-<body class=" layout-reverse">
-
-<div class="sidebar">
+	<body class=" layout-reverse">
+		<div class="sidebar">
   <div class="container sidebar-sticky">
     <div class="sidebar-about">
       <a href="http://golang.rakyll.org/"><h1>go bits</h1></a>
@@ -63,20 +62,11 @@
 </script>
 
 
-    <div class="content container">
-<div class="posts">
-
-      
-  <div class="post">
-    <h1 class="post-title">
-      <a href="http://golang.rakyll.org/grpc-streaming/">
-        Bidirectional gRPC streaming for Go
-      </a>
-    </h1>
-
-    <span class="post-date">Tue, Aug 30, 2016</span>
-
-    <p><em>Disclaimer: This article is not about a core Go package or tool but <a href="http://www.grpc.io/">gRPC</a>.</em></p>
+		<div class="content container">
+			<div class="post">
+			 	<h1>Bidirectional gRPC streaming for Go</h1>
+			  <span class="post-date">Tue, Aug 30, 2016</span>
+			      <p><em>Disclaimer: This article is not about a core Go package or tool but <a href="http://www.grpc.io/">gRPC</a>.</em></p>
 
 <p>gRPC provides support for implementing streaming endpoints as well as
 streaming support in their clients. Bidirectional streaming is useful
@@ -157,97 +147,10 @@ where you can learn more about the initializing of the gRPC connection and more.
 <p>Please note that the same pattern of sending and receiving can be applied to
 work with any gRPC bidirectional streaming client.</p>
 
-  </div>
-  
-  <div class="post">
-    <h1 class="post-title">
-      <a href="http://golang.rakyll.org/eg/">
-        eg to apply transformations to Go code
-      </a>
-    </h1>
+			</div>
 
-    <span class="post-date">Sat, Aug 27, 2016</span>
-
-    <p>If you are willing to make large scale refactoring in your
-Go programs, automating the refactoring tasks is more desirable than
-manual editing. <code>eg</code> is a program that allows you to perform transformations
-based on template Go files.</p>
-
-<p>To install the tool, run the following:</p>
-
-<pre><code>$ go get golang.org/x/tools/cmd/eg
-</code></pre>
-
-<p><code>eg</code> requires a template file to look for which transformation it should
-apply to your source code. What&rsquo;s nice is that the template file is a Go file
-with little annotations.</p>
-
-<p>Consider the following Go program:</p>
-
-<pre><code class="language-go">$ cat $GOPATH/src/hello/hello.go
-package hello
-
-import &quot;time&quot;
-
-// ExtendWith50000ns adds 50000ns to t.
-func ExtendWith50000ns(t time.Time) time.Time {
-	return t.Add(time.Duration(50000))
-}
-</code></pre>
-
-<p>Assume you want to eliminate the unnecessary time.Duration casting at ExtendWith50000ns
-and as a good practice, you would also like to add a unit to the duration rather than
-just passing 50000.</p>
-
-<p><code>eg</code> requires a template file where you define before and afters that represents the
-transformation.</p>
-
-<pre><code class="language-go">$ cat T.template
-package template
-
-import (
-    &quot;time&quot;
-)
-
-func before(t time.Time, d time.Duration) time.Time {
-    // if already time.Duration, do not cast.
-    return t.Add(time.Duration(d))
-}
-
-func after(t time.Time, d time.Duration) time.Time  {
-    return t.Add(d * time.Nanosecond)
-}
-</code></pre>
-
-<p>And run the <code>eg</code> command on your hello package to apply it at every occurrence of this pattern.</p>
-
-<pre><code>$ eg -w -t T.template hello
-=== /Users/jbd/src/hello/hello.go (1 matches)
-</code></pre>
-
-<p>Voila!</p>
-
-<p>The file now contains a duration that is not casted unnecessarily and it has a unit.</p>
-
-<pre><code class="language-go">$ cat $GOPATH/src/hello/hello.go
-package hello
-
-import &quot;time&quot;
-
-// ExtendWith50000ns adds 50000ns to t.
-func ExtendWith50000ns(t time.Time) time.Time {
-	return t.Add(50000 * time.Nanosecond)
-}
-</code></pre>
-
-<p>Note: There are many <a href="https://github.com/golang/tools/tree/master/refactor/eg/testdata">.template files</a>
-underneath the package for testing purposes but they can also be used as a
-reference how to write other transformation templates.</p>
-
-  </div>
-  
-</div>
-</div>
+			
+		</div>
 
   </body>
 </html>

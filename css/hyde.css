@@ -47,6 +47,10 @@ html {
 
 pre {
   background-color: #E0EBF5;
+  overflow: scroll;
+  white-space: pre;
+  word-break: normal;
+  word-wrap: normal;
 }
 
 /*
