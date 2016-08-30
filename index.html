@@ -141,15 +141,15 @@ main goroutine and print the captions as service pushes them:</p>
         break
     }
     if err != nil {
-        log.Printf(&quot;streaming response error: %v&quot;, err)
+        // TODO: handle the error
         continue
     }
     if resp.Error != nil {
-        log.Printf(&quot;grpc error: %v&quot;, resp.Error)
+        // TODO: handle the error
         continue
     }
     for _, result := range resp.Results {
-        fmt.Printf(&quot;result: %+v&quot;, result)
+        fmt.Printf(&quot;result: %+v\n&quot;, result)
     }
 }
 </code></pre>
