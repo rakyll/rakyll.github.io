@@ -76,6 +76,9 @@ main goroutine and print the captions as service pushes them:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;for {
     resp, err := stream.Recv()
+    if err == io.EOF {
+        break
+    }
     if err != nil {
         log.Printf(&amp;quot;streaming response error: %v&amp;quot;, err)
         continue

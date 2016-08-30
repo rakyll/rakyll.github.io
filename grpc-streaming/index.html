@@ -127,6 +127,9 @@ main goroutine and print the captions as service pushes them:</p>
 
 <pre><code class="language-go">for {
     resp, err := stream.Recv()
+    if err == io.EOF {
+        break
+    }
     if err != nil {
         log.Printf(&quot;streaming response error: %v&quot;, err)
         continue
