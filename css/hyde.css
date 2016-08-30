@@ -36,13 +36,17 @@ html {
 }
 @media (min-width: 48em) {
   html {
-    font-size: 16px;
+    font-size: 14px;
   }
 }
 @media (min-width: 58em) {
   html {
-    font-size: 20px;
+    font-size: 16px;
   }
+}
+
+pre {
+  background-color: #E0EBF5;
 }
 
 /*
@@ -53,7 +57,7 @@ html {
  */
 
 .small {
-  font-size: 70%;
+  font-size: 80%;
 }
 
 .sidebar {
