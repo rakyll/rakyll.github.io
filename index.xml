@@ -6,8 +6,69 @@
     <description>Recent content on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 30 Aug 2016 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 02 Sep 2016 11:27:27 -0400</lastBuildDate>
     <atom:link href="http://golang.rakyll.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Using Instruments to profile Go programs</title>
+      <link>http://golang.rakyll.org/instruments/</link>
+      <pubDate>Fri, 02 Sep 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/instruments/</guid>
+      <description>&lt;p&gt;Apple has a suite of instrumentation and tracing tools for performance
+analysis avaiable as a part of their Xcode tooling set. In this article,
+we will use &lt;a href=&#34;https://developer.apple.com/library/prerelease/content/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/&#34;&gt;Instruments&lt;/a&gt;
+to record and analyze the CPU profile of a Go program.&lt;/p&gt;
+
+&lt;p&gt;Instruments also provide a large set of macOS-specific tracing and profiling
+if you have performance problems specifically on darwin.&lt;/p&gt;
+
+&lt;p&gt;Some of these specific profiles are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;System trace: Collects comprehensive information about system calls,
+scheduling, user-kernel space transitions.&lt;/li&gt;
+&lt;li&gt;System usage: Gives very detailed output about I/O system activity.&lt;/li&gt;
+&lt;li&gt;File Activity: Monitors file and directory activity such as open/close,
+permission modifications, creation, copying and moving.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Instruments provide a rich and very easy to use UI to display profiles.
+I highly recommend it as an addition to existing profile vizualizers that
+works with Go programs as of today.&lt;/p&gt;
+
+&lt;p&gt;Launch the Instruments app and select &amp;ldquo;Time Profiler&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/instruments.png&#34; alt=&#34;Instruments launch screen&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Create a target with your Go binary and arguments and env variables
+you want to start the binary with. In this tutorial, I will use the
+following program.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;go get -u github.com/rakyll/hey
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The target I have for &lt;code&gt;hey&lt;/code&gt; looks like what&amp;rsquo;s below.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/instruments-target.png&#34; alt=&#34;Instruments target&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Once you have a target, you can click on the record button to start
+recording samples. Once enough samples are collected, stop or it will
+eventually stop when the program finishes.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/instruments-results.png&#34; alt=&#34;Instruments results&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;You can filter by symbol name, user vs kernel callstacks, time span,
+physical or logical CPU and more. You can also double click any of the symbols listed
+to jump to the source code.&lt;/p&gt;
+
+&lt;p&gt;Please note that Go programs cannot work with every profile available
+on Instruments. But there are a few profiles that absolutely can improve
+your profiling experience and meet your filtering requirements.&lt;/p&gt;
+
+&lt;p&gt;Happy profiling!&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Bidirectional gRPC streaming for Go</title>
