@@ -39,8 +39,6 @@ works with Go programs as of today.&lt;/p&gt;
 
 &lt;p&gt;Launch the Instruments app and select &amp;ldquo;Time Profiler&amp;rdquo;.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/instruments.png&#34; alt=&#34;Instruments launch screen&#34; /&gt;&lt;/p&gt;
-
 &lt;p&gt;Create a target with your Go binary and arguments and env variables
 you want to start the binary with. In this tutorial, I will use the
 following program.&lt;/p&gt;
