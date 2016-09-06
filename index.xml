@@ -21,7 +21,7 @@ we will use &lt;a href=&#34;https://developer.apple.com/library/prerelease/conte
 to record and analyze the CPU profile of a Go program.&lt;/p&gt;
 
 &lt;p&gt;Instruments also provide a large set of macOS-specific tracing and profiling
-if you have performance problems specifically on darwin.&lt;/p&gt;
+if you have performance issues specifically on darwin.&lt;/p&gt;
 
 &lt;p&gt;Some of these specific profiles are:&lt;/p&gt;
 
@@ -35,8 +35,9 @@ permission modifications, creation, copying and moving.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;Instruments provide a rich and very easy to use UI to display profiles.
-I highly recommend it as an addition to existing profile vizualizers that
-works with Go programs as of today.&lt;/p&gt;
+I highly recommend it as an addition to existing profiler UIs and vizualizers.&lt;/p&gt;
+
+&lt;p&gt;Now, let&amp;rsquo;s profile a Go program.&lt;/p&gt;
 
 &lt;p&gt;Launch the Instruments app and select &amp;ldquo;Time Profiler&amp;rdquo;.&lt;/p&gt;
 
@@ -66,8 +67,8 @@ to jump to the source code.&lt;/p&gt;
 
 &lt;p&gt;Please note that Go programs cannot work with every profile available
 on Instruments. But there are a few profiles that absolutely can improve
-your profiling experience. Give CPU profiling a try, report bugs or
-inconsistencies.&lt;/p&gt;
+your profiling experience. With stack frame pointers enabled by default in Go 1.7,
+it became easier for tools like Instruments to capture backtraces more efficiently.&lt;/p&gt;
 
 &lt;p&gt;Happy profiling!&lt;/p&gt;
 </description>
