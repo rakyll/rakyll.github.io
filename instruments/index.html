@@ -78,8 +78,9 @@ if you have performance problems specifically on darwin.</p>
 
 <ul>
 <li>System trace: Collects comprehensive information about system calls,
-scheduling, user-kernel space transitions.</li>
-<li>System usage: Gives very detailed output about I/O system activity.</li>
+scheduling, user-kernel space transitions. (Available only on OSX.)</li>
+<li>System usage: Gives very detailed output about I/O system activity.
+(Available only on iOS.)</li>
 <li>File Activity: Monitors file and directory activity such as open/close,
 permission modifications, creation, copying and moving.</li>
 </ul>
@@ -97,6 +98,9 @@ following program.</p>
 <pre><code>go get -u github.com/rakyll/hey
 </code></pre>
 
+<p>We will use <code>hey</code> to make 10000 requests with 200 goroutines
+to the target provided in the arguments.</p>
+
 <p>The target I have for <code>hey</code> looks like what&rsquo;s below.</p>
 
 <p><img src="/img/instruments-target.png" alt="Instruments target" /></p>
@@ -113,7 +117,8 @@ to jump to the source code.</p>
 
 <p>Please note that Go programs cannot work with every profile available
 on Instruments. But there are a few profiles that absolutely can improve
-your profiling experience and meet your filtering requirements.</p>
+your profiling experience. Give CPU profiling a try, report bugs or
+inconsistencies.</p>
 
 <p>Happy profiling!</p>
 
