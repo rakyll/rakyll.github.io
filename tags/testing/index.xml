@@ -11,10 +11,10 @@
     
     <item>
       <title>Parallelize your table-driven tests</title>
-      <link>http://golang.rakyll.org/parallelize-subtests/</link>
+      <link>http://golang.rakyll.org/parallelize-test-tables/</link>
       <pubDate>Tue, 06 Sep 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/parallelize-subtests/</guid>
+      <guid>http://golang.rakyll.org/parallelize-test-tables/</guid>
       <description>&lt;p&gt;With Go 1.7, testing package supports sub-tests that allows you to run
 multiple smaller tests from a test case. Each sub test is reported
 independently in the &lt;code&gt;go test&lt;/code&gt; output. More information about these
@@ -67,7 +67,7 @@ ok  	hello/subtests	4.020s
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;If you have table driven that are free from races and are majorly blocked
-by anything other than your CPU, consider parallizing them with the new sub tests.&lt;/p&gt;
+by anything other than your CPU, consider parallelizing them with the new sub tests.&lt;/p&gt;
 </description>
     </item>
     
