@@ -90,8 +90,7 @@ subtests (where makes sense) by using (*testing.T).Parallize().</p>
 	}
 	for _, tt := range tc {
 		tt := tt
-		name := fmt.Sprintf(&quot;%d&quot;, tt)
-		t.Run(name, func(st *testing.T) {
+		t.Run(&quot;&quot;, func(st *testing.T) {
 			st.Parallel()
 			time.Sleep(tt.dur)
 		})

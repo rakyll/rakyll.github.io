@@ -39,8 +39,7 @@ subtests (where makes sense) by using (*testing.T).Parallize().&lt;/p&gt;
 	}
 	for _, tt := range tc {
 		tt := tt
-		name := fmt.Sprintf(&amp;quot;%d&amp;quot;, tt)
-		t.Run(name, func(st *testing.T) {
+		t.Run(&amp;quot;&amp;quot;, func(st *testing.T) {
 			st.Parallel()
 			time.Sleep(tt.dur)
 		})
