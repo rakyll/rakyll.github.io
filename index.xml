@@ -6,8 +6,71 @@
     <description>Recent content on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 02 Sep 2016 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 06 Sep 2016 11:27:27 -0400</lastBuildDate>
     <atom:link href="http://golang.rakyll.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Parallelize your table-driven tests</title>
+      <link>http://golang.rakyll.org/parallelize-subtests/</link>
+      <pubDate>Tue, 06 Sep 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/parallelize-subtests/</guid>
+      <description>&lt;p&gt;With Go 1.7, testing package supports sub-tests that allows you to run
+multiple smaller tests from a test case. Each sub test is reported
+independently in the &lt;code&gt;go test&lt;/code&gt; output. More information about these
+recent additions can be found at &lt;a href=&#34;https://speakerdeck.com/mpvl/advanced-testing-concepts-for-go-1-dot-7&#34;&gt;Marcel van Lohuizen&amp;rsquo;s recent talk&lt;/a&gt;
+from GolangUK 2016.&lt;/p&gt;
+
+&lt;p&gt;These additions to Go 1.7 enabled reporting and other testing.T
+functionality for subtests. One of the biggest contributions of the
+recent changes is to be able to use these features for table-driven tests.&lt;/p&gt;
+
+&lt;p&gt;The other important feature it enables is to be able to parallize the
+subtests (where makes sense) by using (*testing.T).Parallize().&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;func TestFoo(t *testing.T) {
+	tc := []struct {
+		dur time.Duration
+	}{
+		{time.Second},
+		{2 * time.Second},
+		{3 * time.Second},
+		{4 * time.Second},
+	}
+	for _, tt := range tc {
+		tt := tt
+		name := fmt.Sprintf(&amp;quot;%d&amp;quot;, tt)
+		t.Run(name, func(st *testing.T) {
+			st.Parallel()
+			time.Sleep(tt.dur)
+		})
+	}
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The test suite above will run roughly in 4 seconds rather than 10 seconds.
+TestFoo#01, TestFoo#02, TestFoo#03 and TestFoo#04 will begin at the same
+time, will wait for &lt;code&gt;tt.dur&lt;/code&gt; and be completed.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go test -v
+=== RUN   TestFoo
+=== RUN   TestFoo/#00
+=== RUN   TestFoo/#01
+=== RUN   TestFoo/#02
+=== RUN   TestFoo/#03
+--- PASS: TestFoo (0.00s)
+    --- PASS: TestFoo/#00 (1.00s)
+    --- PASS: TestFoo/#01 (2.00s)
+    --- PASS: TestFoo/#02 (3.00s)
+    --- PASS: TestFoo/#03 (4.00s)
+PASS
+ok  	hello/subtests	4.020s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you have table driven that are free from races and are majorly blocked
+by anything other than your CPU, consider parallizing them with the new sub tests.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Using Instruments to profile Go programs</title>

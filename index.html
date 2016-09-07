@@ -69,6 +69,72 @@
       
   <div class="post">
     <h1 class="post-title">
+      <a href="http://golang.rakyll.org/parallelize-subtests/">
+        Parallelize your table-driven tests
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Sep 6, 2016</span>
+
+    <p>With Go 1.7, testing package supports sub-tests that allows you to run
+multiple smaller tests from a test case. Each sub test is reported
+independently in the <code>go test</code> output. More information about these
+recent additions can be found at <a href="https://speakerdeck.com/mpvl/advanced-testing-concepts-for-go-1-dot-7">Marcel van Lohuizen&rsquo;s recent talk</a>
+from GolangUK 2016.</p>
+
+<p>These additions to Go 1.7 enabled reporting and other testing.T
+functionality for subtests. One of the biggest contributions of the
+recent changes is to be able to use these features for table-driven tests.</p>
+
+<p>The other important feature it enables is to be able to parallize the
+subtests (where makes sense) by using (*testing.T).Parallize().</p>
+
+<pre><code class="language-go">func TestFoo(t *testing.T) {
+	tc := []struct {
+		dur time.Duration
+	}{
+		{time.Second},
+		{2 * time.Second},
+		{3 * time.Second},
+		{4 * time.Second},
+	}
+	for _, tt := range tc {
+		tt := tt
+		name := fmt.Sprintf(&quot;%d&quot;, tt)
+		t.Run(name, func(st *testing.T) {
+			st.Parallel()
+			time.Sleep(tt.dur)
+		})
+	}
+}
+</code></pre>
+
+<p>The test suite above will run roughly in 4 seconds rather than 10 seconds.
+TestFoo#01, TestFoo#02, TestFoo#03 and TestFoo#04 will begin at the same
+time, will wait for <code>tt.dur</code> and be completed.</p>
+
+<pre><code>$ go test -v
+=== RUN   TestFoo
+=== RUN   TestFoo/#00
+=== RUN   TestFoo/#01
+=== RUN   TestFoo/#02
+=== RUN   TestFoo/#03
+--- PASS: TestFoo (0.00s)
+    --- PASS: TestFoo/#00 (1.00s)
+    --- PASS: TestFoo/#01 (2.00s)
+    --- PASS: TestFoo/#02 (3.00s)
+    --- PASS: TestFoo/#03 (4.00s)
+PASS
+ok  	hello/subtests	4.020s
+</code></pre>
+
+<p>If you have table driven that are free from races and are majorly blocked
+by anything other than your CPU, consider parallizing them with the new sub tests.</p>
+
+  </div>
+  
+  <div class="post">
+    <h1 class="post-title">
       <a href="http://golang.rakyll.org/instruments/">
         Using Instruments to profile Go programs
       </a>
