@@ -6,8 +6,37 @@
     <description>Recent content in Tooling on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 02 Sep 2016 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Thu, 08 Sep 2016 11:27:27 -0400</lastBuildDate>
     <atom:link href="http://golang.rakyll.org/tags/tooling/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Examples coverage</title>
+      <link>http://golang.rakyll.org/examples-coverage/</link>
+      <pubDate>Thu, 08 Sep 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/examples-coverage/</guid>
+      <description>&lt;p&gt;Go programming language provides many unique good features to write and
+maintain examples for your packages backed by the testing tools.&lt;/p&gt;
+
+&lt;p&gt;As an addition to the test coverage and test coverage report, &lt;code&gt;go test&lt;/code&gt;
+also provides coverage for examples if you filter by &amp;ldquo;Example&amp;rdquo;.&lt;/p&gt;
+
+&lt;p&gt;Use the following commands in your package to use the
+&lt;code&gt;-run&lt;/code&gt; flag to only the match the example tests and view the results
+in your browser.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go test -v -run=Example -coverprofile=c.out &amp;amp;&amp;amp; go tool cover -html=c.out
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Please note, the coverage is reported for Examples with an Output block
+and tested. Non-tested examples are not considered in the scope of go test.&lt;/p&gt;
+
+&lt;p&gt;Here is what &lt;a href=&#34;http://golang.rakyll.org/att/example-coverage.html&#34;&gt;coverage&lt;/a&gt; looks like
+for the strings package from the stdlib. Not all cases are supposed to be
+documented with an example maybe but it might your project an idea if you
+are missing out a significant case.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Using Instruments to profile Go programs</title>

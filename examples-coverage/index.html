@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
 <head>
   <link href="http://gmpg.org/xfn/11" rel="profile">
@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
   
-  <title>Archive &middot; go bits</title>
+  <title>Examples coverage &middot; go bits</title>
   
 
   
@@ -26,9 +26,8 @@
   <link href="" rel="alternate" type="application/rss+xml" title="go bits" />
 </head>
 
-<body class=" layout-reverse">
-
-<div class="sidebar">
+	<body class=" layout-reverse">
+		<div class="sidebar">
   <div class="container sidebar-sticky">
     <div class="sidebar-about">
       <a href="http://golang.rakyll.org/"><h1>go bits</h1></a>
@@ -64,47 +63,35 @@
 </script>
 
 
-<div class="content container">
-<div class="posts">
+		<div class="content container">
+			<div class="post">
+			 	<h1>Examples coverage</h1>
+			  <span class="post-date">Thu, Sep 8, 2016</span>
+			      <p>Go programming language provides many unique good features to write and
+maintain examples for your packages backed by the testing tools.</p>
 
-<ul>
+<p>As an addition to the test coverage and test coverage report, <code>go test</code>
+also provides coverage for examples if you filter by &ldquo;Example&rdquo;.</p>
 
+<p>Use the following commands in your package to use the
+<code>-run</code> flag to only the match the example tests and view the results
+in your browser.</p>
 
-<li>
-    <h3><a href="http://golang.rakyll.org/examples-coverage/" title="Examples coverage">Examples coverage</a></h3>
-</li>
+<pre><code>$ go test -v -run=Example -coverprofile=c.out &amp;&amp; go tool cover -html=c.out
+</code></pre>
 
+<p>Please note, the coverage is reported for Examples with an Output block
+and tested. Non-tested examples are not considered in the scope of go test.</p>
 
+<p>Here is what <a href="/att/example-coverage.html">coverage</a> looks like
+for the strings package from the stdlib. Not all cases are supposed to be
+documented with an example maybe but it might your project an idea if you
+are missing out a significant case.</p>
 
-<li>
-    <h3><a href="http://golang.rakyll.org/parallelize-test-tables/" title="Parallelize your table-driven tests">Parallelize your table-driven tests</a></h3>
-</li>
+			</div>
 
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/instruments/" title="Using Instruments to profile Go programs">Using Instruments to profile Go programs</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/grpc-streaming/" title="Bidirectional gRPC streaming for Go">Bidirectional gRPC streaming for Go</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/eg/" title="eg to apply transformations to Go code">eg to apply transformations to Go code</a></h3>
-</li>
-
-
-
-
-</ul>
-
-</div>
-</div>
+			
+		</div>
 
   </body>
 </html>
