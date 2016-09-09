@@ -78,11 +78,11 @@
 
     <span class="post-date">Thu, Sep 8, 2016</span>
 
-    <p>Go programming language provides many unique good features to write and
-maintain examples for your packages backed by the testing tools.</p>
+    <p>Go programming language provides many unique good features to <a href="https://blog.golang.org/examples">
+write and maintain examples</a> for your packages backed by the testing tools.</p>
 
 <p>As an addition to the test coverage and test coverage report, <code>go test</code>
-also provides coverage for examples if you filter by &ldquo;Example&rdquo;.</p>
+also can provide coverage for testable examples.</p>
 
 <p>Use the following commands in your package to use the
 <code>-run</code> flag to only the match the example tests and view the results
@@ -91,13 +91,17 @@ in your browser.</p>
 <pre><code>$ go test -v -run=Example -coverprofile=c.out &amp;&amp; go tool cover -html=c.out
 </code></pre>
 
-<p>Please note, the coverage is reported for Examples with an Output block
-and tested. Non-tested examples are not considered in the scope of go test.</p>
+<p>Please note that the coverage is reported for Examples with an Output block.
+Examples without an &ldquo;Output&rdquo; block will not be tested and reported.</p>
 
-<p>Here is what <a href="/att/example-coverage.html">coverage</a> looks like
-for the strings package from the stdlib. Not all cases are supposed to be
-documented with an example maybe but it might your project an idea if you
-are missing out a significant case.</p>
+<p>Here is what the <a href="/att/example-coverage.html">coverage</a> looks like
+for the strings package from the stdlib.</p>
+
+<p>High example coverage is probably
+not a good signal and not all lines are supposed to be
+documented with an example but it might give you an idea whether you
+are missing out a significant non-obvious case that needs to be documented
+more comphensively.</p>
 
   </div>
   
