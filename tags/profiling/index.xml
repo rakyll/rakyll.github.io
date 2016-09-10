@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Profiling on go bits</title>
+    <title>Profiling on go notes</title>
     <link>http://golang.rakyll.org/tags/profiling/</link>
-    <description>Recent content in Profiling on go bits</description>
+    <description>Recent content in Profiling on go notes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 02 Sep 2016 11:27:27 -0400</lastBuildDate>

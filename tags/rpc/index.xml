@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Rpc on go bits</title>
+    <title>Rpc on go notes</title>
     <link>http://golang.rakyll.org/tags/rpc/</link>
-    <description>Recent content in Rpc on go bits</description>
+    <description>Recent content in Rpc on go notes</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Tue, 30 Aug 2016 11:27:27 -0400</lastBuildDate>
