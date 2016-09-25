@@ -6,8 +6,174 @@
     <description>Recent content on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 08 Sep 2016 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Sun, 25 Sep 2016 11:27:27 -0400</lastBuildDate>
     <atom:link href="http://golang.rakyll.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Useful flags for the Go tools</title>
+      <link>http://golang.rakyll.org/go-tool-flags/</link>
+      <pubDate>Sun, 25 Sep 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/go-tool-flags/</guid>
+      <description>
+
+&lt;p&gt;New to the Go tools? Or do you want to expand your knowledge? This article is
+about flags everyone should know to experience all the goodness.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Disclaimer: This article might be slightly biased. This is a collection of
+flags I personally use and flags people around me having trouble finding references for.
+If you have more ideas, ping me on &lt;a href=&#34;https://twitter.com/rakyll&#34;&gt;Twitter&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;go-build-x&#34;&gt;$ go build -x&lt;/h3&gt;
+
+&lt;p&gt;&lt;code&gt;-x&lt;/code&gt; lists all the commands go build invokes.&lt;/p&gt;
+
+&lt;p&gt;If you are curious about the Go toolchain, or using a cross-C compiler and
+wondering about flags passed to the external compiler, or suspicious about
+a linker bug; use &lt;code&gt;-x&lt;/code&gt; to see all the invocations.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go build -x
+WORK=/var/folders/00/1b8h8000h01000cxqpysvccm005d21/T/go-build600909754
+mkdir -p $WORK/hello/perf/_obj/
+mkdir -p $WORK/hello/perf/_obj/exe/
+cd /Users/jbd/src/hello/perf
+/Users/jbd/go/pkg/tool/darwin_amd64/compile -o $WORK/hello/perf.a -trimpath $WORK -p main -complete -buildid bbf8e880e7dd4114f42a7f57717f9ea5cc1dd18d -D _/Users/jbd/src/hello/perf -I $WORK -pack ./perf.go
+cd .
+/Users/jbd/go/pkg/tool/darwin_amd64/link -o $WORK/hello/perf/_obj/exe/a.out -L $WORK -extld=clang -buildmode=exe -buildid=bbf8e880e7dd4114f42a7f57717f9ea5cc1dd18d $WORK/hello/perf.a
+mv $WORK/hello/perf/_obj/exe/a.out perf
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;go-build-gcflags&#34;&gt;$ go build -gcflags&lt;/h3&gt;
+
+&lt;p&gt;Used to pass flags to the Go compiler. &lt;code&gt;go tool compile -help&lt;/code&gt; lists all
+the flags that can be passed to the compiler.&lt;/p&gt;
+
+&lt;p&gt;For example, to disable compiler optimizations and inlining, you can use
+the following the gcflags.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-N -I&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;go-test-v&#34;&gt;$ go test -v&lt;/h3&gt;
+
+&lt;p&gt;It provides chatty output for the testing. It prints the test name,
+its status (failed or passed), how much it took to run the test, any logs
+from the test case, etc.&lt;/p&gt;
+
+&lt;p&gt;go test without the &lt;code&gt;-v&lt;/code&gt; flag is highly quiet, I always use it with &lt;code&gt;-v&lt;/code&gt; turned on.
+Sample output:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go test -v context
+=== RUN   TestBackground
+--- PASS: TestBackground (0.00s)
+=== RUN   TestTODO
+--- PASS: TestTODO (0.00s)
+=== RUN   TestWithCancel
+--- PASS: TestWithCancel (0.10s)
+=== RUN   TestParentFinishesChild
+--- PASS: TestParentFinishesChild (0.00s)
+=== RUN   TestChildFinishesFirst
+--- PASS: TestChildFinishesFirst (0.00s)
+=== RUN   TestDeadline
+--- PASS: TestDeadline (0.16s)
+=== RUN   TestTimeout
+--- PASS: TestTimeout (0.16s)
+=== RUN   TestCanceledTimeout
+--- PASS: TestCanceledTimeout (0.10s)
+...
+PASS
+ok  	context	2.426s
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;go-test-race&#34;&gt;$ go test -race&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&#34;https://blog.golang.org/race-detector&#34;&gt;Go&amp;rsquo;s race detector&lt;/a&gt; is available
+from the Go tools via &lt;code&gt;-race&lt;/code&gt;. go test also supports this flag and reports races.
+Use this flag during development to detect the races.&lt;/p&gt;
+
+&lt;h3 id=&#34;go-test-run&#34;&gt;$ go test -run&lt;/h3&gt;
+
+&lt;p&gt;You can filter tests to run by regex and the &lt;code&gt;-run&lt;/code&gt; flag. The following command
+will only &lt;a href=&#34;https://blog.golang.org/examples&#34;&gt;test examples&lt;/a&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go test -run=Example
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;go-test-coverprofile&#34;&gt;$ go test -coverprofile&lt;/h3&gt;
+
+&lt;p&gt;You can output a cover profile as you are testing a package, then use go tool to
+visualize them on a browser.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go test -coverprofile=c.out &amp;amp;&amp;amp; go tool cover -html=c.out
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The command above will create a coverage profile and open the results page in
+the browser. The visualized results will look like the page below:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/context-coverage.png&#34; alt=&#34;context coverage&#34; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&#34;go-test-exec&#34;&gt;$ go test -exec&lt;/h3&gt;
+
+&lt;p&gt;It is a lesser known feature in Go that you can intercept the tools with another
+program by using the &lt;code&gt;-exec&lt;/code&gt; flag. This flag allows you to delegate some work to an
+external program from the Go tool.&lt;/p&gt;
+
+&lt;p&gt;A commonly required scenario for this flag is when you need more than just executing
+the tests on the host machine. The Android builder for Go, uses &lt;code&gt;-exec&lt;/code&gt; to push the
+test binaries to an Android device by using &lt;code&gt;adb&lt;/code&gt; and collects the results.
+&lt;a href=&#34;https://github.com/golang/go/blob/master/misc/android/go_android_exec.go&#34;&gt;Android exec program&lt;/a&gt;
+can be used as a reference.&lt;/p&gt;
+
+&lt;h3 id=&#34;go-get-u&#34;&gt;$ go get -u&lt;/h3&gt;
+
+&lt;p&gt;If you run go-get for a package that is already in your GOPATH, go-get
+is not going to update the package to its latest version.
+&lt;code&gt;-u&lt;/code&gt; forces the tool to sync with the latest version of the repo.&lt;/p&gt;
+
+&lt;p&gt;If you are a library author, you might like to write your installation
+instructions with a &lt;code&gt;-u&lt;/code&gt; flag, e.g. the way &lt;a href=&#34;https://github.com/golang/lint#installation&#34;&gt;golint&lt;/a&gt; does.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go get -u github.com/golang/lint/golint
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;go-get-d&#34;&gt;$ go get -d&lt;/h3&gt;
+
+&lt;p&gt;If you just want to clone a repo to your GOPATH and skip the building
+and installation phase, use &lt;code&gt;-d&lt;/code&gt;. It downloads the package and stops
+before trying to build or install it.&lt;/p&gt;
+
+&lt;p&gt;I often use it as a replacement for git clone for repos with vanity URLs,
+because it clones the repo to its proper GOPATH.
+For example,&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go get -d golang.org/x/oauth2/...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;will clone the package to $GOPATH/src/golang.org/x/ouath2. Given golang.org/x/oauth2 is a
+vanity URL, go-getting the repo is useful rather than trying to figure out
+where the actual repo is (go.googlesource.com/oauth2).&lt;/p&gt;
+
+&lt;h3 id=&#34;go-get-t&#34;&gt;$ go get -t&lt;/h3&gt;
+
+&lt;p&gt;If your package has additional dependencies for tests, &lt;code&gt;-t&lt;/code&gt; will allow you to
+download them during go-get.
+If you don&amp;rsquo;t pass &lt;code&gt;-t&lt;/code&gt;, go get will only download the dependencies for your non-test code.&lt;/p&gt;
+
+&lt;h3 id=&#34;go-list-f&#34;&gt;$ go list -f&lt;/h3&gt;
+
+&lt;p&gt;Allows you to list Go packages with a custom format. It is highly useful
+for writing bash scripts.&lt;/p&gt;
+
+&lt;p&gt;The following command will print the dependencies of the runtime package:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;go list -f &#39;{{.Deps}}&#39; runtime
+[runtime/internal/atomic runtime/internal/sys unsafe]
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;More formatting ideas can be found at
+&lt;a href=&#34;http://dave.cheney.net/2014/09/14/go-list-your-swiss-army-knife&#34;&gt;Dave Cheney&amp;rsquo;s article&lt;/a&gt; on &lt;code&gt;go list&lt;/code&gt;.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Examples coverage</title>
@@ -262,6 +428,52 @@ work with any gRPC bidirectional streaming client.&lt;/p&gt;
     </item>
     
     <item>
+      <title>About</title>
+      <link>http://golang.rakyll.org/about/</link>
+      <pubDate>Sat, 27 Aug 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/about/</guid>
+      <description>
+
+&lt;p&gt;I (Jaana Burcu Dogan) started to write on this blog to fill the gaps in knowledge transmission and
+provide useful everyday tips about the Go programming language, its packages and tools.&lt;/p&gt;
+
+&lt;h3 id=&#34;about-me&#34;&gt;About me&lt;/h3&gt;
+
+&lt;p&gt;I am an engineer working on the Go programming language.
+My current responsbility within the project is to look at things from a Go user&amp;rsquo;s
+perspective and make sure our work is aligned with overall requirements of the Go users.
+As a part of my daily job, I do design reviews, write code against the latest
+APIs, publish packages and tools to fill the gaps, run experimentations to propose
+the missing parts, and communicate our work and goals.&lt;/p&gt;
+
+&lt;p&gt;Before working on the Go project, I was a contributor to the Go project
+and I owned a variety of major and minor parts:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Experimental work on Peripheral I/O for Go&lt;/li&gt;
+&lt;li&gt;Toolchain integrations for Go on Brillo&lt;/li&gt;
+&lt;li&gt;Go mobile toolchain for darwin targets&lt;/li&gt;
+&lt;li&gt;Experimentation for audio packages for Go mobile (future work is explained at &lt;a href=&#34;https://github.com/golang/proposal/blob/master/design/13432-mobile-audio.md&#34;&gt;the proposal&lt;/a&gt;)&lt;/li&gt;
+&lt;li&gt;Visualization tools for instrumentation data&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://godoc.org/cloud.google.com/go&#34;&gt;Google Cloud&amp;rsquo;s Go packages&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://golang.org/x/oauth2&#34;&gt;x/oauth2&lt;/a&gt; package&lt;/li&gt;
+&lt;li&gt;Bug fixes and documentation&lt;/li&gt;
+&lt;li&gt;Personal libraries and tools (mainly at &lt;a href=&#34;https://github.com/rakyll&#34;&gt;github/rakyll&lt;/a&gt;)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;contact&#34;&gt;Contact&lt;/h3&gt;
+
+&lt;p&gt;Any feedback and suggestion to the Go project is appreciated.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Email: jbd@golang.org&lt;/li&gt;
+&lt;li&gt;Twitter: &lt;a href=&#34;https://twitter.com/rakyll&#34;&gt; @rakyll&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+    </item>
+    
+    <item>
       <title>eg to apply transformations to Go code</title>
       <link>http://golang.rakyll.org/eg/</link>
       <pubDate>Sat, 27 Aug 2016 11:27:27 -0400</pubDate>
@@ -351,8 +563,7 @@ reference how to write other transformation templates.&lt;/p&gt;
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>http://golang.rakyll.org/archive/</guid>
-      <description>&lt;p&gt;sdlfkd&lt;/p&gt;
-</description>
+      <description></description>
     </item>
     
   </channel>

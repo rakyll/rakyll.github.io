@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
   
-  <title>Parallelize your table-driven tests &middot; go bits</title>
+  <title>About &middot; go bits</title>
   
 
   
@@ -66,61 +66,45 @@
 
 		<div class="content container">
 			<div class="post">
-			 	<h1>Parallelize your table-driven tests</h1>
-			  <span class="post-date">Tue, Sep 6, 2016</span>
-			      <p>With Go 1.7, testing package supports sub-tests that allows you to run
-multiple smaller tests from a test case. Each sub test is reported
-independently in the <code>go test</code> output. More information about these
-recent additions can be found at <a href="https://speakerdeck.com/mpvl/advanced-testing-concepts-for-go-1-dot-7">Marcel van Lohuizen&rsquo;s recent talk</a>
-from GolangUK 2016.</p>
+			 	<h1>About</h1>
+			  <span class="post-date">Sat, Aug 27, 2016</span>
+			      
 
-<p>These additions to Go 1.7 enabled reporting and other testing.T
-functionality for subtests. One of the biggest contributions of the
-recent changes is to be able to use these features for table-driven tests.</p>
+<p>I (Jaana Burcu Dogan) started to write on this blog to fill the gaps in knowledge transmission and
+provide useful everyday tips about the Go programming language, its packages and tools.</p>
 
-<p>The other important feature it enables is to be able to parallize the
-subtests (where makes sense) by using (*testing.T).Parallize().</p>
+<h3 id="about-me">About me</h3>
 
-<pre><code class="language-go">func TestFoo(t *testing.T) {
-	tc := []struct {
-		dur time.Duration
-	}{
-		{time.Second},
-		{2 * time.Second},
-		{3 * time.Second},
-		{4 * time.Second},
-	}
-	for _, tt := range tc {
-		tt := tt
-		t.Run(&quot;&quot;, func(st *testing.T) {
-			st.Parallel()
-			time.Sleep(tt.dur)
-		})
-	}
-}
-</code></pre>
+<p>I am an engineer working on the Go programming language.
+My current responsbility within the project is to look at things from a Go user&rsquo;s
+perspective and make sure our work is aligned with overall requirements of the Go users.
+As a part of my daily job, I do design reviews, write code against the latest
+APIs, publish packages and tools to fill the gaps, run experimentations to propose
+the missing parts, and communicate our work and goals.</p>
 
-<p>The test suite above will run roughly in 4 seconds rather than 10 seconds.
-TestFoo#01, TestFoo#02, TestFoo#03 and TestFoo#04 will begin at the same
-time, will wait for <code>tt.dur</code> and be completed.</p>
+<p>Before working on the Go project, I was a contributor to the Go project
+and I owned a variety of major and minor parts:</p>
 
-<pre><code>$ go test -v
-=== RUN   TestFoo
-=== RUN   TestFoo/#00
-=== RUN   TestFoo/#01
-=== RUN   TestFoo/#02
-=== RUN   TestFoo/#03
---- PASS: TestFoo (0.00s)
-    --- PASS: TestFoo/#00 (1.00s)
-    --- PASS: TestFoo/#01 (2.00s)
-    --- PASS: TestFoo/#02 (3.00s)
-    --- PASS: TestFoo/#03 (4.00s)
-PASS
-ok  	hello/subtests	4.020s
-</code></pre>
+<ul>
+<li>Experimental work on Peripheral I/O for Go</li>
+<li>Toolchain integrations for Go on Brillo</li>
+<li>Go mobile toolchain for darwin targets</li>
+<li>Experimentation for audio packages for Go mobile (future work is explained at <a href="https://github.com/golang/proposal/blob/master/design/13432-mobile-audio.md">the proposal</a>)</li>
+<li>Visualization tools for instrumentation data</li>
+<li><a href="https://godoc.org/cloud.google.com/go">Google Cloud&rsquo;s Go packages</a></li>
+<li><a href="https://golang.org/x/oauth2">x/oauth2</a> package</li>
+<li>Bug fixes and documentation</li>
+<li>Personal libraries and tools (mainly at <a href="https://github.com/rakyll">github/rakyll</a>)</li>
+</ul>
 
-<p>If you have table driven that are free from races and are majorly blocked
-by anything other than your CPU, consider parallelizing them with the new sub tests.</p>
+<h3 id="contact">Contact</h3>
+
+<p>Any feedback and suggestion to the Go project is appreciated.</p>
+
+<ul>
+<li>Email: jbd@golang.org</li>
+<li>Twitter: <a href="https://twitter.com/rakyll"> @rakyll</a></li>
+</ul>
 
 			</div>
 
