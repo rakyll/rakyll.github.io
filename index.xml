@@ -10,7 +10,7 @@
     <atom:link href="http://golang.rakyll.org/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Useful flags for the Go tools</title>
+      <title>Go tooling essentials</title>
       <link>http://golang.rakyll.org/go-tool-flags/</link>
       <pubDate>Sun, 25 Sep 2016 11:27:27 -0400</pubDate>
       
