@@ -274,7 +274,7 @@ it became easier for tools like Instruments to capture backtraces more efficient
     </item>
     
     <item>
-      <title>eg to apply transformations to Go code</title>
+      <title>Apply transformations to Go code with eg</title>
       <link>http://golang.rakyll.org/eg/</link>
       <pubDate>Sat, 27 Aug 2016 11:27:27 -0400</pubDate>
       
