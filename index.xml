@@ -51,7 +51,7 @@ the flags that can be passed to the compiler.&lt;/p&gt;
 &lt;p&gt;For example, to disable compiler optimizations and inlining, you can use
 the following the gcflags.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-N -I&amp;quot;
+&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-N -l&amp;quot;
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;go-test-v&#34;&gt;$ go test -v&lt;/h3&gt;
