@@ -31,7 +31,7 @@ before deep diving into more.&lt;/p&gt;
 mental overload. Go wishes that behavior is predictable from a human perspective,
 rather than humans are being enforced to think like machines to be efficient and productive.
 Go sets the same high bar for its runtime. Without having
-to learn every layer of implementation details or having to think about
+to learn every layer of the implementation or having to think about
 optimizations at every line,
 Go wishes to be good enough
 to be doing the right for most of the time &amp;ndash; anything else can be optimized.&lt;/p&gt;
