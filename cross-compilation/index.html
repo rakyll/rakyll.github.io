@@ -153,9 +153,9 @@ arm-linux-androideabi-gcc -I . -fPIC -marm -pthread -fmessage-length=0 -I $WORK/
 standard library, targeting a specific GOOS and GOARCH.</p>
 
 <pre><code>$ CGO_ENABLED=1 \
-CC=arm-linux-androideabi-gcc \
-CXX=arm-linux-androideabi-g++ \
-GOOS=android GOARCH=arm GOARM=7 go install std
+    CC=arm-linux-androideabi-gcc \
+    CXX=arm-linux-androideabi-g++ \
+    GOOS=android GOARCH=arm GOARM=7 go install std
 </code></pre>
 
 <p>The standard library targeting android/armv7 will be available at $GOROOT/pkg/android_arm.</p>
