@@ -47,6 +47,11 @@
   </url>
   
   <url>
+    <loc>http://golang.rakyll.org/swift/</loc>
+    <lastmod>2015-10-03T11:27:27-04:00</lastmod>
+  </url>
+  
+  <url>
     <loc>http://golang.rakyll.org/archive/</loc>
   </url>
   

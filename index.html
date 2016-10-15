@@ -655,6 +655,77 @@ reference how to write other transformation templates.</p>
   
   
   
+  <div class="post">
+    <h1 class="post-title">
+      <a href="http://golang.rakyll.org/swift/">
+        Calling Go from Swift
+      </a>
+    </h1>
+
+    <span class="post-date">Sat, Oct 3, 2015</span>
+
+    <p><em>Note: Swift bindings are highly experimental and subject to change.
+This work must currently be classified as preliminary work and we will
+be improving APIs in the long term.</em></p>
+
+<p>As a part of the Go Mobile, we have announced tools and packages that
+make language bindings from Java to Go and Objective-C to Go available.
+A relatively new and less documented aspect of the bindings is the
+availability of the Swift to Go calls. This tutorial will explain you
+how to make your initial Swift to Go function invocation.</p>
+
+<p>Grab the gomobile command and initialize it.</p>
+
+<pre><code>$ go get golang.org/x/mobile/cmd/gomobile
+$ gomobile init
+</code></pre>
+
+<p>In this tutorial, we will use an example Go package from the mobile repo
+called hello to generate bindings for. The hello package exports a function
+called Greetings and we will invoke this particular function from a
+Swift-based iOS app. Go get the example hello package and run <code>gomobile bind</code>
+to generate a framework bundle.</p>
+
+<pre><code>$ go get golang.org/x/mobile/example/bind/hello/...
+$ gomobile bind -target=ios golang.org/x/mobile/example/bind/hello
+</code></pre>
+
+<p>The command above is going to generate a bundle called Hello.framework on the
+current working directory which includes a multi-arch C library and a header file.</p>
+
+<p>The next step is to launch Xcode and open your existing Swift-based iOS app project.
+Drag and drop the Hello.framework to the project.
+This step will also automatically make the framework library linked to the final app product.</p>
+
+<p><img src="/img/swift-xcode.png" alt="Xcode drag and drop" /></p>
+
+<p>Once the framework bundle is imported, you are good to import the
+Hello module and invoke GoHelloGreetings which is a proxy function for
+hello.Greetings.</p>
+
+<pre><code>import UIKit
+import Hello
+class ViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        println(Hello.GoHelloGreetings(&quot;gopher&quot;))
+    }
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+}
+</code></pre>
+
+<p>Build and run it on your test device or the iOS simulator.
+Enjoy making your first call to Go from Swift. Please note that this is
+preliminary work and we would like to make changes to improve the APIs in the long term.
+More information and tutorials about Go Mobile are available at
+the <a href="https://golang.org/wiki/Mobile">wiki</a>.</p>
+
+  </div>
+  
+  
+  
   
 </div>
 </div>

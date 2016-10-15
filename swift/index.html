@@ -1,0 +1,135 @@
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.17-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>Calling Go from Swift &middot; go bits</title>
+  
+
+  
+  <link rel="stylesheet" href="http://golang.rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="http://golang.rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="http://golang.rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="go bits" />
+</head>
+
+	<body class=" layout-reverse">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="http://golang.rakyll.org/"><h1>go bits</h1></a>
+      <p class="lead">
+      Lesser knowns about Go programming language and its tools.
+      <br/>
+      by <a href="https://twitter.com/rakyll">Jaana Burcu Dogan</a>
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive">Archive</a> </li>
+      <li><a href="/about">About</a> </li>
+      
+    </ul>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    </p>
+  </div>
+</div>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>Calling Go from Swift</h1>
+			  <span class="post-date">Sat, Oct 3, 2015</span>
+			      <p><em>Note: Swift bindings are highly experimental and subject to change.
+This work must currently be classified as preliminary work and we will
+be improving APIs in the long term.</em></p>
+
+<p>As a part of the Go Mobile, we have announced tools and packages that
+make language bindings from Java to Go and Objective-C to Go available.
+A relatively new and less documented aspect of the bindings is the
+availability of the Swift to Go calls. This tutorial will explain you
+how to make your initial Swift to Go function invocation.</p>
+
+<p>Grab the gomobile command and initialize it.</p>
+
+<pre><code>$ go get golang.org/x/mobile/cmd/gomobile
+$ gomobile init
+</code></pre>
+
+<p>In this tutorial, we will use an example Go package from the mobile repo
+called hello to generate bindings for. The hello package exports a function
+called Greetings and we will invoke this particular function from a
+Swift-based iOS app. Go get the example hello package and run <code>gomobile bind</code>
+to generate a framework bundle.</p>
+
+<pre><code>$ go get golang.org/x/mobile/example/bind/hello/...
+$ gomobile bind -target=ios golang.org/x/mobile/example/bind/hello
+</code></pre>
+
+<p>The command above is going to generate a bundle called Hello.framework on the
+current working directory which includes a multi-arch C library and a header file.</p>
+
+<p>The next step is to launch Xcode and open your existing Swift-based iOS app project.
+Drag and drop the Hello.framework to the project.
+This step will also automatically make the framework library linked to the final app product.</p>
+
+<p><img src="/img/swift-xcode.png" alt="Xcode drag and drop" /></p>
+
+<p>Once the framework bundle is imported, you are good to import the
+Hello module and invoke GoHelloGreetings which is a proxy function for
+hello.Greetings.</p>
+
+<pre><code>import UIKit
+import Hello
+class ViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        println(Hello.GoHelloGreetings(&quot;gopher&quot;))
+    }
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+}
+</code></pre>
+
+<p>Build and run it on your test device or the iOS simulator.
+Enjoy making your first call to Go from Swift. Please note that this is
+preliminary work and we would like to make changes to improve the APIs in the long term.
+More information and tutorials about Go Mobile are available at
+the <a href="https://golang.org/wiki/Mobile">wiki</a>.</p>
+
+			</div>
+
+			
+		</div>
+
+  </body>
+</html>
