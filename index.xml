@@ -670,6 +670,128 @@ the &lt;a href=&#34;https://golang.org/wiki/Mobile&#34;&gt;wiki&lt;/a&gt;.&lt;/p
     </item>
     
     <item>
+      <title>Go cross compilation</title>
+      <link>http://golang.rakyll.org/cross-compilation/</link>
+      <pubDate>Tue, 08 Sep 2015 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/cross-compilation/</guid>
+      <description>
+
+&lt;p&gt;Note: This article extends &lt;a href=&#34;http://dave.cheney.net/2015/03/03/cross-compilation-just-got-a-whole-lot-better-in-go-1-5&#34;&gt;Dave Cheney’s Go 1.5 cross compilers&lt;/a&gt; post.&lt;/p&gt;
+
+&lt;p&gt;Cross compilers got easier with Go 1.5.
+You don’t have to bootstrap the standard library and toolchain as you
+used to do prior to 1.5.&lt;/p&gt;
+
+&lt;h3 id=&#34;if-cgo-is-not-required&#34;&gt;If cgo is not required&lt;/h3&gt;
+
+&lt;p&gt;The go tool won’t require any bootstrapping if cgo is not required.
+That allows you to target the following program to any GOOS/GOARCH without
+requiring you to do any additional work. Invoke &lt;code&gt;go build&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat main.go
+package main
+import &amp;quot;fmt&amp;quot;
+func main() {
+    fmt.Println(&amp;quot;hello world&amp;quot;)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In order to target android/arm, run the following command.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ GOOS=android GOARCH=arm GOARM=7 go build .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The produced binary is targeting ARMv7 processors that runs Android.
+All possible GOOS and GOARCH values are listed on the &lt;a href=&#34;https://golang.org/doc/install/source#environment&#34;&gt;environment docs&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&#34;if-cgo-is-required&#34;&gt;If cgo is required&lt;/h3&gt;
+
+&lt;p&gt;If you need to have cgo enabled, the go tool allows you to provide
+custom C and C++ compilers via CC and CXX environment variables.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ CGO_ENABLED=1 CC=android-armeabi-gcc CXX=android-armeabi-g++ \
+    GOOS=android GOARCH=arm GOARM=7 go build .
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The toolchain will invoke android-armeabi-gcc and android-armeabi-g++
+if it is required to compile any part of the package with a C or C++ compiler.
+Consider the following program with a slightly different main function.
+Rather than outputting &amp;ldquo;hello world&amp;rdquo; to the standard I/O,
+it will use Android system libraries to write &amp;ldquo;hello world&amp;rdquo; to the system log.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ cat main.go
+// +build android
+
+package main
+
+// #cgo LDFLAGS: -llog
+//
+// #include &amp;lt;android/log.h&amp;gt;
+//
+// void hello() {
+//   __android_log_print(
+//     ANDROID_LOG_INFO, &amp;quot;MyProgram&amp;quot;, &amp;quot;hello world&amp;quot;);
+// }
+import &amp;quot;C&amp;quot;
+func main() {
+    C.hello()
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you build the program with the command above and examine the build
+with -x, you can observe that cgo is delegating the C compilation to
+arm-linux-androideabi-gcc.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ CGO_ENABLED=1 \
+CC=arm-linux-androideabi-gcc \
+CXX=arm-linux-androideabi-g++ \
+GOOS=android GOARCH=arm GOARM=7 go build -x .
+...
+CGO_LDFLAGS=”-g” “-O2” “-llog” /Users/jbd/go/pkg/tool/darwin_amd64/cgo -objdir $WORK/github.com/rakyll/hello/_obj/ -importpath github.com/rakyll/hello — -I $WORK/github.com/rakyll/hello/_obj/ main.go
+arm-linux-androideabi-gcc -I . -fPIC -marm -pthread -fmessage-length=0 -print-libgcc-file-name
+arm-linux-androideabi-gcc -I . -fPIC -marm -pthread -fmessage-length=0 -I $WORK/github.com/rakyll/hello/_obj/ -g -O2 -o $WORK/github.com/rakyll/hello/_obj/_cgo_main.o -c $WORK/github.com/rakyll/hello/_obj/_cgo_main.c
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;pre-building-the-standard-library&#34;&gt;Pre-building the standard library&lt;/h3&gt;
+
+&lt;p&gt;The go tool also provides a utility if you would like to pre-build the
+standard library, targeting a specific GOOS and GOARCH.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ CGO_ENABLED=1 \
+CC=arm-linux-androideabi-gcc \
+CXX=arm-linux-androideabi-g++ \
+GOOS=android GOARCH=arm GOARM=7 go install std
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The standard library targeting android/armv7 will be available at $GOROOT/pkg/android_arm.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ ls $GOROOT/pkg/android_arm
+archive    fmt.a      math       runtime.a
+bufio.a    go         math.a     sort.a
+bytes.a    hash       mime       strconv.a
+compress   hash.a     mime.a     strings.a
+container  html       net        sync
+crypto     html.a     net.a      sync.a
+crypto.a   image      os         syscall.a
+database   image.a    os.a       testing
+debug      index      path       testing.a
+encoding   internal   path.a     text
+encoding.a io         reflect.a  time.a
+errors.a   io.a       regexp     unicode
+expvar.a   log        regexp.a   unicode.a
+flag.a     log.a      runtime
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you prefer not to pre-build and install the standard library to the GOROOT,
+required libraries will be built while building user packages.
+But, the standard libraries builds are not preserved for future use at this
+stage and they will be rebuilt each time you run &lt;code&gt;go build&lt;/code&gt;.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Archive</title>
       <link>http://golang.rakyll.org/archive/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
