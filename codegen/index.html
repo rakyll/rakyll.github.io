@@ -256,7 +256,7 @@ Because, optimazation can change the sequence of operations, add code, remove co
 With optimizations, it gets harder to map a Go line to the optimized output or it gets harder to do perf testing where you end up chaging more than one thing at a time.
 Disabling optimizations is possible with <code>-N</code>, and disabling inlining is possible with <code>-l</code>.</p>
 
-<pre><code> $ go build -gcflags=&quot;-l -N&quot;
+<pre><code>$ go build -gcflags=&quot;-l -N&quot;
 </code></pre>
 
 <p>Once optimizations are disabled, you can debug without being affected by transformations or do perf
