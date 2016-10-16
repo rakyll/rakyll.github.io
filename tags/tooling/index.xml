@@ -6,8 +6,210 @@
     <description>Recent content in Tooling on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 25 Sep 2016 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Sat, 15 Oct 2016 11:27:27 -0400</lastBuildDate>
     <atom:link href="http://golang.rakyll.org/tags/tooling/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Inspecting code generation in Go</title>
+      <link>http://golang.rakyll.org/codegen/</link>
+      <pubDate>Sat, 15 Oct 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/codegen/</guid>
+      <description>
+
+&lt;p&gt;Last week, I was at &lt;a href=&#34;http://www.dotgo.eu/&#34;&gt;dotGo&lt;/a&gt;, participating one of the
+finest Go conferences and catching up with gophers from the other side of the
+Atlantic. I gave a very short lightning talk about inspection of code generation
+with the tools alrady available in the toolchain. This post goes through the talk for
+those who didn&amp;rsquo;t have to priviledge to be at the conference. Slides are also
+available at &lt;a href=&#34;go-talks.appspot.com/github.com/rakyll/talks/gcinspect/talk.slide&#34;&gt;go-talks&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;So, you want to file bugs against the Go compiler? There are a few tools that
+will help you to understand the underlying mechanisms and do sanity checks.&lt;/p&gt;
+
+&lt;p&gt;Through the article, we will use the following program:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;package main
+
+import &amp;quot;fmt&amp;quot;
+
+func main() {
+    sum := 1 + 1
+    fmt.Printf(&amp;quot;sum: %v\n&amp;quot;, sum)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;toolchain&#34;&gt;Toolchain&lt;/h3&gt;
+
+&lt;p&gt;Go build is a command that encapsulates tons of things from the user.
+But, it also provides more detailed information about what it does if you ask for it.
+&lt;code&gt;-x&lt;/code&gt; is a flag that makes go build output what is being invoked.
+If you want to see what the components of the toolchain are,
+which sequence they are invoked and which flags being used, use &lt;code&gt;-x&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go build -x
+WORK=/var/folders/00/1b8h8000h01000cxqpysvccm005d21/T/go-build190726544
+mkdir -p $WORK/hello/_obj/
+mkdir -p $WORK/hello/_obj/exe/
+cd /Users/jbd/src/hello
+/Users/jbd/go/pkg/tool/darwin_amd64/compile -o $WORK/hello.a -trimpath $WORK -p main -complete -buildid d934a5702088e0fe5c931a55ff26bec87b80cbdc -D _/Users/jbd/src/hello -I $WORK -pack ./hello.go
+cd .
+/Users/jbd/go/pkg/tool/darwin_amd64/link -o $WORK/hello/_obj/exe/a.out -L $WORK -extld=clang -buildmode=exe -buildid=d934a5702088e0fe5c931a55ff26bec87b80cbdc $WORK/hello.a
+mv $WORK/hello/_obj/exe/a.out hello
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;intermediate-assembly&#34;&gt;Intermediate assembly&lt;/h3&gt;
+
+&lt;p&gt;In Go, there is an intermediate assembly phase before generating the actual arch-specific assembly.
+Compiler takes some Go files, generates the intermediate instructions and escalate it to the &lt;code&gt;obj&lt;/code&gt; package to generate the machine code.
+If you are curious about what compiler generates in this phase, &lt;code&gt;-S&lt;/code&gt; makes the compiler dumps the output.&lt;/p&gt;
+
+&lt;p&gt;The intermediate assembly is generally good reference to understand the cost of a Go line.
+Or it coulbe be a great reference if you want to replace, let&amp;rsquo;s say, a Go function with more optimized assembly equivalent.&lt;/p&gt;
+
+&lt;p&gt;You are seeing the output for the main.main here.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-S&amp;quot;
+# hello
+&amp;quot;&amp;quot;.main t=1 size=179 args=0x0 locals=0x60
+    0x0000 00000 (/Users/jbd/src/hello/hello.go:5)  TEXT    &amp;quot;&amp;quot;.main(SB), $96-0
+    0x0000 00000 (/Users/jbd/src/hello/hello.go:5)  MOVQ    (TLS), CX
+    0x0009 00009 (/Users/jbd/src/hello/hello.go:5)  CMPQ    SP, 16(CX)
+    0x000d 00013 (/Users/jbd/src/hello/hello.go:5)  JLS 169
+    0x0013 00019 (/Users/jbd/src/hello/hello.go:5)  SUBQ    $96, SP
+    0x0017 00023 (/Users/jbd/src/hello/hello.go:5)  MOVQ    BP, 88(SP)
+    0x001c 00028 (/Users/jbd/src/hello/hello.go:5)  LEAQ    88(SP), BP
+    0x0021 00033 (/Users/jbd/src/hello/hello.go:5)  FUNCDATA    $0, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+    0x0021 00033 (/Users/jbd/src/hello/hello.go:5)  FUNCDATA    $1, gclocals·e226d4ae4a7cad8835311c6a4683c14f(SB)
+    0x0021 00033 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $2, &amp;quot;&amp;quot;.autotmp_1+64(SP)
+    0x002a 00042 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $0, &amp;quot;&amp;quot;.autotmp_0+72(SP)
+    0x0033 00051 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $0, &amp;quot;&amp;quot;.autotmp_0+80(SP)
+    0x003c 00060 (/Users/jbd/src/hello/hello.go:7)  LEAQ    type.int(SB), AX
+    0x0043 00067 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, (SP)
+    0x0047 00071 (/Users/jbd/src/hello/hello.go:7)  LEAQ    &amp;quot;&amp;quot;.autotmp_1+64(SP), AX
+    0x004c 00076 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, 8(SP)
+    0x0051 00081 (/Users/jbd/src/hello/hello.go:7)  PCDATA  $0, $1
+    0x0051 00081 (/Users/jbd/src/hello/hello.go:7)  CALL    runtime.convT2E(SB)
+    0x0056 00086 (/Users/jbd/src/hello/hello.go:7)  MOVQ    16(SP), AX
+    0x005b 00091 (/Users/jbd/src/hello/hello.go:7)  MOVQ    24(SP), CX
+    0x0060 00096 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, &amp;quot;&amp;quot;.autotmp_0+72(SP)
+    0x0065 00101 (/Users/jbd/src/hello/hello.go:7)  MOVQ    CX, &amp;quot;&amp;quot;.autotmp_0+80(SP)
+    0x006a 00106 (/Users/jbd/src/hello/hello.go:7)  LEAQ    go.string.&amp;quot;sum: %v\n&amp;quot;(SB), AX
+    0x0071 00113 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, (SP)
+    0x0075 00117 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $8, 8(SP)
+    0x007e 00126 (/Users/jbd/src/hello/hello.go:7)  LEAQ    &amp;quot;&amp;quot;.autotmp_0+72(SP), AX
+    0x0083 00131 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, 16(SP)
+    0x0088 00136 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $1, 24(SP)
+    0x0091 00145 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $1, 32(SP)
+    0x009a 00154 (/Users/jbd/src/hello/hello.go:7)  PCDATA  $0, $1
+    0x009a 00154 (/Users/jbd/src/hello/hello.go:7)  CALL    fmt.Printf(SB)
+    0x009f 00159 (/Users/jbd/src/hello/hello.go:8)  MOVQ    88(SP), BP
+    0x00a4 00164 (/Users/jbd/src/hello/hello.go:8)  ADDQ    $96, SP
+    0x00a8 00168 (/Users/jbd/src/hello/hello.go:8)  RET
+    0x00a9 00169 (/Users/jbd/src/hello/hello.go:8)  NOP
+    0x00a9 00169 (/Users/jbd/src/hello/hello.go:5)  PCDATA  $0, $-1
+    0x00a9 00169 (/Users/jbd/src/hello/hello.go:5)  CALL    runtime.morestack_noctxt(SB)
+    0x00ae 00174 (/Users/jbd/src/hello/hello.go:5)  JMP 0
+    ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;If you would like to learn more insights about the intermediate assembly and why
+it is significant in Go, I highly recommend
+&lt;a href=&#34;https://www.youtube.com/watch?v=KINIAgRpkDA&#34;&gt;Rob Pike&amp;rsquo;s The Design of the Go Assembler&lt;/a&gt;
+from GopherCon this year.&lt;/p&gt;
+
+&lt;h3 id=&#34;disassembler&#34;&gt;Disassembler&lt;/h3&gt;
+
+&lt;p&gt;As I mentioned, &lt;code&gt;-S&lt;/code&gt; is only for the intermediate assembly. The actual machine representation is available in the final artifact.
+You can use a disassembler to examine what&amp;rsquo;s inside.
+Use &lt;code&gt;go tool objdump&lt;/code&gt; with a binary or library. You probably also want to use &lt;code&gt;-s&lt;/code&gt; to focus by symbol name.
+In this example, I am dumping the main.main. This is the actual assembly generated for &lt;code&gt;darwin/amd64&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go tool objdump -s main.main hello
+TEXT main.main(SB) /Users/jbd/src/hello/hello.go
+    hello.go:5  0x2040  65488b0c25a0080000  GS MOVQ GS:0x8a0, CX
+    hello.go:5  0x2049  483b6110            CMPQ 0x10(CX), SP
+    hello.go:5  0x204d  0f8696000000        JBE 0x20e9
+    hello.go:5  0x2053  4883ec60            SUBQ $0x60, SP
+    hello.go:5  0x2057  48896c2458          MOVQ BP, 0x58(SP)
+    hello.go:5  0x205c  488d6c2458          LEAQ 0x58(SP), BP
+    hello.go:7  0x2061  48c744244002000000  MOVQ $0x2, 0x40(SP)
+    hello.go:7  0x206a  48c744244800000000  MOVQ $0x0, 0x48(SP)
+    hello.go:7  0x2073  48c744245000000000  MOVQ $0x0, 0x50(SP)
+    hello.go:7  0x207c  488d053d4d0800      LEAQ 0x84d3d(IP), AX
+    ...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;symbols&#34;&gt;Symbols&lt;/h3&gt;
+
+&lt;p&gt;Sometimes, all you need is to check the symbols rather than understanding code or data sections.
+Similar to general-purpose nm tool, Go distributes an nm which allows you to list the symbols in an artifact with annotations and size.
+Pretty handy if you want to see what&amp;rsquo;s in and being exported from a Go binary or library.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go tool nm hello
+...
+f4760 B __cgo_init
+f4768 B __cgo_notify_runtime_init_done
+f4770 B __cgo_thread_start
+4fb70 T __rt0_amd64_darwin
+4e220 T _gosave
+4fb90 T _main
+ad1e0 R _masks
+4fd00 T _nanotime
+4e480 T _setg_gcc
+ad2e0 R _shifts
+624a0 T errors.(*errorString).Error
+62400 T errors.New
+52470 T fmt.(*buffer).WriteRune
+...
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&#34;optimizations&#34;&gt;Optimizations&lt;/h3&gt;
+
+&lt;p&gt;With the contribution of the new SSA backend, the team contributed a tool that visualizes all the SSA passes.
+Set GOSSAFUNC env variable with a func name and run the go build command.
+It will generate an ssa.html file which will provide all the steps, compiler has gone through to optimize your code.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ GOSSAFUNC=main go build &amp;amp;&amp;amp; open ssa.html
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Here, there is a visualization of all the passes applied to the main function.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/ssa.png&#34; alt=&#34;SSA optimizations&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Go compiler can also annotate the inlining and escape analysis.
+If you pass &lt;code&gt;-m&lt;/code&gt; flag to the compiler, it will output the optimizations or annotations related to these two.
+Here we see the &lt;code&gt;net/context&lt;/code&gt; package related inlining operations and escape analysis.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-m&amp;quot; golang.org/x/net/context
+ # golang.org/x/net/context
+../net/context/context.go:140: can inline Background
+../net/context/context.go:149: can inline TODO
+../net/context/go17.go:62: inlining call to time.Time.Add
+../net/context/context.go:141: background escapes to heap
+../net/context/context.go:150: todo escapes to heap
+../net/context/go17.go:33: parent escapes to heap
+../net/context/go17.go:32: leaking param: parent
+../net/context/go17.go:47: parent escapes to heap
+../net/context/go17.go:46: leaking param: parent
+../net/context/go17.go:46: leaking param: deadline
+../net/context/go17.go:48: ctx escapes to heap
+../net/context/go17.go:61: leaking param: parent
+../net/context/go17.go:71: parent escapes to heap
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;It is worth to mention that you often need to disable optimizations to have a simpler view of what&amp;rsquo;s going on.
+Because, optimazation can change the sequence of operations, add code, remove code or apply transformations to the code.
+With optimizations, it gets harder to map a Go line to the optimized output or it gets harder to do perf testing where you end up chaging more than one thing at a time.
+Disabling optimizations is possible with &lt;code&gt;-N&lt;/code&gt;, and disabling inlining is possible with &lt;code&gt;-l&lt;/code&gt;.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt; $ go build -gcflags=&amp;quot;-l -N&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Once optimizations are disabled, you can debug without being affected by transformations or do perf
+testing without being affected more than one change at a time.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Go tooling essentials</title>
