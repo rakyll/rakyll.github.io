@@ -695,21 +695,6 @@ As a part of my daily job, I do design reviews, write code against the latest
 APIs, publish packages and tools to fill the gaps, run experimentations to propose
 the missing parts, and communicate our work and goals.&lt;/p&gt;
 
-&lt;p&gt;Before working on the Go project, I was a contributor to the Go project
-and I owned a variety of major and minor parts:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Experimental work on Peripheral I/O for Go&lt;/li&gt;
-&lt;li&gt;Toolchain integrations for Go on Brillo&lt;/li&gt;
-&lt;li&gt;Go mobile toolchain for darwin targets&lt;/li&gt;
-&lt;li&gt;Experimentation for audio packages for Go mobile (future work is explained at &lt;a href=&#34;https://github.com/golang/proposal/blob/master/design/13432-mobile-audio.md&#34;&gt;the proposal&lt;/a&gt;)&lt;/li&gt;
-&lt;li&gt;Visualization tools for instrumentation data&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://godoc.org/cloud.google.com/go&#34;&gt;Google Cloud&amp;rsquo;s Go packages&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://golang.org/x/oauth2&#34;&gt;x/oauth2&lt;/a&gt; package&lt;/li&gt;
-&lt;li&gt;Bug fixes and documentation&lt;/li&gt;
-&lt;li&gt;Personal libraries and tools (mainly at &lt;a href=&#34;https://github.com/rakyll&#34;&gt;github/rakyll&lt;/a&gt;)&lt;/li&gt;
-&lt;/ul&gt;
-
 &lt;h3 id=&#34;contact&#34;&gt;Contact&lt;/h3&gt;
 
 &lt;p&gt;Any feedback and suggestion to the Go project is appreciated.&lt;/p&gt;
