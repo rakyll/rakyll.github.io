@@ -262,6 +262,43 @@ Disabling optimizations is possible with <code>-N</code>, and disabling inlining
 <p>Once optimizations are disabled, you can debug without being affected by transformations or do perf
 testing without being affected more than one change at a time.</p>
 
+<h3 id="lexer">Lexer</h3>
+
+<p>If you are working on the lexer, compiler provides a flag to debug
+the lexer as the lexer is going through the source files.</p>
+
+<pre><code>$ go build -gcflags=&quot;-x&quot;
+# hello
+lex: PACKAGE
+lex: ident main
+lex: implicit semi
+lex: IMPORT
+lex: string literal
+lex: implicit semi
+lex: FUNC
+lex: ident main
+./hello.go:5 lex: TOKEN '('
+./hello.go:5 lex: TOKEN ')'
+./hello.go:5 lex: TOKEN '{'
+lex: ident sum
+./hello.go:6 lex: TOKEN COLAS
+lex: integer literal
+./hello.go:6 lex: TOKEN '+'
+lex: integer literal
+lex: implicit semi
+lex: ident fmt
+./hello.go:7 lex: TOKEN '.'
+lex: ident Printf
+./hello.go:7 lex: TOKEN '('
+lex: string literal
+./hello.go:7 lex: TOKEN ','
+lex: ident sum
+./hello.go:7 lex: TOKEN ')'
+lex: implicit semi
+./hello.go:8 lex: TOKEN '}'
+lex: implicit semi
+</code></pre>
+
 			</div>
 
 			

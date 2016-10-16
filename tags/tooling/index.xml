@@ -208,6 +208,43 @@ Disabling optimizations is possible with &lt;code&gt;-N&lt;/code&gt;, and disabl
 
 &lt;p&gt;Once optimizations are disabled, you can debug without being affected by transformations or do perf
 testing without being affected more than one change at a time.&lt;/p&gt;
+
+&lt;h3 id=&#34;lexer&#34;&gt;Lexer&lt;/h3&gt;
+
+&lt;p&gt;If you are working on the lexer, compiler provides a flag to debug
+the lexer as the lexer is going through the source files.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-x&amp;quot;
+# hello
+lex: PACKAGE
+lex: ident main
+lex: implicit semi
+lex: IMPORT
+lex: string literal
+lex: implicit semi
+lex: FUNC
+lex: ident main
+./hello.go:5 lex: TOKEN &#39;(&#39;
+./hello.go:5 lex: TOKEN &#39;)&#39;
+./hello.go:5 lex: TOKEN &#39;{&#39;
+lex: ident sum
+./hello.go:6 lex: TOKEN COLAS
+lex: integer literal
+./hello.go:6 lex: TOKEN &#39;+&#39;
+lex: integer literal
+lex: implicit semi
+lex: ident fmt
+./hello.go:7 lex: TOKEN &#39;.&#39;
+lex: ident Printf
+./hello.go:7 lex: TOKEN &#39;(&#39;
+lex: string literal
+./hello.go:7 lex: TOKEN &#39;,&#39;
+lex: ident sum
+./hello.go:7 lex: TOKEN &#39;)&#39;
+lex: implicit semi
+./hello.go:8 lex: TOKEN &#39;}&#39;
+lex: implicit semi
+&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     
