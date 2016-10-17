@@ -10,22 +10,19 @@
     <atom:link href="http://golang.rakyll.org/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Inspecting code generation in Go</title>
+      <title>Debugging code generation in Go</title>
       <link>http://golang.rakyll.org/codegen/</link>
       <pubDate>Sat, 15 Oct 2016 11:27:27 -0400</pubDate>
       
       <guid>http://golang.rakyll.org/codegen/</guid>
       <description>
 
-&lt;p&gt;Last week, I was at &lt;a href=&#34;http://www.dotgo.eu/&#34;&gt;dotGo&lt;/a&gt;, participating one of the
+&lt;p&gt;&lt;em&gt;Last week, I was at &lt;a href=&#34;http://www.dotgo.eu/&#34;&gt;dotGo&lt;/a&gt;, participating one of the
 finest Go conferences and catching up with gophers from the other side of the
 Atlantic. I gave a very short lightning talk about inspection of code generation
 with the tools alrady available in the toolchain. This post goes through the talk for
 those who didn&amp;rsquo;t have to priviledge to be at the conference. Slides are also
-available at &lt;a href=&#34;go-talks.appspot.com/github.com/rakyll/talks/gcinspect/talk.slide&#34;&gt;go-talks&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;So, you want to file bugs against the Go compiler? There are a few tools that
-will help you to understand the underlying mechanisms and do sanity checks.&lt;/p&gt;
+available at &lt;a href=&#34;go-talks.appspot.com/github.com/rakyll/talks/gcinspect/talk.slide&#34;&gt;go-talks&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;Through the article, we will use the following program:&lt;/p&gt;
 
