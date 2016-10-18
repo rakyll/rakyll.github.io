@@ -22,7 +22,7 @@ finest Go conferences and catching up with gophers from the other side of the
 Atlantic. I gave a very short lightning talk about inspection of code generation
 with the tools alrady available in the toolchain. This post goes through the talk for
 those who didn&amp;rsquo;t have to priviledge to be at the conference. Slides are also
-available at &lt;a href=&#34;go-talks.appspot.com/github.com/rakyll/talks/gcinspect/talk.slide&#34;&gt;go-talks&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+available at &lt;a href=&#34;https://go-talks.appspot.com/github.com/rakyll/talks/gcinspect/talk.slide&#34;&gt;go-talks&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;Through the article, we will use the following program:&lt;/p&gt;
 
