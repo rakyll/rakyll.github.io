@@ -228,25 +228,63 @@ It will generate an ssa.html file which will provide all the steps, compiler has
 <p><img src="/img/ssa.png" alt="SSA optimizations" /></p>
 
 <p>Go compiler can also annotate the inlining and escape analysis.
-If you pass <code>-m</code> flag to the compiler, it will output the optimizations or annotations related to these two.
+If you pass <code>-m=2</code> flag to the compiler, it will output the optimizations or annotations related to these two.
 Here we see the <code>net/context</code> package related inlining operations and escape analysis.</p>
 
 <pre><code>$ go build -gcflags=&quot;-m&quot; golang.org/x/net/context
- # golang.org/x/net/context
-../net/context/context.go:140: can inline Background
-../net/context/context.go:149: can inline TODO
-../net/context/go17.go:62: inlining call to time.Time.Add
-../net/context/context.go:141: background escapes to heap
-../net/context/context.go:150: todo escapes to heap
-../net/context/go17.go:33: parent escapes to heap
-../net/context/go17.go:32: leaking param: parent
-../net/context/go17.go:47: parent escapes to heap
-../net/context/go17.go:46: leaking param: parent
-../net/context/go17.go:46: leaking param: deadline
-../net/context/go17.go:48: ctx escapes to heap
-../net/context/go17.go:61: leaking param: parent
-../net/context/go17.go:71: parent escapes to heap
+# golang.org/x/net/context
+../golang.org/x/net/context/context.go:140: can inline Background as: func() Context { return background }
+../golang.org/x/net/context/context.go:149: can inline TODO as: func() Context { return todo }
+../golang.org/x/net/context/go17.go:32: cannot inline WithCancel: non-leaf function
+../golang.org/x/net/context/go17.go:46: cannot inline WithDeadline: non-leaf function
+../golang.org/x/net/context/go17.go:61: cannot inline WithTimeout: non-leaf function
+../golang.org/x/net/context/go17.go:62: inlining call to time.Time.Add method(time.Time) func(time.Duration) time.Time { time.t·2.sec += int64(time.d·3 / time.Duration(1000000000)); var time.nsec·4 int32; time.nsec·4 = &lt;N&gt;; time.nsec·4 = time.t·2.nsec + int32(time.d·3 % time.Duration(1000000000)); if time.nsec·4 &gt;= int32(1000000000) { time.t·2.sec++; time.nsec·4 -= int32(1000000000) } else { if time.nsec·4 &lt; int32(0) { time.t·2.sec--; time.nsec·4 += int32(1000000000) } }; time.t·2.nsec = time.nsec·4; return time.t·2 }
+../golang.org/x/net/context/go17.go:70: cannot inline WithValue: non-leaf function
+../golang.org/x/net/context/context.go:141: background escapes to heap
+../golang.org/x/net/context/context.go:141:     from ~r0 (return) at ../golang.org/x/net/context/context.go:140
+../golang.org/x/net/context/context.go:150: todo escapes to heap
+../golang.org/x/net/context/context.go:150:     from ~r0 (return) at ../golang.org/x/net/context/context.go:149
+../golang.org/x/net/context/go17.go:33: parent escapes to heap
+../golang.org/x/net/context/go17.go:33:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:33
+../golang.org/x/net/context/go17.go:32: leaking param: parent
+../golang.org/x/net/context/go17.go:32:     from parent (interface-converted) at ../golang.org/x/net/context/go17.go:33
+../golang.org/x/net/context/go17.go:32:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:33
+../golang.org/x/net/context/go17.go:47: parent escapes to heap
+../golang.org/x/net/context/go17.go:47:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:47
+../golang.org/x/net/context/go17.go:46: leaking param: parent
+../golang.org/x/net/context/go17.go:46:     from parent (interface-converted) at ../golang.org/x/net/context/go17.go:47
+../golang.org/x/net/context/go17.go:46:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:47
+../golang.org/x/net/context/go17.go:46: leaking param: deadline
+../golang.org/x/net/context/go17.go:46:     from deadline (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:46
+../golang.org/x/net/context/go17.go:48: ctx escapes to heap
+../golang.org/x/net/context/go17.go:48:     from ~r2 (return) at ../golang.org/x/net/context/go17.go:46
+../golang.org/x/net/context/go17.go:61: leaking param: parent
+../golang.org/x/net/context/go17.go:61:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:61
+../golang.org/x/net/context/go17.go:71: parent escapes to heap
+../golang.org/x/net/context/go17.go:71:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:71
+../golang.org/x/net/context/go17.go:70: leaking param: parent
+../golang.org/x/net/context/go17.go:70:     from parent (interface-converted) at ../golang.org/x/net/context/go17.go:71
+../golang.org/x/net/context/go17.go:70:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:71
+../golang.org/x/net/context/go17.go:70: leaking param: key
+../golang.org/x/net/context/go17.go:70:     from key (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:70
+../golang.org/x/net/context/go17.go:70: leaking param: val
+../golang.org/x/net/context/go17.go:70:     from val (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:70
+../golang.org/x/net/context/go17.go:71: context.WithValue(parent, key, val) escapes to heap
+../golang.org/x/net/context/go17.go:71:     from ~r3 (return) at ../golang.org/x/net/context/go17.go:70
+&lt;autogenerated&gt;:1: leaking param: .this
+&lt;autogenerated&gt;:1:  from .this.Deadline() (receiver in indirect call) at &lt;autogenerated&gt;:1
+&lt;autogenerated&gt;:2: leaking param: .this
+&lt;autogenerated&gt;:2:  from .this.Done() (receiver in indirect call) at &lt;autogenerated&gt;:2
+&lt;autogenerated&gt;:3: leaking param: .this
+&lt;autogenerated&gt;:3:  from .this.Err() (receiver in indirect call) at &lt;autogenerated&gt;:3
+&lt;autogenerated&gt;:4: leaking param: key
+&lt;autogenerated&gt;:4:  from .this.Value(key) (parameter to indirect call) at &lt;autogenerated&gt;:4
+&lt;autogenerated&gt;:4: leaking param: .this
+&lt;autogenerated&gt;:4:  from .this.Value(key) (receiver in indirect call) at &lt;autogenerated&gt;:4
 </code></pre>
+
+<p>You can use <code>-m</code> to see a less verbose output without reasonings, but <a href="https://twitter.com/Dr2chase/status/788353223522455552">David Chase</a> says
+even though <code>-m=2</code> is not perfect, it is often useful.</p>
 
 <p>It is worth to mention that you often need to disable optimizations to have a simpler view of what&rsquo;s going on.
 Because, optimazation can change the sequence of operations, add code, remove code or apply transformations to the code.
