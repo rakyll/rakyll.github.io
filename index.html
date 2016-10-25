@@ -80,8 +80,8 @@
     <span class="post-date">Tue, Oct 25, 2016</span>
 
     <p>The <a href="https://godoc.org/pkg/context">context</a> package makes it possible
-to manage a chain of calls within the same call path with <code>WithCancel</code>,
-<code>WithDeadline</code>, and <code>WithTimeout</code>.</p>
+to manage a chain of calls within the same call path by signaling context&rsquo;s
+Done channel.</p>
 
 <p>In this article, we will examine how to use the context package to
 avoid leaking goroutines.</p>

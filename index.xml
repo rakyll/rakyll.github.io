@@ -16,8 +16,8 @@
       
       <guid>http://golang.rakyll.org/leakingctx/</guid>
       <description>&lt;p&gt;The &lt;a href=&#34;https://godoc.org/pkg/context&#34;&gt;context&lt;/a&gt; package makes it possible
-to manage a chain of calls within the same call path with &lt;code&gt;WithCancel&lt;/code&gt;,
-&lt;code&gt;WithDeadline&lt;/code&gt;, and &lt;code&gt;WithTimeout&lt;/code&gt;.&lt;/p&gt;
+to manage a chain of calls within the same call path by signaling context&amp;rsquo;s
+Done channel.&lt;/p&gt;
 
 &lt;p&gt;In this article, we will examine how to use the context package to
 avoid leaking goroutines.&lt;/p&gt;
