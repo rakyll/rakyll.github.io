@@ -40,8 +40,8 @@ func gen() &amp;lt;-chan int {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;&lt;code&gt;gen&lt;/code&gt; starts a goroutine with an infinite loop, but the caller of &lt;code&gt;gen&lt;/code&gt; consumes
-the values returned until n is equal to 5.&lt;/p&gt;
+&lt;p&gt;The generator above starts a goroutine with an infinite loop,
+but the caller consumes the values until n is equal to 5.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// The call site of gen doesn&#39;t have a 
 for n := range gen() {
@@ -53,13 +53,13 @@ for n := range gen() {
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Once the caller is done with the generator (when it breaks the loop),
-the goroutine started in &lt;code&gt;gen&lt;/code&gt; will run forever executing the infinite loop.&lt;/p&gt;
+the goroutine will run forever executing the infinite loop. Our code
+will leak a goroutine.&lt;/p&gt;
 
 &lt;p&gt;We can avoid the problem by signaling the internal goroutine with a
-stop channel but there is a better solution: cancellable contexts. In
-order to be able to cancel the goroutine, the gen function will select
-on a context&amp;rsquo;s Done channel. And once the context is done, we
-will return from the goroutine.&lt;/p&gt;
+stop channel but there is a better solution: cancellable contexts.
+The generator can select on a context&amp;rsquo;s Done channel and once the context is
+done, the internal goroutine can be cancelled.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// gen is a generator that can be cancellable by cancelling the ctx.
 func gen(ctx context.Context) &amp;lt;-chan int {
@@ -80,9 +80,9 @@ func gen(ctx context.Context) &amp;lt;-chan int {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;The caller now can signal the generator when it is done by cancelling the context.
-The generator won&amp;rsquo;t generate any more values and the internal goroutine will be
-returned.&lt;/p&gt;
+&lt;p&gt;Now, the caller can signal the generator when it is done consuming.
+Once cancel function is called, the generator won&amp;rsquo;t generate any more
+values and the internal goroutine will be returned.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;ctx, cancel := context.WithCancel(context.Background())
 defer cancel() // make sure all paths cancel the context to avoid context leak

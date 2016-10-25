@@ -104,8 +104,8 @@ func gen() &lt;-chan int {
 }
 </code></pre>
 
-<p><code>gen</code> starts a goroutine with an infinite loop, but the caller of <code>gen</code> consumes
-the values returned until n is equal to 5.</p>
+<p>The generator above starts a goroutine with an infinite loop,
+but the caller consumes the values until n is equal to 5.</p>
 
 <pre><code class="language-go">// The call site of gen doesn't have a 
 for n := range gen() {
@@ -117,13 +117,13 @@ for n := range gen() {
 </code></pre>
 
 <p>Once the caller is done with the generator (when it breaks the loop),
-the goroutine started in <code>gen</code> will run forever executing the infinite loop.</p>
+the goroutine will run forever executing the infinite loop. Our code
+will leak a goroutine.</p>
 
 <p>We can avoid the problem by signaling the internal goroutine with a
-stop channel but there is a better solution: cancellable contexts. In
-order to be able to cancel the goroutine, the gen function will select
-on a context&rsquo;s Done channel. And once the context is done, we
-will return from the goroutine.</p>
+stop channel but there is a better solution: cancellable contexts.
+The generator can select on a context&rsquo;s Done channel and once the context is
+done, the internal goroutine can be cancelled.</p>
 
 <pre><code class="language-go">// gen is a generator that can be cancellable by cancelling the ctx.
 func gen(ctx context.Context) &lt;-chan int {
@@ -144,9 +144,9 @@ func gen(ctx context.Context) &lt;-chan int {
 }
 </code></pre>
 
-<p>The caller now can signal the generator when it is done by cancelling the context.
-The generator won&rsquo;t generate any more values and the internal goroutine will be
-returned.</p>
+<p>Now, the caller can signal the generator when it is done consuming.
+Once cancel function is called, the generator won&rsquo;t generate any more
+values and the internal goroutine will be returned.</p>
 
 <pre><code>ctx, cancel := context.WithCancel(context.Background())
 defer cancel() // make sure all paths cancel the context to avoid context leak
