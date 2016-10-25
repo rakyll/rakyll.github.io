@@ -3,7 +3,12 @@
   
   <url>
     <loc>http://golang.rakyll.org/</loc>
-    <lastmod>2016-10-15T11:27:27-04:00</lastmod>
+    <lastmod>2016-10-25T11:27:27-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/leakingctx/</loc>
+    <lastmod>2016-10-25T11:27:27-04:00</lastmod>
   </url>
   
   <url>

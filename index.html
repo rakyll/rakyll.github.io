@@ -72,6 +72,104 @@
   
   <div class="post">
     <h1 class="post-title">
+      <a href="http://golang.rakyll.org/leakingctx/">
+        Using contexts to avoid leaking goroutines
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Oct 25, 2016</span>
+
+    <p>The <a href="https://godoc.org/pkg/context">context</a> package makes it possible
+to manage a chain of calls within the same call path with <code>WithCancel</code>,
+<code>WithDeadline</code>, and <code>WithTimeout</code>.</p>
+
+<p>In this article, we will examine how to use the context package to
+avoid leaking goroutines.</p>
+
+<p>Assume, you have a function that starts a goroutine internally. Once this
+function is called, the caller may not be able to terminate the goroutine
+started by the function.</p>
+
+<pre><code class="language-go">// gen is a broken generator that will leak a goroutine.
+func gen() &lt;-chan int {
+	ch := make(chan int)
+	go func() {
+		var n int
+		for {
+			ch &lt;- n
+			n++
+		}
+	}()
+	return ch
+}
+</code></pre>
+
+<p><code>gen</code> starts a goroutine with an infinite loop, but the caller of <code>gen</code> consumes
+the values returned until n is equal to 5.</p>
+
+<pre><code class="language-go">// The call site of gen doesn't have a 
+for n := range gen() {
+    fmt.Println(n)
+    if n == 5 {
+        break
+    }
+}
+</code></pre>
+
+<p>Once the caller is done with the generator (when it breaks the loop),
+the goroutine started in <code>gen</code> will run forever executing the infinite loop.</p>
+
+<p>We can avoid the problem by signaling the internal goroutine with a
+stop channel but there is a better solution: cancellable contexts. In
+order to be able to cancel the goroutine, the gen function will select
+on a context&rsquo;s Done channel. And once the context is done, we
+will return from the goroutine.</p>
+
+<pre><code class="language-go">// gen is a generator that can be cancellable by cancelling the ctx.
+func gen(ctx context.Context) &lt;-chan int {
+	ch := make(chan int)
+	go func() {
+		var n int
+		for {
+			select {
+			case &lt;-ctx.Done():
+				return // avoid leaking of this goroutine when ctx is done.
+			default:
+				ch &lt;- n
+				n++
+			}
+		}
+	}()
+	return ch
+}
+</code></pre>
+
+<p>The caller now can signal the generator when it is done by cancelling the context.
+The generator won&rsquo;t generate any more values and the internal goroutine will be
+returned.</p>
+
+<pre><code>ctx, cancel := context.WithCancel(context.Background())
+defer cancel() // make sure all paths cancel the context to avoid context leak
+
+for n := range gen(ctx) {
+    fmt.Println(n)
+    if n == 5 {
+        cancel()
+        break
+    }
+}
+
+// ...
+</code></pre>
+
+<p>The full program is available as a <a href="https://gist.github.com/rakyll/1aa860377dab8fd445431bbb3204f600">gist</a>.</p>
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
       <a href="http://golang.rakyll.org/codegen/">
         Debugging code generation in Go
       </a>

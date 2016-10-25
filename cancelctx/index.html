@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+	<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
 <head>
   <link href="http://gmpg.org/xfn/11" rel="profile">
@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 
   
-  <title>Archive &middot; go bits</title>
+  <title>Cancel goroutines to avoid leaking &middot; go bits</title>
   
 
   
@@ -26,9 +26,8 @@
   <link href="" rel="alternate" type="application/rss+xml" title="go bits" />
 </head>
 
-<body class=" layout-reverse">
-
-<div class="sidebar">
+	<body class=" layout-reverse">
+		<div class="sidebar">
   <div class="container sidebar-sticky">
     <div class="sidebar-about">
       <a href="http://golang.rakyll.org/"><h1>go bits</h1></a>
@@ -65,85 +64,21 @@
 </script>
 
 
-<div class="content container">
-<div class="posts">
+		<div class="content container">
+			<div class="post">
+			 	<h1>Cancel goroutines to avoid leaking</h1>
+			  <span class="post-date">Tue, Oct 25, 2016</span>
+			      <p>The <a href="https://godoc.org/pkg/context">context</a> package makes it possible
+to manage a chain of calls within the same call path with <code>WithCancel</code>,
+<code>WithDeadline</code>, and <code>WithTimeout</code>.</p>
 
-<ul>
+<p>In this article, we will examine how to use these
+contexts to build structures to avoid leaking goroutines.</p>
 
+			</div>
 
-<li>
-    <h3><a href="http://golang.rakyll.org/leakingctx/" title="Using contexts to avoid leaking goroutines">Using contexts to avoid leaking goroutines</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/codegen/" title="Debugging code generation in Go">Debugging code generation in Go</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/human-first/" title="Keeping Go a human-first language">Keeping Go a human-first language</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/go-tool-flags/" title="Go tooling essentials">Go tooling essentials</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/examples-coverage/" title="Examples coverage">Examples coverage</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/parallelize-test-tables/" title="Parallelize your table-driven tests">Parallelize your table-driven tests</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/instruments/" title="Using Instruments to profile Go programs">Using Instruments to profile Go programs</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/grpc-streaming/" title="Bidirectional gRPC streaming for Go">Bidirectional gRPC streaming for Go</a></h3>
-</li>
-
-
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/eg/" title="Apply transformations to Go code with eg">Apply transformations to Go code with eg</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/swift/" title="Calling Go from Swift">Calling Go from Swift</a></h3>
-</li>
-
-
-
-<li>
-    <h3><a href="http://golang.rakyll.org/cross-compilation/" title="Go cross compilation">Go cross compilation</a></h3>
-</li>
-
-
-
-
-</ul>
-
-</div>
-</div>
+			
+		</div>
 
   </body>
 </html>
