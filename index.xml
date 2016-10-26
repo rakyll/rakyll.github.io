@@ -70,8 +70,7 @@ func gen(ctx context.Context) &amp;lt;-chan int {
 			select {
 			case &amp;lt;-ctx.Done():
 				return // avoid leaking of this goroutine when ctx is done.
-			default:
-				ch &amp;lt;- n
+			case ch &amp;lt;- n:
 				n++
 			}
 		}
