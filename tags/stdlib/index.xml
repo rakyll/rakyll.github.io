@@ -81,8 +81,7 @@ func gen(ctx context.Context) &amp;lt;-chan int {
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Now, the caller can signal the generator when it is done consuming.
-Once cancel function is called, the generator won&amp;rsquo;t generate any more
-values and the internal goroutine will be returned.&lt;/p&gt;
+Once cancel function is called, the internal goroutine will be returned.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;ctx, cancel := context.WithCancel(context.Background())
 defer cancel() // make sure all paths cancel the context to avoid context leak
