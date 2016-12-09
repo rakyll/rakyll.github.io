@@ -3,7 +3,7 @@
 <head>
   <link href="http://gmpg.org/xfn/11" rel="profile">
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="generator" content="Hugo 0.17-DEV" />
+  <meta name="generator" content="Hugo 0.18-DEV" />
 
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
@@ -69,6 +69,64 @@
 <div class="posts">
 
 
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="http://golang.rakyll.org/deprecated/">
+        Deprecating things in Go
+      </a>
+    </h1>
+
+    <span class="post-date">Thu, Dec 8, 2016</span>
+
+    <p>In Go, for a long time, we didn&rsquo;t have a convention to label the deprecated APIs.
+In the past years, there is new convention emerged to add deprecation notices to the docs.</p>
+
+<p>Today, standard library uses this specific format.</p>
+
+<p>As an example, Go 1.8 deprecates <a href="https://tip.golang.org/pkg/database/sql/driver/#Execer"><code>sql/driver.Execer</code></a>
+and adds a deprecation notice to its godoc.</p>
+
+<pre><code>// Execer is an optional interface that may be implemented by a Conn.
+//
+// If a Conn does not implement Execer, the sql package's DB.Exec will
+// first prepare a query, execute the statement, and then close the
+// statement.
+//
+// Exec may return ErrSkip.
+//
+// Deprecated: Drivers should implement ExecerContext instead (or additionally).
+type Execer interface {
+	Exec(query string, args []Value) (Result, error)
+}
+</code></pre>
+
+<p>The deprecation notice should be in the godoc, begin with string &ldquo;Deprecated: &ldquo; and follow with
+a tip for replacement.</p>
+
+<pre><code>// Deprecated: Use stings.HasPrefix instead.
+</code></pre>
+
+<p>User are expected to follow the tip and switch to the new recommended API.</p>
+
+<p>Additional to the notices, there is an effort going on to discourage users
+to keep depending on the deprecated APIs.</p>
+
+<p>See the following items for the ongoing work:</p>
+
+<ul>
+<li><a href="https://github.com/golang/go/issues/17056">Proposal to hide deprecated APIs by default</a></li>
+<li><a href="https://github.com/golang/gddo/issues/456">Hiding deprecated APIs on godoc.org</a></li>
+<li><a href="https://github.com/golang/lint/issues/238">Reporting deprecated APIs with golint</a></li>
+</ul>
+
+<p>In conclusion, please use this specific format to add deprecation notices. Not &ldquo;DEPRECATED&rdquo; or
+not &ldquo;This type is deprecated&rdquo;. Soon, you will be able to enjoy the tooling support that yells at your
+users to stop depending on your deprecated APIs.</p>
+
+  </div>
+  
+  
   
   <div class="post">
     <h1 class="post-title">

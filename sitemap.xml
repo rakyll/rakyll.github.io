@@ -2,8 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://golang.rakyll.org/</loc>
-    <lastmod>2016-10-25T11:27:27-04:00</lastmod>
+    <loc>http://golang.rakyll.org/deprecated/</loc>
+    <lastmod>2016-12-08T11:27:27-04:00</lastmod>
   </url>
   
   <url>
@@ -68,6 +68,59 @@
   
   <url>
     <loc>http://golang.rakyll.org/archive/</loc>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/tags/coventions/</loc>
+    <lastmod>2016-12-08T11:27:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/tags/language/</loc>
+    <lastmod>2016-10-11T11:27:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/tags/profiling/</loc>
+    <lastmod>2016-09-02T11:27:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/tags/rpc/</loc>
+    <lastmod>2016-08-30T11:27:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/tags/stdlib/</loc>
+    <lastmod>2016-10-25T11:27:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/tags/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/tags/testing/</loc>
+    <lastmod>2016-09-06T11:27:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/tags/tooling/</loc>
+    <lastmod>2016-10-15T11:27:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>http://golang.rakyll.org/</loc>
+    <lastmod>2016-12-08T11:27:27-04:00</lastmod>
+    <priority>0</priority>
   </url>
   
 </urlset>
