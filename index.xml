@@ -40,7 +40,7 @@ type Execer interface {
 &lt;p&gt;The deprecation notice should be in the godoc, begin with string &amp;ldquo;Deprecated: &amp;ldquo; and follow with
 a tip for replacement.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;// Deprecated: Use stings.HasPrefix instead.
+&lt;pre&gt;&lt;code&gt;// Deprecated: Use strings.HasPrefix instead.
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;User are expected to follow the tip and switch to the new recommended API.&lt;/p&gt;
