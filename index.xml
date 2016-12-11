@@ -6,23 +6,8 @@
     <description>Recent content on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 10 Dec 2016 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Thu, 08 Dec 2016 11:27:27 -0400</lastBuildDate>
     <atom:link href="http://golang.rakyll.org/index.xml" rel="self" type="application/rss+xml" />
-    
-    <item>
-      <title>HTTP/2 Server Push</title>
-      <link>http://golang.rakyll.org/http2push/</link>
-      <pubDate>Sat, 10 Dec 2016 11:27:27 -0400</pubDate>
-      
-      <guid>http://golang.rakyll.org/http2push/</guid>
-      <description>&lt;p&gt;Go 1.8 is going to feature support for HTTP/2 server push.&lt;/p&gt;
-
-&lt;p&gt;HTTP/2 has many features designed to make the Web faster. One of those features
-is the server push, the ability to send resources before the client asks for it.
-This feature enables websites to push assets like JavaScript and CSS files immediately
-before waiting for the web page to be loaded and asking for those resources.&lt;/p&gt;
-</description>
-    </item>
     
     <item>
       <title>Deprecating things in Go</title>
