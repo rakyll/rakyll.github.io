@@ -6,8 +6,23 @@
     <description>Recent content on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 08 Dec 2016 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Sat, 10 Dec 2016 11:27:27 -0400</lastBuildDate>
     <atom:link href="http://golang.rakyll.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>HTTP/2 Server Push</title>
+      <link>http://golang.rakyll.org/http2push/</link>
+      <pubDate>Sat, 10 Dec 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/http2push/</guid>
+      <description>&lt;p&gt;Go 1.8 is going to feature support for HTTP/2 server push.&lt;/p&gt;
+
+&lt;p&gt;HTTP/2 has many features designed to make the Web faster. One of those features
+is the server push, the ability to send resources before the client asks for it.
+This feature enables websites to push assets like JavaScript and CSS files immediately
+before waiting for the web page to be loaded and asking for those resources.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Deprecating things in Go</title>
@@ -899,7 +914,7 @@ work with any gRPC bidirectional streaming client.&lt;/p&gt;
       <guid>http://golang.rakyll.org/about/</guid>
       <description>
 
-&lt;p&gt;I (Jaana Burcu Dogan) started to write on this blog to fill the gaps in knowledge transmission and
+&lt;p&gt;I started to write on this blog to fill the gaps in knowledge transmission and
 provide useful everyday tips about the Go programming language, its packages and tools.&lt;/p&gt;
 
 &lt;h3 id=&#34;about-me&#34;&gt;About me&lt;/h3&gt;
@@ -922,8 +937,8 @@ mostly focusing on platforms and telecom infrastructure.&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Email: jbd@golang.org&lt;/li&gt;
-&lt;li&gt;Github:  &lt;a href=&#34;https://github.com/rakyll&#34;&gt; @rakyll&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;Twitter: &lt;a href=&#34;https://twitter.com/rakyll&#34;&gt; @rakyll&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Github:  &lt;a href=&#34;https://github.com/rakyll&#34;&gt;@rakyll&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;Twitter: &lt;a href=&#34;https://twitter.com/rakyll&#34;&gt;@rakyll&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 </description>
     </item>
