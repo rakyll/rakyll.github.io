@@ -65,7 +65,7 @@ download and give this a try. A full sample program can by found on &lt;a href=&
     </item>
     
     <item>
-      <title>Deprecating things in Go</title>
+      <title>Deprecation notices in Go</title>
       <link>http://golang.rakyll.org/deprecated/</link>
       <pubDate>Thu, 08 Dec 2016 11:27:27 -0400</pubDate>
       
