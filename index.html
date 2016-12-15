@@ -72,6 +72,54 @@
   
   <div class="post">
     <h1 class="post-title">
+      <a href="http://golang.rakyll.org/default-gopath/">
+        The default GOPATH
+      </a>
+    </h1>
+
+    <span class="post-date">Wed, Dec 14, 2016</span>
+
+    <p>Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.</p>
+
+<p>The requirement of setting a GOPATH has been a major issue for Go users
+who installed the Go tools for the first time and got the
+&ldquo;you have to set a GOPATH&rdquo; error in their initial experience with the tools.
+Explaining the GOPATH is and instructing how to set this env variable were both
+distracting new users away from using Go. This was especially true for users who
+are not necessarily developing in Go but using <code>go get</code> to download commands.</p>
+
+<p>Go 1.8 is introducing a <a href="https://github.com/golang/go/issues/17262">default GOPATH</a>.
+If you don&rsquo;t set one, the tools will use the default. Default GOPATH is:</p>
+
+<ul>
+<li>$HOME/go on Unix-like systems</li>
+<li>%USERPROFILE%\go on Windows</li>
+</ul>
+
+<p>Even though having a default GOPATH is the good first step, it doesn&rsquo;t solve
+all the problems.</p>
+
+<ul>
+<li>Users still need to add $GOPATH/bin into their PATH to run binaries installed by
+<code>go get</code> and <code>go install</code>.</li>
+<li>The users who are developing with the Go language still need to understand
+that the presence of GOPATH, its location and its structure.</li>
+<li>If your GOROOT (the location where you checkout the Go&rsquo;s source code)
+is the default GOPATH and if you don&rsquo;t have a GOPATH set, the
+tools will reject to use the default GOPATH not to corrupt your
+GOROOT.</li>
+</ul>
+
+<p>When in doubt, you can learn about what your GOPATH by running <code>go env GOPATH</code>
+as usual. It will report no paths if the go tool is rejecting to auto
+set a default GOPATH for any reason.</p>
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
       <a href="http://golang.rakyll.org/http2push/">
         HTTP/2 Server Push
       </a>

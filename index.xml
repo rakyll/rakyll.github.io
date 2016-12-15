@@ -6,8 +6,51 @@
     <description>Recent content on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 10 Dec 2016 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Wed, 14 Dec 2016 11:27:27 -0400</lastBuildDate>
     <atom:link href="http://golang.rakyll.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>The default GOPATH</title>
+      <link>http://golang.rakyll.org/default-gopath/</link>
+      <pubDate>Wed, 14 Dec 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/default-gopath/</guid>
+      <description>&lt;p&gt;Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.&lt;/p&gt;
+
+&lt;p&gt;The requirement of setting a GOPATH has been a major issue for Go users
+who installed the Go tools for the first time and got the
+&amp;ldquo;you have to set a GOPATH&amp;rdquo; error in their initial experience with the tools.
+Explaining the GOPATH is and instructing how to set this env variable were both
+distracting new users away from using Go. This was especially true for users who
+are not necessarily developing in Go but using &lt;code&gt;go get&lt;/code&gt; to download commands.&lt;/p&gt;
+
+&lt;p&gt;Go 1.8 is introducing a &lt;a href=&#34;https://github.com/golang/go/issues/17262&#34;&gt;default GOPATH&lt;/a&gt;.
+If you don&amp;rsquo;t set one, the tools will use the default. Default GOPATH is:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;$HOME/go on Unix-like systems&lt;/li&gt;
+&lt;li&gt;%USERPROFILE%\go on Windows&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Even though having a default GOPATH is the good first step, it doesn&amp;rsquo;t solve
+all the problems.&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Users still need to add $GOPATH/bin into their PATH to run binaries installed by
+&lt;code&gt;go get&lt;/code&gt; and &lt;code&gt;go install&lt;/code&gt;.&lt;/li&gt;
+&lt;li&gt;The users who are developing with the Go language still need to understand
+that the presence of GOPATH, its location and its structure.&lt;/li&gt;
+&lt;li&gt;If your GOROOT (the location where you checkout the Go&amp;rsquo;s source code)
+is the default GOPATH and if you don&amp;rsquo;t have a GOPATH set, the
+tools will reject to use the default GOPATH not to corrupt your
+GOROOT.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;When in doubt, you can learn about what your GOPATH by running &lt;code&gt;go env GOPATH&lt;/code&gt;
+as usual. It will report no paths if the go tool is rejecting to auto
+set a default GOPATH for any reason.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>HTTP/2 Server Push</title>
@@ -1253,15 +1296,6 @@ required libraries will be built while building user packages.
 But, the standard libraries builds are not preserved for future use at this
 stage and they will be rebuilt each time you run &lt;code&gt;go build&lt;/code&gt;.&lt;/p&gt;
 </description>
-    </item>
-    
-    <item>
-      <title>Archive</title>
-      <link>http://golang.rakyll.org/archive/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://golang.rakyll.org/archive/</guid>
-      <description></description>
     </item>
     
   </channel>
