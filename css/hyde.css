@@ -45,6 +45,18 @@ html {
   }
 }
 
+ul.archive li {
+  font-size: 1.25rem;
+  line-height: 220%;
+  font-weight: bold;
+}
+
+ul.archive li .date {
+  font-size: 13px;
+  font-weight: normal;
+  color: #515151;
+}
+
 pre {
   background-color: #E0EBF5;
   overflow: auto;
