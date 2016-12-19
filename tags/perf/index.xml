@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Perf on go bits</title>
+    <link>http://golang.rakyll.org/tags/perf/index.xml</link>
+    <description>Recent content in Perf on go bits</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="http://golang.rakyll.org/tags/perf/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Mutex profile</title>
+      <link>http://golang.rakyll.org/mutexprofile/</link>
+      <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
+      
+      <guid>http://golang.rakyll.org/mutexprofile/</guid>
+      <description>&lt;p&gt;Go 1.8 introduces a new profile, the contended mutex profile, that allows you to
+capture a fraction of the stack traces of goroutines with contended mutexes.&lt;/p&gt;
+
+&lt;p&gt;You need to set the sampling fraction by calling
+&lt;a href=&#34;http://beta.golang.org/pkg/runtime/#SetMutexProfileFraction&#34;&gt;runtime.SetMutexProfileFraction&lt;/a&gt;
+to a value above zero to enable collection.&lt;/p&gt;
+
+&lt;p&gt;Consider the following program:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import _ &amp;quot;net/http/pprof&amp;quot;
+
+var mu sync.Mutex
+var items = make(map[int]struct{})
+
+runtime.SetMutexProfileFraction(5)
+for i := 0; i &amp;lt; 1000*1000; i++ {
+    go func() {
+        mu.Lock()
+        defer mu.Unlock()
+
+        items[i] = struct{}{}
+    }()
+}
+
+http.ListenAndServe(&amp;quot;:8888&amp;quot;, nil)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Run the program, &lt;a href=&#34;http://localhost:8888/debug/pprof/mutex?debug=1&#34;&gt;http://localhost:8888/debug/pprof/mutex&lt;/a&gt; will
+serve the mutex profile. Then, you can use &lt;code&gt;go tool pprof&lt;/code&gt; to examine the profile.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go tool pprof &amp;lt;binary&amp;gt; http://localhost:8888/debug/pprof/mutex?debug=1
+Fetching profile from http://localhost:8888/debug/pprof/mutex
+Saved profile in /Users/jbd/pprof/pprof.mutexprofile.localhost:8888.contentions.delay.002.pb.gz
+Entering interactive mode (type &amp;quot;help&amp;quot; for commands)
+(pprof) list
+Total: 27.15s
+ROUTINE ======================== main.main.func1 in /Users/jbd/src/hello/mutexprofile/main.go
+         0     27.15s (flat, cum)   100% of Total
+         .          .     18:		go func() {
+         .          .     19:			mu.Lock()
+         .          .     20:			defer mu.Unlock()
+         .          .     21:
+         .          .     22:			items[i] = struct{}{}
+         .     27.15s     23:		}()
+         .          .     24:	}
+         .          .     25:	http.ListenAndServe(&amp;quot;:8888&amp;quot;, nil)
+         .          .     26:}
+ROUTINE ======================== runtime.goexit in /Users/jbd/go/src/runtime/asm_amd64.s
+         0     27.15s (flat, cum)   100% of Total
+         .          .   2179:	RET
+         .          .   2180:
+         .          .   2181:// The top-most function running on a goroutine
+         .          .   2182:// returns to goexit+PCQuantum.
+         .          .   2183:TEXT runtime·goexit(SB),NOSPLIT,$0-0
+         .     27.15s   2184:	BYTE	$0x90	// NOP
+         .          .   2185:	CALL	runtime·goexit1(SB)	// does not return
+         .          .   2186:	// traceback from goexit1 must hit code range of goexit
+         .          .   2187:	BYTE	$0x90	// NOP
+         .          .   2188:
+         .          .   2189:TEXT runtime·prefetcht0(SB),NOSPLIT,$0-8
+ROUTINE ======================== sync.(*Mutex).Unlock in /Users/jbd/go/src/sync/mutex.go
+    27.15s     27.15s (flat, cum)   100% of Total
+         .          .    121:			return
+         .          .    122:		}
+         .          .    123:		// Grab the right to wake someone.
+         .          .    124:		new = (old - 1&amp;lt;&amp;lt;mutexWaiterShift) | mutexWoken
+         .          .    125:		if atomic.CompareAndSwapInt32(&amp;amp;m.state, old, new) {
+    27.15s     27.15s    126:			runtime_Semrelease(&amp;amp;m.sema)
+         .          .    127:			return
+         .          .    128:		}
+         .          .    129:		old = m.state
+         .          .    130:	}
+         .          .    131:}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;The fraction is automatically set in tests if &lt;code&gt;-mutexprofile&lt;/code&gt; is used. Set
+the flag to write the profile to a file.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;go test -mutexprofile=mutex.out
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then, the pprof tool can be used to examine the recorded profile.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;go tool pprof &amp;lt;binary&amp;gt; mutex.out
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;See the &lt;a href=&#34;http://beta.golang.org/pkg/runtime/pprof/&#34;&gt;runtime/pprof&lt;/a&gt; package for more details about profiling
+and the predefined profiles. Happy profiling!&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>
