@@ -30,12 +30,12 @@ var items = make(map[int]struct{})
 
 runtime.SetMutexProfileFraction(5)
 for i := 0; i &amp;lt; 1000*1000; i++ {
-    go func() {
+    go func(i int) {
         mu.Lock()
         defer mu.Unlock()
 
         items[i] = struct{}{}
-    }()
+    }(i)
 }
 
 http.ListenAndServe(&amp;quot;:8888&amp;quot;, nil)
