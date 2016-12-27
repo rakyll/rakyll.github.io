@@ -562,7 +562,7 @@ For example,&lt;/p&gt;
 &lt;pre&gt;&lt;code&gt;$ go get -d golang.org/x/oauth2/...
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;will clone the package to $GOPATH/src/golang.org/x/ouath2. Given golang.org/x/oauth2 is a
+&lt;p&gt;will clone the package to $GOPATH/src/golang.org/x/oauth2. Given golang.org/x/oauth2 is a
 vanity URL, go-getting the repo is useful rather than trying to figure out
 where the actual repo is (go.googlesource.com/oauth2).&lt;/p&gt;
 
