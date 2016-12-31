@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Stdlib on go bits</title>
-    <link>http://golang.rakyll.org/tags/stdlib/index.xml</link>
+    <link>https://rakyll.org/tags/stdlib/index.xml</link>
     <description>Recent content in Stdlib on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="http://golang.rakyll.org/tags/stdlib/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://rakyll.org/tags/stdlib/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>HTTP/2 Server Push</title>
-      <link>http://golang.rakyll.org/http2push/</link>
+      <link>https://rakyll.org/http2push/</link>
       <pubDate>Sat, 10 Dec 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/http2push/</guid>
+      <guid>https://rakyll.org/http2push/</guid>
       <description>&lt;p&gt;Go 1.8 is going to feature support for HTTP/2 server push.&lt;/p&gt;
 
 &lt;p&gt;HTTP/2 has many features designed to make the Web faster. One of those features
@@ -55,7 +55,7 @@ http.HandleFunc(&amp;quot;/&amp;quot;, func(w http.ResponseWriter, r *http.Reque
 &lt;p&gt;In the Network tab, you can see that the JavaScript file is loaded by server push rather
 than a GET request.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/http2push.png&#34; alt=&#34;Push&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/http2push.png&#34; alt=&#34;Push&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Push support will be available in Go 1.8
 that is available as &lt;a href=&#34;(https://groups.google.com/forum/#!topic/golang-nuts/QYuo0fai6YE)&#34;&gt;beta&lt;/a&gt;,
@@ -65,10 +65,10 @@ download and give this a try. A full sample program can by found on &lt;a href=&
     
     <item>
       <title>Using contexts to avoid leaking goroutines</title>
-      <link>http://golang.rakyll.org/leakingctx/</link>
+      <link>https://rakyll.org/leakingctx/</link>
       <pubDate>Tue, 25 Oct 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/leakingctx/</guid>
+      <guid>https://rakyll.org/leakingctx/</guid>
       <description>&lt;p&gt;The &lt;a href=&#34;https://godoc.org/pkg/context&#34;&gt;context&lt;/a&gt; package makes it possible
 to manage a chain of calls within the same call path by signaling context&amp;rsquo;s
 Done channel.&lt;/p&gt;

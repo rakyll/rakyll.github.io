@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Coventions on go bits</title>
-    <link>http://golang.rakyll.org/tags/coventions/index.xml</link>
+    <link>https://rakyll.org/tags/coventions/index.xml</link>
     <description>Recent content in Coventions on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="http://golang.rakyll.org/tags/coventions/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://rakyll.org/tags/coventions/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Deprecation notices in Go</title>
-      <link>http://golang.rakyll.org/deprecated/</link>
+      <link>https://rakyll.org/deprecated/</link>
       <pubDate>Thu, 08 Dec 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/deprecated/</guid>
+      <guid>https://rakyll.org/deprecated/</guid>
       <description>&lt;p&gt;In Go, for a long time, we didn&amp;rsquo;t have a convention to label the deprecated APIs.
 In the past years, there is new convention emerged to add deprecation notices to the docs.&lt;/p&gt;
 

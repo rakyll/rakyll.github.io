@@ -2,150 +2,150 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>http://golang.rakyll.org/mutexprofile/</loc>
+    <loc>https://rakyll.org/mutexprofile/</loc>
     <lastmod>2016-12-19T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/default-gopath/</loc>
+    <loc>https://rakyll.org/default-gopath/</loc>
     <lastmod>2016-12-14T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/http2push/</loc>
+    <loc>https://rakyll.org/http2push/</loc>
     <lastmod>2016-12-10T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/deprecated/</loc>
+    <loc>https://rakyll.org/deprecated/</loc>
     <lastmod>2016-12-08T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/leakingctx/</loc>
+    <loc>https://rakyll.org/leakingctx/</loc>
     <lastmod>2016-10-25T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/codegen/</loc>
+    <loc>https://rakyll.org/codegen/</loc>
     <lastmod>2016-10-15T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/human-first/</loc>
+    <loc>https://rakyll.org/human-first/</loc>
     <lastmod>2016-10-11T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/go-tool-flags/</loc>
+    <loc>https://rakyll.org/go-tool-flags/</loc>
     <lastmod>2016-09-25T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/examples-coverage/</loc>
+    <loc>https://rakyll.org/examples-coverage/</loc>
     <lastmod>2016-09-08T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/parallelize-test-tables/</loc>
+    <loc>https://rakyll.org/parallelize-test-tables/</loc>
     <lastmod>2016-09-06T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/instruments/</loc>
+    <loc>https://rakyll.org/instruments/</loc>
     <lastmod>2016-09-02T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/grpc-streaming/</loc>
+    <loc>https://rakyll.org/grpc-streaming/</loc>
     <lastmod>2016-08-30T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/about/</loc>
+    <loc>https://rakyll.org/about/</loc>
     <lastmod>2016-08-27T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/eg/</loc>
+    <loc>https://rakyll.org/eg/</loc>
     <lastmod>2016-08-27T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/swift/</loc>
+    <loc>https://rakyll.org/swift/</loc>
     <lastmod>2015-10-03T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/cross-compilation/</loc>
+    <loc>https://rakyll.org/cross-compilation/</loc>
     <lastmod>2015-09-08T11:27:27-04:00</lastmod>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/archive/</loc>
+    <loc>https://rakyll.org/archive/</loc>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/coventions/</loc>
+    <loc>https://rakyll.org/tags/coventions/</loc>
     <lastmod>2016-12-08T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/go1/index.8/</loc>
+    <loc>https://rakyll.org/tags/go1/index.8/</loc>
     <lastmod>2016-12-14T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/language/</loc>
+    <loc>https://rakyll.org/tags/language/</loc>
     <lastmod>2016-10-11T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/perf/</loc>
+    <loc>https://rakyll.org/tags/perf/</loc>
     <lastmod>2016-12-19T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/profiling/</loc>
+    <loc>https://rakyll.org/tags/profiling/</loc>
     <lastmod>2016-09-02T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/rpc/</loc>
+    <loc>https://rakyll.org/tags/rpc/</loc>
     <lastmod>2016-08-30T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/stdlib/</loc>
+    <loc>https://rakyll.org/tags/stdlib/</loc>
     <lastmod>2016-12-10T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/</loc>
+    <loc>https://rakyll.org/tags/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/testing/</loc>
+    <loc>https://rakyll.org/tags/testing/</loc>
     <lastmod>2016-09-06T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/tags/tooling/</loc>
+    <loc>https://rakyll.org/tags/tooling/</loc>
     <lastmod>2016-12-19T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>http://golang.rakyll.org/</loc>
+    <loc>https://rakyll.org/</loc>
     <lastmod>2016-12-19T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>

@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Perf on go bits</title>
-    <link>http://golang.rakyll.org/tags/perf/index.xml</link>
+    <link>https://rakyll.org/tags/perf/index.xml</link>
     <description>Recent content in Perf on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="http://golang.rakyll.org/tags/perf/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://rakyll.org/tags/perf/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Mutex profile</title>
-      <link>http://golang.rakyll.org/mutexprofile/</link>
+      <link>https://rakyll.org/mutexprofile/</link>
       <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/mutexprofile/</guid>
+      <guid>https://rakyll.org/mutexprofile/</guid>
       <description>&lt;p&gt;Go 1.8 introduces a new profile, the contended mutex profile, that allows you to
 capture a fraction of the stack traces of goroutines with contended mutexes.&lt;/p&gt;
 

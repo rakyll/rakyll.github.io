@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Rpc on go bits</title>
-    <link>http://golang.rakyll.org/tags/rpc/index.xml</link>
+    <link>https://rakyll.org/tags/rpc/index.xml</link>
     <description>Recent content in Rpc on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="http://golang.rakyll.org/tags/rpc/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://rakyll.org/tags/rpc/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Bidirectional gRPC streaming for Go</title>
-      <link>http://golang.rakyll.org/grpc-streaming/</link>
+      <link>https://rakyll.org/grpc-streaming/</link>
       <pubDate>Tue, 30 Aug 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/grpc-streaming/</guid>
+      <guid>https://rakyll.org/grpc-streaming/</guid>
       <description>&lt;p&gt;&lt;em&gt;Disclaimer: This article is not about a core Go package or tool but &lt;a href=&#34;http://www.grpc.io/&#34;&gt;gRPC&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;gRPC provides support for implementing streaming endpoints as well as

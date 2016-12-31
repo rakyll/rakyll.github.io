@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Profiling on go bits</title>
-    <link>http://golang.rakyll.org/tags/profiling/index.xml</link>
+    <link>https://rakyll.org/tags/profiling/index.xml</link>
     <description>Recent content in Profiling on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="http://golang.rakyll.org/tags/profiling/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://rakyll.org/tags/profiling/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Using Instruments to profile Go programs</title>
-      <link>http://golang.rakyll.org/instruments/</link>
+      <link>https://rakyll.org/instruments/</link>
       <pubDate>Fri, 02 Sep 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/instruments/</guid>
+      <guid>https://rakyll.org/instruments/</guid>
       <description>&lt;p&gt;Apple has a suite of instrumentation and tracing tools for performance
 analysis avaiable as a part of their Xcode tooling set. In this article,
 we will use &lt;a href=&#34;https://developer.apple.com/library/prerelease/content/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/&#34;&gt;Instruments&lt;/a&gt;
@@ -52,13 +52,13 @@ to the target provided in the arguments.&lt;/p&gt;
 
 &lt;p&gt;The target I have for &lt;code&gt;hey&lt;/code&gt; looks like what&amp;rsquo;s below.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/instruments-target.png&#34; alt=&#34;Instruments target&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/instruments-target.png&#34; alt=&#34;Instruments target&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Once you have a target, you can click on the record button to start
 recording samples. Once enough samples are collected, stop or it will
 eventually stop when the program finishes.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/instruments-results.png&#34; alt=&#34;Instruments results&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/instruments-results.png&#34; alt=&#34;Instruments results&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;You can filter by symbol name, user vs kernel callstacks, time span,
 physical or logical CPU and more. You can also double click any of the symbols listed

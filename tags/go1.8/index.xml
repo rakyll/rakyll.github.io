@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Go1.8 on go bits</title>
-    <link>http://golang.rakyll.org/tags/go1.8/index.xml</link>
+    <link>https://rakyll.org/tags/go1.8/index.xml</link>
     <description>Recent content in Go1.8 on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="http://golang.rakyll.org/tags/go1.8/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://rakyll.org/tags/go1.8/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>The default GOPATH</title>
-      <link>http://golang.rakyll.org/default-gopath/</link>
+      <link>https://rakyll.org/default-gopath/</link>
       <pubDate>Wed, 14 Dec 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/default-gopath/</guid>
+      <guid>https://rakyll.org/default-gopath/</guid>
       <description>&lt;p&gt;Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.&lt;/p&gt;
 
 &lt;p&gt;The requirement of setting a GOPATH has been a major issue for Go users
@@ -53,10 +53,10 @@ set a default GOPATH for any reason.&lt;/p&gt;
     
     <item>
       <title>HTTP/2 Server Push</title>
-      <link>http://golang.rakyll.org/http2push/</link>
+      <link>https://rakyll.org/http2push/</link>
       <pubDate>Sat, 10 Dec 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/http2push/</guid>
+      <guid>https://rakyll.org/http2push/</guid>
       <description>&lt;p&gt;Go 1.8 is going to feature support for HTTP/2 server push.&lt;/p&gt;
 
 &lt;p&gt;HTTP/2 has many features designed to make the Web faster. One of those features
@@ -98,7 +98,7 @@ http.HandleFunc(&amp;quot;/&amp;quot;, func(w http.ResponseWriter, r *http.Reque
 &lt;p&gt;In the Network tab, you can see that the JavaScript file is loaded by server push rather
 than a GET request.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/http2push.png&#34; alt=&#34;Push&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/http2push.png&#34; alt=&#34;Push&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Push support will be available in Go 1.8
 that is available as &lt;a href=&#34;(https://groups.google.com/forum/#!topic/golang-nuts/QYuo0fai6YE)&#34;&gt;beta&lt;/a&gt;,

@@ -2,18 +2,18 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tooling on go bits</title>
-    <link>http://golang.rakyll.org/tags/tooling/index.xml</link>
+    <link>https://rakyll.org/tags/tooling/index.xml</link>
     <description>Recent content in Tooling on go bits</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="http://golang.rakyll.org/tags/tooling/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://rakyll.org/tags/tooling/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Mutex profile</title>
-      <link>http://golang.rakyll.org/mutexprofile/</link>
+      <link>https://rakyll.org/mutexprofile/</link>
       <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/mutexprofile/</guid>
+      <guid>https://rakyll.org/mutexprofile/</guid>
       <description>&lt;p&gt;Go 1.8 introduces a new profile, the contended mutex profile, that allows you to
 capture a fraction of the stack traces of goroutines with contended mutexes.&lt;/p&gt;
 
@@ -107,10 +107,10 @@ and the predefined profiles. Happy profiling!&lt;/p&gt;
     
     <item>
       <title>The default GOPATH</title>
-      <link>http://golang.rakyll.org/default-gopath/</link>
+      <link>https://rakyll.org/default-gopath/</link>
       <pubDate>Wed, 14 Dec 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/default-gopath/</guid>
+      <guid>https://rakyll.org/default-gopath/</guid>
       <description>&lt;p&gt;Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.&lt;/p&gt;
 
 &lt;p&gt;The requirement of setting a GOPATH has been a major issue for Go users
@@ -150,10 +150,10 @@ set a default GOPATH for any reason.&lt;/p&gt;
     
     <item>
       <title>Debugging code generation in Go</title>
-      <link>http://golang.rakyll.org/codegen/</link>
+      <link>https://rakyll.org/codegen/</link>
       <pubDate>Sat, 15 Oct 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/codegen/</guid>
+      <guid>https://rakyll.org/codegen/</guid>
       <description>
 
 &lt;p&gt;&lt;em&gt;Last week, I was at &lt;a href=&#34;http://www.dotgo.eu/&#34;&gt;dotGo&lt;/a&gt;, participating one of the
@@ -311,7 +311,7 @@ It will generate an ssa.html file which will provide all the steps, compiler has
 
 &lt;p&gt;Here, there is a visualization of all the passes applied to the main function.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/ssa.png&#34; alt=&#34;SSA optimizations&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/ssa.png&#34; alt=&#34;SSA optimizations&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Go compiler can also annotate the inlining and escape analysis.
 If you pass &lt;code&gt;-m=2&lt;/code&gt; flag to the compiler, it will output the optimizations or annotations related to these two.
@@ -424,10 +424,10 @@ lex: implicit semi
     
     <item>
       <title>Go tooling essentials</title>
-      <link>http://golang.rakyll.org/go-tool-flags/</link>
+      <link>https://rakyll.org/go-tool-flags/</link>
       <pubDate>Sun, 25 Sep 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/go-tool-flags/</guid>
+      <guid>https://rakyll.org/go-tool-flags/</guid>
       <description>
 
 &lt;p&gt;New to the Go tools? Or do you want to expand your knowledge? This article is
@@ -523,7 +523,7 @@ visualize them on a browser.&lt;/p&gt;
 &lt;p&gt;The command above will create a coverage profile and open the results page in
 the browser. The visualized results will look like the page below:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/context-coverage.png&#34; alt=&#34;context coverage&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/context-coverage.png&#34; alt=&#34;context coverage&#34; /&gt;&lt;/p&gt;
 
 &lt;h3 id=&#34;go-test-exec&#34;&gt;$ go test -exec&lt;/h3&gt;
 
@@ -590,10 +590,10 @@ for writing bash scripts.&lt;/p&gt;
     
     <item>
       <title>Examples coverage</title>
-      <link>http://golang.rakyll.org/examples-coverage/</link>
+      <link>https://rakyll.org/examples-coverage/</link>
       <pubDate>Thu, 08 Sep 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/examples-coverage/</guid>
+      <guid>https://rakyll.org/examples-coverage/</guid>
       <description>&lt;p&gt;Go programming language provides many unique good features to &lt;a href=&#34;https://blog.golang.org/examples&#34;&gt;
 write and maintain examples&lt;/a&gt; for your packages backed by the testing tools.&lt;/p&gt;
 
@@ -610,7 +610,7 @@ in your browser.&lt;/p&gt;
 &lt;p&gt;Please note that the coverage is reported for Examples with an Output block.
 Examples without an &amp;ldquo;Output&amp;rdquo; block will not be tested and reported.&lt;/p&gt;
 
-&lt;p&gt;Here is what the &lt;a href=&#34;http://golang.rakyll.org/att/example-coverage.html&#34;&gt;coverage&lt;/a&gt; looks like
+&lt;p&gt;Here is what the &lt;a href=&#34;https://rakyll.org/att/example-coverage.html&#34;&gt;coverage&lt;/a&gt; looks like
 for the strings package from the stdlib.&lt;/p&gt;
 
 &lt;p&gt;High example coverage is probably not a neccesary signal
@@ -623,10 +623,10 @@ more comphensively.&lt;/p&gt;
     
     <item>
       <title>Using Instruments to profile Go programs</title>
-      <link>http://golang.rakyll.org/instruments/</link>
+      <link>https://rakyll.org/instruments/</link>
       <pubDate>Fri, 02 Sep 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/instruments/</guid>
+      <guid>https://rakyll.org/instruments/</guid>
       <description>&lt;p&gt;Apple has a suite of instrumentation and tracing tools for performance
 analysis avaiable as a part of their Xcode tooling set. In this article,
 we will use &lt;a href=&#34;https://developer.apple.com/library/prerelease/content/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/&#34;&gt;Instruments&lt;/a&gt;
@@ -665,13 +665,13 @@ to the target provided in the arguments.&lt;/p&gt;
 
 &lt;p&gt;The target I have for &lt;code&gt;hey&lt;/code&gt; looks like what&amp;rsquo;s below.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/instruments-target.png&#34; alt=&#34;Instruments target&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/instruments-target.png&#34; alt=&#34;Instruments target&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Once you have a target, you can click on the record button to start
 recording samples. Once enough samples are collected, stop or it will
 eventually stop when the program finishes.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;http://golang.rakyll.org/img/instruments-results.png&#34; alt=&#34;Instruments results&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/instruments-results.png&#34; alt=&#34;Instruments results&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;You can filter by symbol name, user vs kernel callstacks, time span,
 physical or logical CPU and more. You can also double click any of the symbols listed
@@ -688,10 +688,10 @@ it became easier for tools like Instruments to capture backtraces more efficient
     
     <item>
       <title>Apply transformations to Go code with eg</title>
-      <link>http://golang.rakyll.org/eg/</link>
+      <link>https://rakyll.org/eg/</link>
       <pubDate>Sat, 27 Aug 2016 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/eg/</guid>
+      <guid>https://rakyll.org/eg/</guid>
       <description>&lt;p&gt;If you are willing to make large scale refactoring in your
 Go programs, automating the refactoring tasks is more desirable than
 manual editing. &lt;code&gt;eg&lt;/code&gt; is a program that allows you to perform transformations
@@ -772,10 +772,10 @@ reference how to write other transformation templates.&lt;/p&gt;
     
     <item>
       <title>Go cross compilation</title>
-      <link>http://golang.rakyll.org/cross-compilation/</link>
+      <link>https://rakyll.org/cross-compilation/</link>
       <pubDate>Tue, 08 Sep 2015 11:27:27 -0400</pubDate>
       
-      <guid>http://golang.rakyll.org/cross-compilation/</guid>
+      <guid>https://rakyll.org/cross-compilation/</guid>
       <description>
 
 &lt;p&gt;Note: This article extends &lt;a href=&#34;http://dave.cheney.net/2015/03/03/cross-compilation-just-got-a-whole-lot-better-in-go-1-5&#34;&gt;Dave Cheney’s Go 1.5 cross compilers&lt;/a&gt; post.&lt;/p&gt;
