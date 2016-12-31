@@ -1,15 +1,236 @@
-<!DOCTYPE HTML>
-<html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="refresh" content="1;url=https://rakyll.org/go-tool-flags/">
-        <script type="text/javascript">
-            window.location.href = "https://rakyll.org\/go-tool-flags\/"
-        </script>
-        <title>Page Redirection</title>
-    </head>
-    <body>
-        
-        If you are not redirected automatically, go to <a href='https://rakyll.org/go-tool-flags/'>rakyll.org</a>.
-    </body>
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.18-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>Go tooling essentials &middot; go bits</title>
+  
+
+  
+  <link rel="stylesheet" href="https://rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="go bits" />
+</head>
+
+	<body class=" layout-reverse">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="https://rakyll.org/"><h1>go bits</h1></a>
+      <p class="lead">
+      A collage of little known practical tips for the Go programming language.
+      <br/>
+      by <a href="https://twitter.com/rakyll">@rakyll</a>
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive/">Archive</a> </li>
+      <li><a href="/about/">About</a> </li>
+      
+    </ul>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    </p>
+  </div>
+</div>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>Go tooling essentials</h1>
+			  <span class="post-date">Sun, Sep 25, 2016</span>
+			      
+
+<p>New to the Go tools? Or do you want to expand your knowledge? This article is
+about the flags for the Go tools everyone should know.</p>
+
+<p><em>Disclaimer: This article might be slightly biased. This is a collection of
+flags I personally use and flags people around me having trouble finding references for.
+If you have more ideas, ping me on <a href="https://twitter.com/rakyll">Twitter</a>.</em></p>
+
+<h3 id="go-build-x">$ go build -x</h3>
+
+<p><code>-x</code> lists all the commands go build invokes.</p>
+
+<p>If you are curious about the Go toolchain, or using a cross-C compiler and
+wondering about flags passed to the external compiler, or suspicious about
+a linker bug; use <code>-x</code> to see all the invocations.</p>
+
+<pre><code>$ go build -x
+WORK=/var/folders/00/1b8h8000h01000cxqpysvccm005d21/T/go-build600909754
+mkdir -p $WORK/hello/perf/_obj/
+mkdir -p $WORK/hello/perf/_obj/exe/
+cd /Users/jbd/src/hello/perf
+/Users/jbd/go/pkg/tool/darwin_amd64/compile -o $WORK/hello/perf.a -trimpath $WORK -p main -complete -buildid bbf8e880e7dd4114f42a7f57717f9ea5cc1dd18d -D _/Users/jbd/src/hello/perf -I $WORK -pack ./perf.go
+cd .
+/Users/jbd/go/pkg/tool/darwin_amd64/link -o $WORK/hello/perf/_obj/exe/a.out -L $WORK -extld=clang -buildmode=exe -buildid=bbf8e880e7dd4114f42a7f57717f9ea5cc1dd18d $WORK/hello/perf.a
+mv $WORK/hello/perf/_obj/exe/a.out perf
+</code></pre>
+
+<h3 id="go-build-gcflags">$ go build -gcflags</h3>
+
+<p>Used to pass flags to the Go compiler. <code>go tool compile -help</code> lists all
+the flags that can be passed to the compiler.</p>
+
+<p>For example, to disable compiler optimizations and inlining, you can use
+the following the gcflags.</p>
+
+<pre><code>$ go build -gcflags=&quot;-N -l&quot;
+</code></pre>
+
+<h3 id="go-test-v">$ go test -v</h3>
+
+<p>It provides chatty output for the testing. It prints the test name,
+its status (failed or passed), how much it took to run the test, any logs
+from the test case, etc.</p>
+
+<p>go test without the <code>-v</code> flag is highly quiet, I always use it with <code>-v</code> turned on.
+Sample output:</p>
+
+<pre><code>$ go test -v context
+=== RUN   TestBackground
+--- PASS: TestBackground (0.00s)
+=== RUN   TestTODO
+--- PASS: TestTODO (0.00s)
+=== RUN   TestWithCancel
+--- PASS: TestWithCancel (0.10s)
+=== RUN   TestParentFinishesChild
+--- PASS: TestParentFinishesChild (0.00s)
+=== RUN   TestChildFinishesFirst
+--- PASS: TestChildFinishesFirst (0.00s)
+=== RUN   TestDeadline
+--- PASS: TestDeadline (0.16s)
+=== RUN   TestTimeout
+--- PASS: TestTimeout (0.16s)
+=== RUN   TestCanceledTimeout
+--- PASS: TestCanceledTimeout (0.10s)
+...
+PASS
+ok  	context	2.426s
+</code></pre>
+
+<h3 id="go-test-race">$ go test -race</h3>
+
+<p><a href="https://blog.golang.org/race-detector">Go&rsquo;s race detector</a> is available
+from the Go tools via <code>-race</code>. go test also supports this flag and reports races.
+Use this flag during development to detect the races.</p>
+
+<h3 id="go-test-run">$ go test -run</h3>
+
+<p>You can filter tests to run by regex and the <code>-run</code> flag. The following command
+will only <a href="https://blog.golang.org/examples">test examples</a>.</p>
+
+<pre><code>$ go test -run=Example
+</code></pre>
+
+<h3 id="go-test-coverprofile">$ go test -coverprofile</h3>
+
+<p>You can output a cover profile as you are testing a package, then use go tool to
+visualize them on a browser.</p>
+
+<pre><code>$ go test -coverprofile=c.out &amp;&amp; go tool cover -html=c.out
+</code></pre>
+
+<p>The command above will create a coverage profile and open the results page in
+the browser. The visualized results will look like the page below:</p>
+
+<p><img src="/img/context-coverage.png" alt="context coverage" /></p>
+
+<h3 id="go-test-exec">$ go test -exec</h3>
+
+<p>It is a lesser known feature in Go that you can intercept the tools with another
+program by using the <code>-exec</code> flag. This flag allows you to delegate some work to an
+external program from the Go tool.</p>
+
+<p>A commonly required scenario for this flag is when you need more than just executing
+the tests on the host machine. The Android builder for Go, uses <code>-exec</code> to push the
+test binaries to an Android device by using <code>adb</code> and collects the results.
+<a href="https://github.com/golang/go/blob/master/misc/android/go_android_exec.go">Android exec program</a>
+can be used as a reference.</p>
+
+<h3 id="go-get-u">$ go get -u</h3>
+
+<p>If you run go-get for a package that is already in your GOPATH, go-get
+is not going to update the package to its latest version.
+<code>-u</code> forces the tool to sync with the latest version of the repo.</p>
+
+<p>If you are a library author, you might like to write your installation
+instructions with a <code>-u</code> flag, e.g. the way <a href="https://github.com/golang/lint#installation">golint</a> does.</p>
+
+<pre><code>$ go get -u github.com/golang/lint/golint
+</code></pre>
+
+<h3 id="go-get-d">$ go get -d</h3>
+
+<p>If you just want to clone a repo to your GOPATH and skip the building
+and installation phase, use <code>-d</code>. It downloads the package and stops
+before trying to build or install it.</p>
+
+<p>I often use it as a replacement for git clone for repos with vanity URLs,
+because it clones the repo to its proper GOPATH.
+For example,</p>
+
+<pre><code>$ go get -d golang.org/x/oauth2/...
+</code></pre>
+
+<p>will clone the package to $GOPATH/src/golang.org/x/oauth2. Given golang.org/x/oauth2 is a
+vanity URL, go-getting the repo is useful rather than trying to figure out
+where the actual repo is (go.googlesource.com/oauth2).</p>
+
+<h3 id="go-get-t">$ go get -t</h3>
+
+<p>If your package has additional dependencies for tests, <code>-t</code> will allow you to
+download them during go-get.
+If you don&rsquo;t pass <code>-t</code>, go get will only download the dependencies for your non-test code.</p>
+
+<h3 id="go-list-f">$ go list -f</h3>
+
+<p>Allows you to list Go packages with a custom format. It is highly useful
+for writing bash scripts.</p>
+
+<p>The following command will print the dependencies of the runtime package:</p>
+
+<pre><code>go list -f '{{.Deps}}' runtime
+[runtime/internal/atomic runtime/internal/sys unsafe]
+</code></pre>
+
+<p>More formatting ideas can be found at
+<a href="http://dave.cheney.net/2014/09/14/go-list-your-swiss-army-knife">Dave Cheney&rsquo;s article</a> on <code>go list</code>.</p>
+
+			</div>
+
+			
+
+		</div>
+
+  </body>
 </html>
