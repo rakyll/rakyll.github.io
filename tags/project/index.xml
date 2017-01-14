@@ -33,18 +33,18 @@ I have included in the data set.&lt;/p&gt;
 
 &lt;p&gt;But, more than 55% of the commits came from the top 10 contributors.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;| Author               | Changes   |
-|----------------------|-----------|
-| Brad Fitzpatrick     | 225       |
-| Russ Cox             | 140       |
-| Josh Bleecher Snyder | 137       |
-| Robert Griesemer     | 129       |
-| Ian Lance Taylor     | 117       |
-| Austin Clements      | 111       |
-| Matthew Dempsky      | 94        |
-| David Crawshaw       | 69        |
-| Keith Randall        | 65        |
-| Cherry Zhang         | 55        |
+&lt;pre&gt;&lt;code&gt;| Author               | Changes |
+|----------------------|---------|
+| Brad Fitzpatrick     | 225     |
+| Russ Cox             | 140     |
+| Josh Bleecher Snyder | 137     |
+| Robert Griesemer     | 129     |
+| Ian Lance Taylor     | 117     |
+| Austin Clements      | 111     |
+| Matthew Dempsky      | 94      |
+| David Crawshaw       | 69      |
+| Keith Randall        | 65      |
+| Cherry Zhang         | 55      |
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;There is only one non-Googler in the top 10, Josh Bleecher Snyder.&lt;/p&gt;
