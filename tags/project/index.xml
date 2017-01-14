@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Project on Go, the unwritten parts</title>
+    <link>https://rakyll.org/tags/project/index.xml</link>
+    <description>Recent content in Project on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <atom:link href="https://rakyll.org/tags/project/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Go 1.8 development stats</title>
+      <link>https://rakyll.org/go18cls/</link>
+      <pubDate>Wed, 11 Jan 2017 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/go18cls/</guid>
+      <description>
+
+&lt;p&gt;Go 1.8 is going to to launched in February 2017. There is a sizable list of
+&lt;a href=&#34;https://beta.golang.org/doc/go1.8&#34;&gt;new features and improvements&lt;/a&gt; on the release notes.
+While these notes is the best summary to see what has happened in the last 6 months,
+I will try to give you some stats to give you a sense of the size of the work.
+I have examined all the changes merged into the tree during the Go 1.8 window and
+will highligth the some of the interesting and significant ones.&lt;/p&gt;
+
+&lt;p&gt;There has been 2049 commits I have examined to gather these results.
+&lt;a href=&#34;https://go-review.googlesource.com/#/c/35111/&#34;&gt;c/35111&lt;/a&gt; is the last commit
+I have included in the data set.&lt;/p&gt;
+
+&lt;h2 id=&#34;contributors&#34;&gt;Contributors&lt;/h2&gt;
+
+&lt;p&gt;There have been 201 contributors involved during the development of 1.8 👏👏👏&lt;/p&gt;
+
+&lt;p&gt;But, more than 55% of the commits came from the top 10 contributors.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;| Author               | Changes   |
+|----------------------|-----------|
+| Brad Fitzpatrick     | 225       |
+| Russ Cox             | 140       |
+| Josh Bleecher Snyder | 137       |
+| Robert Griesemer     | 129       |
+| Ian Lance Taylor     | 117       |
+| Austin Clements      | 111       |
+| Matthew Dempsky      | 94        |
+| David Crawshaw       | 69        |
+| Keith Randall        | 65        |
+| Cherry Zhang         | 55        |
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;There is only one non-Googler in the top 10, Josh Bleecher Snyder.&lt;/p&gt;
+
+&lt;h2 id=&#34;reviews&#34;&gt;Reviews&lt;/h2&gt;
+
+&lt;p&gt;Go has a reputation of having comphensive and throughtful code reviewing.
+Each change list needs at least one reviewer, for controversial topics the number grows easily.
+The average number of reviewers for each change was 3.41 people during this cycle.&lt;/p&gt;
+
+&lt;p&gt;1160 changes got a LGTM without anyone requiring to leave any comment,
+most of these changes are coming from already tenured contributors.&lt;/p&gt;
+
+&lt;p&gt;There also have been noiser changes. Top three of them with most reviewers are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/16551/&#34;&gt;c/16551&lt;/a&gt;: Addition of os.Executable&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/29397/&#34;&gt;c/29397&lt;/a&gt;: Far jumps are handled on ARM, big ARM binaries are fine now.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/32019/&#34;&gt;c/32019&lt;/a&gt;: Implementation of the default GOPATH&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The average number of comments left on a change is 3.51.&lt;/p&gt;
+
+&lt;p&gt;Half of the changes took 8 hours or less to submit from its creation.
+Of course, there been some long standing changes that have waited for long
+(even for a year) and finally made their way to this release but the
+review stage has been quite productive in most cases.&lt;/p&gt;
+
+&lt;h2 id=&#34;size&#34;&gt;Size&lt;/h2&gt;
+
+&lt;p&gt;The size of a change is the sum of lines added and lines deleted.
+Average size for a change during 1.8 development was 190.73 lines.
+If you look at the distribution though, half of the changes are
+smaller than 25 lines.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-biggest-changes&#34;&gt;The biggest changes&lt;/h3&gt;
+
+&lt;p&gt;Most sizeable changes are often going to the compiler. Here are the top 3 biggest changes in 1.8:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/29168/&#34;&gt;c/29168&lt;/a&gt;: Deletion of the old compiler backend&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/28978/&#34;&gt;c/28978&lt;/a&gt;: SSA backend for s390x&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/31478/&#34;&gt;c/31478&lt;/a&gt;: SSA backend for mips&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;minor-fixes&#34;&gt;Minor fixes&lt;/h3&gt;
+
+&lt;p&gt;How many times you have spotted a problem but ignored it because you were ashamed
+of openining a single line commit? There are 390 changes that are under 5 lines in 1.8.
+There is no such thing called little contribution in Go, almost 20% of the
+changes were teeny-tiny.&lt;/p&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

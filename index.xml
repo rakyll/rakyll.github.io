@@ -1,13 +1,104 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>go bits</title>
+    <title>Go, the unwritten parts</title>
     <link>https://rakyll.org/index.xml</link>
-    <description>Recent content on go bits</description>
+    <description>Recent content on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 19 Dec 2016 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Wed, 11 Jan 2017 11:27:27 -0400</lastBuildDate>
     <atom:link href="https://rakyll.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    <item>
+      <title>Go 1.8 development stats</title>
+      <link>https://rakyll.org/go18cls/</link>
+      <pubDate>Wed, 11 Jan 2017 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/go18cls/</guid>
+      <description>
+
+&lt;p&gt;Go 1.8 is going to to launched in February 2017. There is a sizable list of
+&lt;a href=&#34;https://beta.golang.org/doc/go1.8&#34;&gt;new features and improvements&lt;/a&gt; on the release notes.
+While these notes is the best summary to see what has happened in the last 6 months,
+I will try to give you some stats to give you a sense of the size of the work.
+I have examined all the changes merged into the tree during the Go 1.8 window and
+will highligth the some of the interesting and significant ones.&lt;/p&gt;
+
+&lt;p&gt;There has been 2049 commits I have examined to gather these results.
+&lt;a href=&#34;https://go-review.googlesource.com/#/c/35111/&#34;&gt;c/35111&lt;/a&gt; is the last commit
+I have included in the data set.&lt;/p&gt;
+
+&lt;h2 id=&#34;contributors&#34;&gt;Contributors&lt;/h2&gt;
+
+&lt;p&gt;There have been 201 contributors involved during the development of 1.8 👏👏👏&lt;/p&gt;
+
+&lt;p&gt;But, more than 55% of the commits came from the top 10 contributors.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;| Author               | Changes   |
+|----------------------|-----------|
+| Brad Fitzpatrick     | 225       |
+| Russ Cox             | 140       |
+| Josh Bleecher Snyder | 137       |
+| Robert Griesemer     | 129       |
+| Ian Lance Taylor     | 117       |
+| Austin Clements      | 111       |
+| Matthew Dempsky      | 94        |
+| David Crawshaw       | 69        |
+| Keith Randall        | 65        |
+| Cherry Zhang         | 55        |
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;There is only one non-Googler in the top 10, Josh Bleecher Snyder.&lt;/p&gt;
+
+&lt;h2 id=&#34;reviews&#34;&gt;Reviews&lt;/h2&gt;
+
+&lt;p&gt;Go has a reputation of having comphensive and throughtful code reviewing.
+Each change list needs at least one reviewer, for controversial topics the number grows easily.
+The average number of reviewers for each change was 3.41 people during this cycle.&lt;/p&gt;
+
+&lt;p&gt;1160 changes got a LGTM without anyone requiring to leave any comment,
+most of these changes are coming from already tenured contributors.&lt;/p&gt;
+
+&lt;p&gt;There also have been noiser changes. Top three of them with most reviewers are:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/16551/&#34;&gt;c/16551&lt;/a&gt;: Addition of os.Executable&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/29397/&#34;&gt;c/29397&lt;/a&gt;: Far jumps are handled on ARM, big ARM binaries are fine now.&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/32019/&#34;&gt;c/32019&lt;/a&gt;: Implementation of the default GOPATH&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The average number of comments left on a change is 3.51.&lt;/p&gt;
+
+&lt;p&gt;Half of the changes took 8 hours or less to submit from its creation.
+Of course, there been some long standing changes that have waited for long
+(even for a year) and finally made their way to this release but the
+review stage has been quite productive in most cases.&lt;/p&gt;
+
+&lt;h2 id=&#34;size&#34;&gt;Size&lt;/h2&gt;
+
+&lt;p&gt;The size of a change is the sum of lines added and lines deleted.
+Average size for a change during 1.8 development was 190.73 lines.
+If you look at the distribution though, half of the changes are
+smaller than 25 lines.&lt;/p&gt;
+
+&lt;h3 id=&#34;the-biggest-changes&#34;&gt;The biggest changes&lt;/h3&gt;
+
+&lt;p&gt;Most sizeable changes are often going to the compiler. Here are the top 3 biggest changes in 1.8:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/29168/&#34;&gt;c/29168&lt;/a&gt;: Deletion of the old compiler backend&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/28978/&#34;&gt;c/28978&lt;/a&gt;: SSA backend for s390x&lt;/li&gt;
+&lt;li&gt;&lt;a href=&#34;https://go-review.googlesource.com/#/c/31478/&#34;&gt;c/31478&lt;/a&gt;: SSA backend for mips&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&#34;minor-fixes&#34;&gt;Minor fixes&lt;/h3&gt;
+
+&lt;p&gt;How many times you have spotted a problem but ignored it because you were ashamed
+of openining a single line commit? There are 390 changes that are under 5 lines in 1.8.
+There is no such thing called little contribution in Go, almost 20% of the
+changes were teeny-tiny.&lt;/p&gt;
+</description>
+    </item>
     
     <item>
       <title>Mutex profile</title>
@@ -1204,72 +1295,6 @@ func ExtendWith50000ns(t time.Time) time.Time {
 &lt;p&gt;Note: There are many &lt;a href=&#34;https://github.com/golang/tools/tree/master/refactor/eg/testdata&#34;&gt;.template files&lt;/a&gt;
 underneath the package for testing purposes but they can also be used as a
 reference how to write other transformation templates.&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>Calling Go from Swift</title>
-      <link>https://rakyll.org/swift/</link>
-      <pubDate>Sat, 03 Oct 2015 11:27:27 -0400</pubDate>
-      
-      <guid>https://rakyll.org/swift/</guid>
-      <description>&lt;p&gt;&lt;em&gt;Note: Swift bindings are highly experimental and subject to change.
-This work must currently be classified as preliminary work and we will
-be improving APIs in the long term.&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;As a part of the Go Mobile, we have announced tools and packages that
-make language bindings from Java to Go and Objective-C to Go available.
-A relatively new and less documented aspect of the bindings is the
-availability of the Swift to Go calls. This tutorial will explain you
-how to make your initial Swift to Go function invocation.&lt;/p&gt;
-
-&lt;p&gt;Grab the gomobile command and initialize it.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go get golang.org/x/mobile/cmd/gomobile
-$ gomobile init
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In this tutorial, we will use an example Go package from the mobile repo
-called hello to generate bindings for. The hello package exports a function
-called Greetings and we will invoke this particular function from a
-Swift-based iOS app. Go get the example hello package and run &lt;code&gt;gomobile bind&lt;/code&gt;
-to generate a framework bundle.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go get golang.org/x/mobile/example/bind/hello/...
-$ gomobile bind -target=ios golang.org/x/mobile/example/bind/hello
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The command above is going to generate a bundle called Hello.framework on the
-current working directory which includes a multi-arch C library and a header file.&lt;/p&gt;
-
-&lt;p&gt;The next step is to launch Xcode and open your existing Swift-based iOS app project.
-Drag and drop the Hello.framework to the project.
-This step will also automatically make the framework library linked to the final app product.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/swift-xcode.png&#34; alt=&#34;Xcode drag and drop&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Once the framework bundle is imported, you are good to import the
-Hello module and invoke GoHelloGreetings which is a proxy function for
-hello.Greetings.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;import UIKit
-import Hello
-class ViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        println(Hello.GoHelloGreetings(&amp;quot;gopher&amp;quot;))
-    }
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Build and run it on your test device or the iOS simulator.
-Enjoy making your first call to Go from Swift. Please note that this is
-preliminary work and we would like to make changes to improve the APIs in the long term.
-More information and tutorials about Go Mobile are available at
-the &lt;a href=&#34;https://golang.org/wiki/Mobile&#34;&gt;wiki&lt;/a&gt;.&lt;/p&gt;
 </description>
     </item>
     

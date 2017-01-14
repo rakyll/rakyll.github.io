@@ -1,15 +1,124 @@
-<!DOCTYPE HTML>
-<html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="refresh" content="1;url=https://rakyll.org/deprecated/">
-        <script type="text/javascript">
-            window.location.href = "https://rakyll.org\/deprecated\/"
-        </script>
-        <title>Page Redirection</title>
-    </head>
-    <body>
-        
-        If you are not redirected automatically, go to <a href='https://rakyll.org/deprecated/'>rakyll.org</a>.
-    </body>
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.18-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>Deprecation notices in Go &middot; Go, the unwritten parts</title>
+  
+
+  
+  <link rel="stylesheet" href="https://rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Go, the unwritten parts" />
+</head>
+
+	<body class=" layout-reverse">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="https://rakyll.org/"><h1>Go, the unwritten parts</h1></a>
+      <p class="lead">
+      A collage of little known practical tips for the Go programming language.
+      <br/>
+      by <a href="https://twitter.com/rakyll">@rakyll</a>
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="https://github.com/rakyll/">GitHub</a></li>
+      
+    </ul>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    </p>
+  </div>
+</div>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>Deprecation notices in Go</h1>
+			  <span class="post-date">Thu, Dec 8, 2016</span>
+			      <p>In Go, for a long time, we didn&rsquo;t have a convention to label the deprecated APIs.
+In the past years, there is new convention emerged to add deprecation notices to the docs.</p>
+
+<p>Today, standard library uses this specific format.</p>
+
+<p>As an example, Go 1.8 deprecates <a href="https://tip.golang.org/pkg/database/sql/driver/#Execer"><code>sql/driver.Execer</code></a>
+and adds a deprecation notice to its godoc.</p>
+
+<pre><code>// Execer is an optional interface that may be implemented by a Conn.
+//
+// If a Conn does not implement Execer, the sql package's DB.Exec will
+// first prepare a query, execute the statement, and then close the
+// statement.
+//
+// Exec may return ErrSkip.
+//
+// Deprecated: Drivers should implement ExecerContext instead (or additionally).
+type Execer interface {
+	Exec(query string, args []Value) (Result, error)
+}
+</code></pre>
+
+<p>The deprecation notice should be in the godoc, begin with string &ldquo;Deprecated: &ldquo; and follow with
+a tip for replacement.</p>
+
+<pre><code>// Deprecated: Use strings.HasPrefix instead.
+</code></pre>
+
+<p>User are expected to follow the tip and switch to the new recommended API.</p>
+
+<p>Additional to the notices, there is an effort going on to discourage users
+to keep depending on the deprecated APIs.</p>
+
+<p>See the following items for the ongoing work:</p>
+
+<ul>
+<li><a href="https://github.com/golang/go/issues/17056">Proposal to hide deprecated APIs by default</a></li>
+<li><a href="https://github.com/golang/gddo/issues/456">Hiding deprecated APIs on godoc.org</a></li>
+<li><a href="https://github.com/golang/lint/issues/238">Reporting deprecated APIs with golint</a></li>
+</ul>
+
+<p>In conclusion, please use this specific format to add deprecation notices. Not &ldquo;DEPRECATED&rdquo; or
+not &ldquo;This type is deprecated&rdquo;. Soon, you will be able to enjoy the tooling support that yells at your
+users to stop depending on your deprecated APIs.</p>
+
+			</div>
+
+			
+
+		</div>
+
+  </body>
 </html>

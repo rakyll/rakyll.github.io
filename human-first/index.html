@@ -1,15 +1,117 @@
-<!DOCTYPE HTML>
-<html lang="en-US">
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="refresh" content="1;url=https://rakyll.org/human-first/">
-        <script type="text/javascript">
-            window.location.href = "https://rakyll.org\/human-first\/"
-        </script>
-        <title>Page Redirection</title>
-    </head>
-    <body>
-        
-        If you are not redirected automatically, go to <a href='https://rakyll.org/human-first/'>rakyll.org</a>.
-    </body>
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.18-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>Keeping Go a human-first language &middot; Go, the unwritten parts</title>
+  
+
+  
+  <link rel="stylesheet" href="https://rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Go, the unwritten parts" />
+</head>
+
+	<body class=" layout-reverse">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="https://rakyll.org/"><h1>Go, the unwritten parts</h1></a>
+      <p class="lead">
+      A collage of little known practical tips for the Go programming language.
+      <br/>
+      by <a href="https://twitter.com/rakyll">@rakyll</a>
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="https://github.com/rakyll/">GitHub</a></li>
+      
+    </ul>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    </p>
+  </div>
+</div>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>Keeping Go a human-first language</h1>
+			  <span class="post-date">Tue, Oct 11, 2016</span>
+			      <p><em>Disclaimer: I forked my opinions on this one from a barely readable Twitter thread
+and wanted to write it down how I feel about keeping the language internals away
+from the users, especially from the newcomers. This is not a skill-level concern,
+it is a core goal of Go to provide a high-level programming language that saves users from
+excessive mental overhead. Note that these
+are personal opinons and are not writen on the behalf of a group.</em></p>
+
+<p>Go is a highly opiniated language when it comes to API design,
+readability and human-first approach.
+It is critical to understand these aspects and the history of the language
+before deep diving into more.</p>
+
+<p>Go is created at Google to make engineers more productive and do more without
+mental overload. Go wishes that behavior is predictable from a human perspective,
+rather than humans are being enforced to think like machines to be efficient and productive.
+Go sets the same high bar for its runtime. Go wishes to be good enough
+to be doing the right for the most of the time &ndash; anything else can be optimized.</p>
+
+<p>It is highly critical for us to keep Go users having
+high expectations that things will work out of the box, and escalating major problems
+to the team where the promise is not matching the actual behavior. Go is far away from being
+a perfect language. It is important not to be sold so quickly and participate in the future of the
+language if you are already skilled to understand the internals and their pitfalls.</p>
+
+<p>I encourage our users to <a href="https://golang.org/issues/new">report bugs</a> rather than creating
+extensive documentation around how to hack the current limitiations for the short-term gain.
+There is much space for improvement in Go and the team desperately needs actual feedback from
+actual users to commit work in the right direction.
+Go needs to understand its users rather than users having to understand
+every aspect of the language. This is the only scalable
+approach.</p>
+
+<p>Maybe along the way, our core goal of creating a human-first language will
+be challenged, but I believe Go has proven that a language can be high-level,
+precise and performant at the same time. I see no reason we should give up on this
+so quickly. I apologize on the behalf of everyone involved in Go for a long time
+to forget that this specific language goal needs to keep being communicated better.</p>
+
+			</div>
+
+			
+
+		</div>
+
+  </body>
 </html>

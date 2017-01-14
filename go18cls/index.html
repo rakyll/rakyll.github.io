@@ -1,0 +1,162 @@
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.18-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>Go 1.8 development stats &middot; Go, the unwritten parts</title>
+  
+
+  
+  <link rel="stylesheet" href="https://rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Go, the unwritten parts" />
+</head>
+
+	<body class=" layout-reverse">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <a href="https://rakyll.org/"><h1>Go, the unwritten parts</h1></a>
+      <p class="lead">
+      A collage of little known practical tips for the Go programming language.
+      <br/>
+      by <a href="https://twitter.com/rakyll">@rakyll</a>
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="https://github.com/rakyll/">GitHub</a></li>
+      
+    </ul>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    </p>
+  </div>
+</div>
+
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>Go 1.8 development stats</h1>
+			  <span class="post-date">Wed, Jan 11, 2017</span>
+			      
+
+<p>Go 1.8 is going to to launched in February 2017. There is a sizable list of
+<a href="https://beta.golang.org/doc/go1.8">new features and improvements</a> on the release notes.
+While these notes is the best summary to see what has happened in the last 6 months,
+I will try to give you some stats to give you a sense of the size of the work.
+I have examined all the changes merged into the tree during the Go 1.8 window and
+will highligth the some of the interesting and significant ones.</p>
+
+<p>There has been 2049 commits I have examined to gather these results.
+<a href="https://go-review.googlesource.com/#/c/35111/">c/35111</a> is the last commit
+I have included in the data set.</p>
+
+<h2 id="contributors">Contributors</h2>
+
+<p>There have been 201 contributors involved during the development of 1.8 👏👏👏</p>
+
+<p>But, more than 55% of the commits came from the top 10 contributors.</p>
+
+<pre><code>| Author               | Changes   |
+|----------------------|-----------|
+| Brad Fitzpatrick     | 225       |
+| Russ Cox             | 140       |
+| Josh Bleecher Snyder | 137       |
+| Robert Griesemer     | 129       |
+| Ian Lance Taylor     | 117       |
+| Austin Clements      | 111       |
+| Matthew Dempsky      | 94        |
+| David Crawshaw       | 69        |
+| Keith Randall        | 65        |
+| Cherry Zhang         | 55        |
+</code></pre>
+
+<p>There is only one non-Googler in the top 10, Josh Bleecher Snyder.</p>
+
+<h2 id="reviews">Reviews</h2>
+
+<p>Go has a reputation of having comphensive and throughtful code reviewing.
+Each change list needs at least one reviewer, for controversial topics the number grows easily.
+The average number of reviewers for each change was 3.41 people during this cycle.</p>
+
+<p>1160 changes got a LGTM without anyone requiring to leave any comment,
+most of these changes are coming from already tenured contributors.</p>
+
+<p>There also have been noiser changes. Top three of them with most reviewers are:</p>
+
+<ul>
+<li><a href="https://go-review.googlesource.com/#/c/16551/">c/16551</a>: Addition of os.Executable</li>
+<li><a href="https://go-review.googlesource.com/#/c/29397/">c/29397</a>: Far jumps are handled on ARM, big ARM binaries are fine now.</li>
+<li><a href="https://go-review.googlesource.com/#/c/32019/">c/32019</a>: Implementation of the default GOPATH</li>
+</ul>
+
+<p>The average number of comments left on a change is 3.51.</p>
+
+<p>Half of the changes took 8 hours or less to submit from its creation.
+Of course, there been some long standing changes that have waited for long
+(even for a year) and finally made their way to this release but the
+review stage has been quite productive in most cases.</p>
+
+<h2 id="size">Size</h2>
+
+<p>The size of a change is the sum of lines added and lines deleted.
+Average size for a change during 1.8 development was 190.73 lines.
+If you look at the distribution though, half of the changes are
+smaller than 25 lines.</p>
+
+<h3 id="the-biggest-changes">The biggest changes</h3>
+
+<p>Most sizeable changes are often going to the compiler. Here are the top 3 biggest changes in 1.8:</p>
+
+<ul>
+<li><a href="https://go-review.googlesource.com/#/c/29168/">c/29168</a>: Deletion of the old compiler backend</li>
+<li><a href="https://go-review.googlesource.com/#/c/28978/">c/28978</a>: SSA backend for s390x</li>
+<li><a href="https://go-review.googlesource.com/#/c/31478/">c/31478</a>: SSA backend for mips</li>
+</ul>
+
+<h3 id="minor-fixes">Minor fixes</h3>
+
+<p>How many times you have spotted a problem but ignored it because you were ashamed
+of openining a single line commit? There are 390 changes that are under 5 lines in 1.8.
+There is no such thing called little contribution in Go, almost 20% of the
+changes were teeny-tiny.</p>
+
+			</div>
+
+			
+
+		</div>
+
+  </body>
+</html>
