@@ -236,11 +236,7 @@ tools will reject to use the default GOPATH not to corrupt your GOROOT.&lt;/li&g
 &lt;p&gt;You still may prefer to &lt;a href=&#34;https://golang.org/wiki/SettingGOPATH&#34;&gt;set a custom GOPATH&lt;/a&gt;
 if the default is not working for you.&lt;/p&gt;
 
-&lt;p&gt;If a custom GOPATH is set, the folling command will report its value:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go env GOPATH
-/Users/jbd
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;If a custom GOPATH is set, &lt;code&gt;go env GOPATH&lt;/code&gt; will report its value.&lt;/p&gt;
 </description>
     </item>
     
