@@ -60,7 +60,7 @@ html {
 
 body {
   color: #515151;
-  background-color: #fff5ea;
+  background-color: #fff;
   -webkit-text-size-adjust: 100%;
   -ms-text-size-adjust: 100%;
 }
@@ -160,7 +160,7 @@ code {
   padding: .25em .5em;
   font-size: 85%;
   color: #b400f4;
-  background-color: #fff;
+  background-color: #fff5ea;
   border-radius: 3px;
 }
 pre {
