@@ -58,7 +58,7 @@ ul.archive li .date {
 }
 
 pre {
-  background-color: #E0EBF5;
+  background-color: #e8f2ff;
   overflow: auto;
   white-space: pre;
   word-break: normal;
@@ -80,8 +80,10 @@ pre {
 .sidebar {
   text-align: center;
   padding: 2rem 1rem;
-  color: rgba(255,255,255,.5);
-  background-color: #202020;
+  color: #ebebeb;
+  background-image: url("/pattern.png");
+  background-color: #01380c;
+  background-repeat: repeat-y;
 }
 @media (min-width: 48em) {
   .sidebar {
