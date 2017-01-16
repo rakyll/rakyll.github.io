@@ -128,8 +128,8 @@ If you don&amp;rsquo;t set one, the tools will use the default. Default GOPATH i
 &lt;li&gt;%USERPROFILE%\go on Windows&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Even though having a default GOPATH is the good first step, it doesn&amp;rsquo;t solve
-all the problems.&lt;/p&gt;
+&lt;p&gt;Even though you don&amp;rsquo;t have care about setting this variable, there are few items
+that still requires your attention.&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Users still need to add $GOPATH/bin into their PATH to run binaries installed by
@@ -138,13 +138,16 @@ all the problems.&lt;/p&gt;
 that the presence of GOPATH, its location and its structure.&lt;/li&gt;
 &lt;li&gt;If your GOROOT (the location where you checkout the Go&amp;rsquo;s source code)
 is the default GOPATH and if you don&amp;rsquo;t have a GOPATH set, the
-tools will reject to use the default GOPATH not to corrupt your
-GOROOT.&lt;/li&gt;
+tools will reject to use the default GOPATH not to corrupt your GOROOT.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;When in doubt, you can learn about what your GOPATH by running &lt;code&gt;go env GOPATH&lt;/code&gt;
-as usual. It will report no paths if the go tool is rejecting to auto
-set a default GOPATH for any reason.&lt;/p&gt;
+&lt;p&gt;You still may prefer to &lt;a href=&#34;https://golang.org/wiki/SettingGOPATH&#34;&gt;set a custom GOPATH&lt;/a&gt;
+if the default is not working for you.&lt;/p&gt;
+
+&lt;p&gt;If a custom GOPATH is set, the folling command will report its value:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;$ go env GOPATH
+&lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
     

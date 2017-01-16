@@ -296,8 +296,8 @@ If you don&rsquo;t set one, the tools will use the default. Default GOPATH is:</
 <li>%USERPROFILE%\go on Windows</li>
 </ul>
 
-<p>Even though having a default GOPATH is the good first step, it doesn&rsquo;t solve
-all the problems.</p>
+<p>Even though you don&rsquo;t have care about setting this variable, there are few items
+that still requires your attention.</p>
 
 <ul>
 <li>Users still need to add $GOPATH/bin into their PATH to run binaries installed by
@@ -306,13 +306,16 @@ all the problems.</p>
 that the presence of GOPATH, its location and its structure.</li>
 <li>If your GOROOT (the location where you checkout the Go&rsquo;s source code)
 is the default GOPATH and if you don&rsquo;t have a GOPATH set, the
-tools will reject to use the default GOPATH not to corrupt your
-GOROOT.</li>
+tools will reject to use the default GOPATH not to corrupt your GOROOT.</li>
 </ul>
 
-<p>When in doubt, you can learn about what your GOPATH by running <code>go env GOPATH</code>
-as usual. It will report no paths if the go tool is rejecting to auto
-set a default GOPATH for any reason.</p>
+<p>You still may prefer to <a href="https://golang.org/wiki/SettingGOPATH">set a custom GOPATH</a>
+if the default is not working for you.</p>
+
+<p>If a custom GOPATH is set, the folling command will report its value:</p>
+
+<pre><code>$ go env GOPATH
+</code></pre>
 
   </div>
   
