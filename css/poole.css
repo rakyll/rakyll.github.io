@@ -112,6 +112,10 @@ strong {
   color: #303030;
 }
 
+.avatar {
+  display: block;
+  float: right;
+}
 
 /* Lists */
 ul, ol, dl {
