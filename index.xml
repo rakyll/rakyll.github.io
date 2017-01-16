@@ -239,6 +239,7 @@ if the default is not working for you.&lt;/p&gt;
 &lt;p&gt;If a custom GOPATH is set, the folling command will report its value:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;$ go env GOPATH
+/Users/jbd
 &lt;/code&gt;&lt;/pre&gt;
 </description>
     </item>
