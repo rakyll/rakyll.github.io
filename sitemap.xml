@@ -87,6 +87,11 @@
   </url>
   
   <url>
+    <loc>https://rakyll.org/interface-pollution/</loc>
+    <lastmod>2014-10-18T11:27:27-04:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rakyll.org/archive/</loc>
   </url>
   
@@ -129,6 +134,12 @@
   <url>
     <loc>https://rakyll.org/tags/project/</loc>
     <lastmod>2017-01-11T11:27:27-04:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://rakyll.org/tags/readability/</loc>
+    <lastmod>2014-10-18T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   

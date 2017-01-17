@@ -1,0 +1,151 @@
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.18-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>Interface pollution in Go &middot; Go, the unwritten parts</title>
+  
+
+  
+  <link rel="stylesheet" href="https://rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+  
+  <link href="" rel="alternate" type="application/rss+xml" title="Go, the unwritten parts" />
+</head>
+
+	<body class=" layout-reverse">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+
+
+    <div class="sidebar-about">
+      <a href="https://rakyll.org/"><h1>Go, the unwritten parts</h1></a>
+      <a href="https://twitter.com/rakyll"><img class="avatar" title="Written by @rakyll" src="/favicon.png" /></a>
+      <p class="lead">
+      A collage of little known practical tips for the Go programming language.
+      </p>
+    </div>
+
+    <ul class="sidebar-nav">
+      
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="https://github.com/rakyll/">GitHub</a></li>
+      
+    </ul>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    </p>
+  </div>
+</div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>Interface pollution in Go</h1>
+			  <span class="post-date">Sat, Oct 18, 2014</span>
+			      <p>If there was a single powerful language feature in Go, it’d be the interfaces.
+The internals of Go contain strong combinations of useful ideas from various type
+systems and inevitably they ring the curiosity bells. I recently surveyed Github
+for Go interface declarations, and the results indicated that Go users pollute
+the environment with interfaces no one needs or will use.</p>
+
+<p>Don’t export any interfaces until you have to.</p>
+
+<p>Interfaces are great, but interface pollution is not so. You’re likely to come to
+Go from a language (if not from a dynamic language) that generates a static dispatch
+table during compilation, the compiler require you to explicitly tell the interfaces
+a type wants to implement. That’s how the complier can generate a vtable with pointers
+to all available virtual functions. If your background is in C++ or Java, you’re likely
+to have some baggage around initiating your codebase with abstract types and work on the
+concrete implementation as a follow-up exercise. This is not how you do it in Go.
+Introduce concrete types and don’t export any interfaces unless you have to encourage
+external packages to implement one. io package is a good starting point to study some
+of the the best practices. It exports interfaces because it also needs to export
+generic-use functions like Copy.</p>
+
+<pre><code>func Copy(dst Writer, src Reader) (written int64, err error)
+</code></pre>
+
+<p>Should your package export generic functionality? If the answer is a “maybe”,
+you’re likely to be polluting your package with an interface declaration.
+Justify the need of multiple implementations, likeliness of them to interact
+back with your package and act accordingly.</p>
+
+<p>Go doesn’t have a traditional dispatch table, and can rely on the interface values
+during a method dispatch. It’s literally more of a freestyle dispatcher mechanism
+that requires some work during interface value assignment — it generates a tiny lookup
+hash-table for the concrete type it’s pointing to. The assignment is not insanely
+expensive, so it’s a fair exchange for a more pleasant type system.
+Ian Lance Taylor has <a href="http://www.airs.com/blog/archives/277">a great blog post about the internals</a>
+if you’re looking for further reading.</p>
+
+<p>If a user requires some level of “inversion of control”, an on-the-fly interface
+definition in their own scope would just work. This possibility minimizes the
+presumptions you have to make about the way your package is being consumed and
+the initial abstractions you have to work on.</p>
+
+<p>It also applies to the testability concerns, you don’t have to provide interfaces
+to help the user to write their own stubs. Earlier today, I got a request to export
+an interface from the pubsub package to make it more mockable. Rather than doing so,
+the preferable way is to tell your user to introduce an interface that focuses on the
+calls they want to write a stub for. Point to the actual implementation via an interface value.</p>
+
+<pre><code>type acknowledger interface {
+    Ack(sub string, id ...string) error
+}
+
+type mockClient struct{}
+
+func (c *mockClient) Ack(sub string, id ...string) error {
+    return nil
+}
+
+var acker acknowledger = pubsub.New(...)
+
+acker = &amp;mockClient{} // in the test package
+</code></pre>
+
+<p>Noteworthy that, in Go, the standard library defines tiny interfaces you happen to
+implement without effort and is doing a good job at encouraging the developers to write
+compatible code with the rest of the standard library — and the other third party packages.
+Adopt what’s available in the standard library where possible and document accordingly.</p>
+
+<p>Go fascinates me each time I deeply reevaluate my experience with the interfaces.
+Given the chance of minimal fragmentation in interfaces, this is how a programming
+language make software, that isn’t designed to work together, work well together.</p>
+
+			</div>
+
+			
+
+		</div>
+
+  </body>
+</html>
