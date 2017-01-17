@@ -86,7 +86,7 @@ pre, code {
   padding: 2rem 1rem;
   color: #ebebeb;
   background-image: url("/pattern.png");
-  background-color: #01380c;
+  background-color: #000;
   background-repeat: repeat-y;
 }
 @media (min-width: 48em) {
