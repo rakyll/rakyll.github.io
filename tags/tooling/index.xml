@@ -97,7 +97,7 @@ the flag to write the profile to a file.&lt;/p&gt;
 
 &lt;p&gt;Then, the pprof tool can be used to examine the recorded profile.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;go tool pprof &amp;lt;binary&amp;gt; mutex.out
+&lt;pre&gt;&lt;code&gt;go tool pprof &amp;lt;test.binary&amp;gt; mutex.out
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;See the &lt;a href=&#34;http://beta.golang.org/pkg/runtime/pprof/&#34;&gt;runtime/pprof&lt;/a&gt; package for more details about profiling
