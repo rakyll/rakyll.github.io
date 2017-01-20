@@ -195,3 +195,9 @@ a.sidebar-nav-item:focus {
     margin-right: 22rem;
   }
 }
+
+
+.language-wrong {
+  color: #b7140f;
+  background-image: url(/strike.png);
+}
