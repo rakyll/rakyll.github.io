@@ -85,9 +85,7 @@ pre, code {
   text-align: center;
   padding: 2rem 1rem;
   color: #ebebeb;
-  background-image: url("/pattern.png");
-  background-color: #000;
-  background-repeat: repeat-y;
+  background-color: #375EAB;
 }
 @media (min-width: 48em) {
   .sidebar {

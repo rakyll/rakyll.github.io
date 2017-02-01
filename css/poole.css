@@ -67,7 +67,7 @@ body {
 
 /* No `:visited` state is required by default (browsers will use `a`) */
 a {
-  color: #005609;
+  color: #375EAB;
   text-decoration: none;
   font-weight: bold;
   
@@ -158,7 +158,7 @@ pre {
 }
 code {
   padding: .25em .5em;
-  color: #a700bf;
+  color: #375EAB;
   font-size: 85%;
 }
 pre {
