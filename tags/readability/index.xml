@@ -78,7 +78,7 @@ it is often a good practice to keep the core types grouped at the top of a file.
 &lt;h3 id=&#34;organize-by-responsbility&#34;&gt;Organize by responsbility&lt;/h3&gt;
 
 &lt;p&gt;A common practise from other languages is to organize types together in a package
-called models or types. In Go, we organize code by their functional responsbilities.&lt;/p&gt;
+called models or types. In Go, we organize code by their functional responsibilities.&lt;/p&gt;
 
 &lt;pre&gt;&lt;code class=&#34;language-wrong&#34;&gt;package models // DON&#39;T DO IT!!!
 

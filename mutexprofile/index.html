@@ -68,6 +68,22 @@
 </script>
 
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script type="text/javascript">
+function linkify(i) {
+  console.log(i, el);
+  var id = this.id();
+  this.html("hehehe");
+}
+
+$(document).ready(function() {
+  $("h2").each(linkify);
+  $("h3").each(linkify);
+  $("h4").each(linkify);
+});
+
+</script>
+
 		<div class="content container">
 			<div class="post">
 			 	<h1>Mutex profile</h1>
