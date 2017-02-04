@@ -10,11 +10,11 @@
     <atom:link href="https://rakyll.org/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Naming tests</title>
-      <link>https://rakyll.org/style-namingtests/</link>
+      <title>Naming tests to self-document</title>
+      <link>https://rakyll.org/naming-tests-to-doc/</link>
       <pubDate>Fri, 03 Feb 2017 11:27:27 -0400</pubDate>
       
-      <guid>https://rakyll.org/style-namingtests/</guid>
+      <guid>https://rakyll.org/naming-tests-to-doc/</guid>
       <description>&lt;p&gt;Go doesn&amp;rsquo;t specifically enforce you how you choose your test names.
 Tests are a significant contributors for the maintainability
 of your code. Tests not just providing correctness checking
