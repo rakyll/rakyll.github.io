@@ -126,14 +126,16 @@ type User struct {...}
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;p&gt;Rather than creating a models package and declare all entity types there,
-a User type should live in a user package that provides everything related to users.&lt;/p&gt;
+a User type should live in a service-layer package.&lt;/p&gt;
 
-&lt;pre&gt;&lt;code&gt;package user
+&lt;pre&gt;&lt;code&gt;package mngtservice
 
 // User represents a user in the system.
 type User struct {...}
 
-func QueryUsers(ctx context.Context, q *Query) ([]*User, *Iterator, error)
+func UsersByQuery(ctx context.Context, q *Query) ([]*User, *Iterator, error)
+
+func UserIDByEmail(ctx context.Context, email string) (int64, error)
 &lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&#34;optimize-for-godoc&#34;&gt;Optimize for godoc&lt;/h3&gt;
