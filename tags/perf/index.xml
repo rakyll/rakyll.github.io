@@ -103,7 +103,7 @@ the flag to write the profile to a file.&lt;/p&gt;
 &lt;p&gt;See the &lt;a href=&#34;http://beta.golang.org/pkg/runtime/pprof/&#34;&gt;runtime/pprof&lt;/a&gt; package for more details about profiling
 and the predefined profiles.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://talks.golang.org/2017/state-of-go.slide#23&#34;&gt;The State of the Go 2017 talk&lt;/a&gt;
+&lt;p&gt;&lt;a href=&#34;https://talks.golang.org/2017/state-of-go.slide#23&#34;&gt;The State of Go 2017 talk&lt;/a&gt;
 also contains a guide how to run benchmarks while capturing the mutex profile. It is worth to take a
 look if you are willing to write benchmarks.&lt;/p&gt;
 
