@@ -30,8 +30,9 @@ the entry point to the response.&lt;/p&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Diagnose and improve latency problems.&lt;/li&gt;
-&lt;li&gt;Understand all within the lifecycle of a request to see bottlenecks.&lt;/li&gt;
 &lt;li&gt;See the integration problems that are only visible in production.&lt;/li&gt;
+&lt;li&gt;See fundamental problems with our architecture, such as bottleneck
+that were not obvious to see without tracing data.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;If you are a gRPC user, you should be deploying distributed
