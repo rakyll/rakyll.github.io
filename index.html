@@ -83,7 +83,9 @@
 
     <span class="post-date">Wed, Mar 22, 2017</span>
 
-    <p>In monolithic systems, it is relatively easy to collect diagnostic
+    
+
+<p>In monolithic systems, it is relatively easy to collect diagnostic
 data from the building blocks of a program. All modules live within
 one process and share common resources to report logs and errors.</p>
 
@@ -180,6 +182,16 @@ more services to serve your user requests:</p>
 <p>Similar to the gRPC interceptors, I also contributed a few HTTP utilities
 to enable tracing support for your HTTP-speaking microservices.
 See <a href="godoc.org/cloud.google.com/go/trace/traceutil">trace/traceutil</a> package for more information and examples.</p>
+
+<h2 id="what-s-next">What&rsquo;s next?</h2>
+
+<p>In the past few months, I have been priviledged to work on Go distributed tracing
+APIs on a part-time basis. We experimented a lot, addressed many critical open
+questions, and worked hard to achieve a very minimal backend-agnostic tracing
+API for the entire Go ecosystem.</p>
+
+<p>Achieving common APIs will make distributed tracing more accesible, make our
+libraries trace-aware and create oppurtunity to reuse our utilities. I am looking forward to share this work in the upcoming weeks.</p>
 
 
   </div>

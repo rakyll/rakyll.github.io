@@ -15,7 +15,9 @@
       <pubDate>Wed, 22 Mar 2017 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/grpc-trace/</guid>
-      <description>&lt;p&gt;In monolithic systems, it is relatively easy to collect diagnostic
+      <description>
+
+&lt;p&gt;In monolithic systems, it is relatively easy to collect diagnostic
 data from the building blocks of a program. All modules live within
 one process and share common resources to report logs and errors.&lt;/p&gt;
 
@@ -112,6 +114,16 @@ more services to serve your user requests:&lt;/p&gt;
 &lt;p&gt;Similar to the gRPC interceptors, I also contributed a few HTTP utilities
 to enable tracing support for your HTTP-speaking microservices.
 See &lt;a href=&#34;godoc.org/cloud.google.com/go/trace/traceutil&#34;&gt;trace/traceutil&lt;/a&gt; package for more information and examples.&lt;/p&gt;
+
+&lt;h2 id=&#34;what-s-next&#34;&gt;What&amp;rsquo;s next?&lt;/h2&gt;
+
+&lt;p&gt;In the past few months, I have been priviledged to work on Go distributed tracing
+APIs on a part-time basis. We experimented a lot, addressed many critical open
+questions, and worked hard to achieve a very minimal backend-agnostic tracing
+API for the entire Go ecosystem.&lt;/p&gt;
+
+&lt;p&gt;Achieving common APIs will make distributed tracing more accesible, make our
+libraries trace-aware and create oppurtunity to reuse our utilities. I am looking forward to share this work in the upcoming weeks.&lt;/p&gt;
 </description>
     </item>
     
