@@ -9,6 +9,111 @@
     <atom:link href="https://rakyll.org/tags/rpc/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
+      <title>Automatic Stackdriver Tracing for gRPC</title>
+      <link>https://rakyll.org/grpc-trace/</link>
+      <pubDate>Wed, 22 Mar 2017 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/grpc-trace/</guid>
+      <description>&lt;p&gt;In monolithic systems, it is relatively easy to collect diagnostic
+data from the building blocks of a program. All modules live within
+one process and share common resources to report logs and errors.&lt;/p&gt;
+
+&lt;p&gt;Once you are distributing your system into microservices, it becomes
+harder to follow a call starting from the user&amp;rsquo;s entry point until a
+response is served. To address this problem, Google invented
+&lt;a href=&#34;https://research.google.com/pubs/pub36356.html&#34;&gt;Dapper&lt;/a&gt; to instrument and analyze its production services. Dapper-like
+distrubuted tracing systems allow you to trace a user request from
+the entry point to the response.&lt;/p&gt;
+
+&lt;p&gt;Distribute tracing helps us to:&lt;/p&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Diagnose and improve latency problems.&lt;/li&gt;
+&lt;li&gt;Understand all within the lifecycle of a request to see bottlenecks.&lt;/li&gt;
+&lt;li&gt;See the integration problems that are only visible in production.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If you are a gRPC user, you should be deploying distributed
+production services. Being able to trace a user request end-to-end
+is a requirement in order to&lt;/p&gt;
+
+&lt;p&gt;In this article, we are going to modify the &lt;a href=&#34;https://github.com/grpc/grpc-go/tree/master/examples/helloworld&#34;&gt;helloworld&lt;/a&gt;
+example from the gRPC Go package to add tracing.&lt;/p&gt;
+
+&lt;p&gt;Import the trace package:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;import &amp;quot;cloud.google.com/go/trace&amp;quot;
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Initiate a trace client:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;ctx := context.Background()
+tc, err := trace.NewClient(ctx, &amp;quot;project-id&amp;quot;)
+if err != nil {
+    log.Fatal(err)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;In order to initiate the greeter client, use the Stackdriver Trace
+client interceptor we are providing:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
+if err != nil {
+    log.Fatalf(&amp;quot;did not connect: %v&amp;quot;, err)
+}
+defer conn.Close()
+c := pb.NewGreeterClient(conn)
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;All the outgoing requests from &lt;code&gt;c&lt;/code&gt; will be automatically traced:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;span := tc.NewSpan(&amp;quot;/foo&amp;quot;)
+defer span.Finish()
+
+ctx = trace.NewContext(ctx, span)
+r, err := c.SayHello(ctx, &amp;amp;pb.HelloRequest{Name: name})
+if err != nil {
+    log.Fatalf(&amp;quot;could not greet: %v&amp;quot;, err)
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;On the server side, in order to be able to recieve the traces (and keep propagating), use the server interceptor we are providing when initializing
+a server:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;s := grpc.NewServer(grpc.UnaryInterceptor(trace.GRPCServerInterceptor(tc)))
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Then, the server handlers will be able to access the &lt;code&gt;trace.Span&lt;/code&gt;
+instances from the current calling context:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code&gt;func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	span := trace.FromContext(ctx)
+    // TODO: Use the span directly or keep using the context
+    // to make more outgoing calls from this handler.
+    // If you don&#39;t finish the span, it will be auto-finished
+    // once this function returns.
+
+	return &amp;amp;pb.HelloReply{Message: &amp;quot;Hello &amp;quot; + in.Name}, nil
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;A single-hop from the client to server looks like below on the
+Stackdriver Trace console:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/trace1.png&#34; alt=&#34;Tracing&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;But things are getting more exciting as you begin to depend on
+more services to serve your user requests:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/trace2.png&#34; alt=&#34;Tracing&#34; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Similar to the gRPC interceptors, I also contributed a few HTTP utilities
+to enable tracing support for your HTTP-speaking microservices.
+See &lt;a href=&#34;godoc.org/cloud.google.com/go/trace/traceutil&#34;&gt;trace/traceutil&lt;/a&gt; package for more information and examples.&lt;/p&gt;
+</description>
+    </item>
+    
+    <item>
       <title>Bidirectional gRPC streaming for Go</title>
       <link>https://rakyll.org/grpc-streaming/</link>
       <pubDate>Tue, 30 Aug 2016 11:27:27 -0400</pubDate>
