@@ -37,9 +37,9 @@ the entry point to the response.&lt;/p&gt;
 that were not obvious without looking at the tracing data.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;If you are a gRPC user, you should be deploying distributed
-production services. Being able to trace a user request end-to-end
-is a requirement in order to&lt;/p&gt;
+&lt;p&gt;As a gRPC user, you are deploying distributed production services and
+being able to trace a user request end-to-end can easily be a critical
+fundamental requirement.&lt;/p&gt;
 
 &lt;p&gt;In this article, we are going to modify the &lt;a href=&#34;https://github.com/grpc/grpc-go/tree/master/examples/helloworld&#34;&gt;helloworld&lt;/a&gt;
 example from the gRPC Go package to add tracing.&lt;/p&gt;
