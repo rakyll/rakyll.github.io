@@ -112,7 +112,7 @@ more services to serve your user requests:&lt;/p&gt;
 
 &lt;p&gt;Similar to the gRPC interceptors, I also contributed a few HTTP utilities
 to enable tracing support for your HTTP-speaking microservices.
-See &lt;a href=&#34;godoc.org/cloud.google.com/go/trace/traceutil&#34;&gt;trace/traceutil&lt;/a&gt; package for more information and examples.&lt;/p&gt;
+See &lt;a href=&#34;https://godoc.org/cloud.google.com/go/trace/traceutil&#34;&gt;trace/traceutil&lt;/a&gt; package for more information and examples.&lt;/p&gt;
 
 &lt;h2 id=&#34;what-s-next&#34;&gt;What&amp;rsquo;s next?&lt;/h2&gt;
 
