@@ -71,7 +71,7 @@ c := pb.NewGreeterClient(conn)
 &lt;p&gt;All the outgoing requests from &lt;code&gt;c&lt;/code&gt; will be automatically traced:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;span := tc.NewSpan(&amp;quot;/foo&amp;quot;)
-defer span.Finish()
+defer span.FinishWait() // use span.Finish() if your client is a long-running process.
 
 ctx = trace.NewContext(ctx, span)
 r, err := c.SayHello(ctx, &amp;amp;pb.HelloRequest{Name: name})
