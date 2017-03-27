@@ -57,6 +57,10 @@ if err != nil {
 }
 &lt;/code&gt;&lt;/pre&gt;
 
+&lt;p&gt;See the &lt;a href=&#34;https://godoc.org/cloud.google.com/go#pkg-examples&#34;&gt;examples&lt;/a&gt;
+to learn how to set the auth. In the example above,
+we use the &amp;ldquo;Application Default Credentials&amp;rdquo;.&lt;/p&gt;
+
 &lt;p&gt;In order to initiate the greeter client, use the Stackdriver Trace
 client interceptor we are providing:&lt;/p&gt;
 
