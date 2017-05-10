@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tags on Go, the unwritten parts</title>
+    <link>https://rakyll.org/tags/</link>
+    <description>Recent content in Tags on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 08 Dec 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Coventions</title>
+      <link>https://rakyll.org/tags/coventions/</link>
+      <pubDate>Thu, 08 Dec 2016 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/coventions/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Go1.8</title>
+      <link>https://rakyll.org/tags/go1.8/</link>
+      <pubDate>Wed, 14 Dec 2016 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/go1.8/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Language</title>
+      <link>https://rakyll.org/tags/language/</link>
+      <pubDate>Tue, 11 Oct 2016 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/language/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Perf</title>
+      <link>https://rakyll.org/tags/perf/</link>
+      <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/perf/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Profiling</title>
+      <link>https://rakyll.org/tags/profiling/</link>
+      <pubDate>Fri, 02 Sep 2016 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/profiling/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Project</title>
+      <link>https://rakyll.org/tags/project/</link>
+      <pubDate>Wed, 11 Jan 2017 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/project/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Readability</title>
+      <link>https://rakyll.org/tags/readability/</link>
+      <pubDate>Fri, 03 Feb 2017 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/readability/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Rpc</title>
+      <link>https://rakyll.org/tags/rpc/</link>
+      <pubDate>Wed, 22 Mar 2017 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/rpc/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Stdlib</title>
+      <link>https://rakyll.org/tags/stdlib/</link>
+      <pubDate>Sat, 10 Dec 2016 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/stdlib/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Testing</title>
+      <link>https://rakyll.org/tags/testing/</link>
+      <pubDate>Tue, 06 Sep 2016 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/testing/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Tooling</title>
+      <link>https://rakyll.org/tags/tooling/</link>
+      <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/tooling/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

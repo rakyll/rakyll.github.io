@@ -2,11 +2,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Coventions on Go, the unwritten parts</title>
-    <link>https://rakyll.org/tags/coventions/index.xml</link>
+    <link>https://rakyll.org/tags/coventions/</link>
     <description>Recent content in Coventions on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="https://rakyll.org/tags/coventions/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 08 Dec 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/coventions/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Deprecation notices in Go</title>
@@ -14,51 +17,10 @@
       <pubDate>Thu, 08 Dec 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/deprecated/</guid>
-      <description>&lt;p&gt;In Go, for a long time, we didn&amp;rsquo;t have a convention to label the deprecated APIs.
-In the past years, there is new convention emerged to add deprecation notices to the docs.&lt;/p&gt;
-
-&lt;p&gt;Today, standard library uses this specific format.&lt;/p&gt;
-
-&lt;p&gt;As an example, Go 1.8 deprecates &lt;a href=&#34;https://tip.golang.org/pkg/database/sql/driver/#Execer&#34;&gt;&lt;code&gt;sql/driver.Execer&lt;/code&gt;&lt;/a&gt;
-and adds a deprecation notice to its godoc.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// Execer is an optional interface that may be implemented by a Conn.
-//
-// If a Conn does not implement Execer, the sql package&#39;s DB.Exec will
-// first prepare a query, execute the statement, and then close the
-// statement.
-//
-// Exec may return ErrSkip.
-//
-// Deprecated: Drivers should implement ExecerContext instead (or additionally).
-type Execer interface {
-	Exec(query string, args []Value) (Result, error)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The deprecation notice should be in the godoc, begin with string &amp;ldquo;Deprecated: &amp;ldquo; and follow with
-a tip for replacement.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;// Deprecated: Use strings.HasPrefix instead.
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;User are expected to follow the tip and switch to the new recommended API.&lt;/p&gt;
-
-&lt;p&gt;Additional to the notices, there is an effort going on to discourage users
-to keep depending on the deprecated APIs.&lt;/p&gt;
-
-&lt;p&gt;See the following items for the ongoing work:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/golang/go/issues/17056&#34;&gt;Proposal to hide deprecated APIs by default&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/golang/gddo/issues/456&#34;&gt;Hiding deprecated APIs on godoc.org&lt;/a&gt;&lt;/li&gt;
-&lt;li&gt;&lt;a href=&#34;https://github.com/golang/lint/issues/238&#34;&gt;Reporting deprecated APIs with golint&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;In conclusion, please use this specific format to add deprecation notices. Not &amp;ldquo;DEPRECATED&amp;rdquo; or
-not &amp;ldquo;This type is deprecated&amp;rdquo;. Soon, you will be able to enjoy the tooling support that yells at your
-users to stop depending on your deprecated APIs.&lt;/p&gt;
-</description>
+      <description>In Go, for a long time, we didn&amp;rsquo;t have a convention to label the deprecated APIs. In the past years, there is new convention emerged to add deprecation notices to the docs.
+Today, standard library uses this specific format.
+As an example, Go 1.8 deprecates sql/driver.Execer and adds a deprecation notice to its godoc.
+// Execer is an optional interface that may be implemented by a Conn. // // If a Conn does not implement Execer, the sql package&#39;s DB.</description>
     </item>
     
   </channel>

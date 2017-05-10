@@ -2,11 +2,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Profiling on Go, the unwritten parts</title>
-    <link>https://rakyll.org/tags/profiling/index.xml</link>
+    <link>https://rakyll.org/tags/profiling/</link>
     <description>Recent content in Profiling on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="https://rakyll.org/tags/profiling/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 02 Sep 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/profiling/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Using Instruments to profile Go programs</title>
@@ -14,63 +17,10 @@
       <pubDate>Fri, 02 Sep 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/instruments/</guid>
-      <description>&lt;p&gt;Apple has a suite of instrumentation and tracing tools for performance
-analysis avaiable as a part of their Xcode tooling set. In this article,
-we will use &lt;a href=&#34;https://developer.apple.com/library/prerelease/content/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/&#34;&gt;Instruments&lt;/a&gt;
-to record and analyze the CPU profile of a Go program.&lt;/p&gt;
-
-&lt;p&gt;Instruments also provide a large set of macOS-specific tracing and profiling
-if you have performance issues specifically on darwin.&lt;/p&gt;
-
-&lt;p&gt;Some of these specific profiles are:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;System trace: Collects comprehensive information about system calls,
-scheduling, user-kernel space transitions. (Available only on OSX.)&lt;/li&gt;
-&lt;li&gt;System usage: Gives very detailed output about I/O system activity.
-(Available only on iOS.)&lt;/li&gt;
-&lt;li&gt;File Activity: Monitors file and directory activity such as open/close,
-permission modifications, creation, copying and moving.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Instruments provide a rich and very easy to use UI to display profiles.
-I highly recommend it as an addition to existing profiler UIs and vizualizers.&lt;/p&gt;
-
-&lt;p&gt;Now, let&amp;rsquo;s profile a Go program.&lt;/p&gt;
-
-&lt;p&gt;Launch the Instruments app and select &amp;ldquo;Time Profiler&amp;rdquo;.&lt;/p&gt;
-
-&lt;p&gt;Create a target with your Go binary and arguments and env variables
-you want to start the binary with. In this tutorial, I will use the
-following program.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;go get -u github.com/rakyll/hey
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We will use &lt;code&gt;hey&lt;/code&gt; to make 10000 requests with 200 goroutines
-to the target provided in the arguments.&lt;/p&gt;
-
-&lt;p&gt;The target I have for &lt;code&gt;hey&lt;/code&gt; looks like what&amp;rsquo;s below.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/instruments-target.png&#34; alt=&#34;Instruments target&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Once you have a target, you can click on the record button to start
-recording samples. Once enough samples are collected, stop or it will
-eventually stop when the program finishes.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/instruments-results.png&#34; alt=&#34;Instruments results&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;You can filter by symbol name, user vs kernel callstacks, time span,
-physical or logical CPU and more. You can also double click any of the symbols listed
-to jump to the source code.&lt;/p&gt;
-
-&lt;p&gt;Please note that Go programs cannot work with every profile available
-on Instruments. But there are a few profiles that absolutely can improve
-your profiling experience. With stack frame pointers enabled by default in Go 1.7,
-it became easier for tools like Instruments to capture backtraces more efficiently.&lt;/p&gt;
-
-&lt;p&gt;Happy profiling!&lt;/p&gt;
-</description>
+      <description>Apple has a suite of instrumentation and tracing tools for performance analysis avaiable as a part of their Xcode tooling set. In this article, we will use Instruments to record and analyze the CPU profile of a Go program.
+Instruments also provide a large set of macOS-specific tracing and profiling if you have performance issues specifically on darwin.
+Some of these specific profiles are:
+ System trace: Collects comprehensive information about system calls, scheduling, user-kernel space transitions.</description>
     </item>
     
   </channel>

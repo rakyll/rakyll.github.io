@@ -2,11 +2,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Stdlib on Go, the unwritten parts</title>
-    <link>https://rakyll.org/tags/stdlib/index.xml</link>
+    <link>https://rakyll.org/tags/stdlib/</link>
     <description>Recent content in Stdlib on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="https://rakyll.org/tags/stdlib/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 10 Dec 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/stdlib/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>HTTP/2 Server Push</title>
@@ -14,53 +17,9 @@
       <pubDate>Sat, 10 Dec 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/http2push/</guid>
-      <description>&lt;p&gt;Go 1.8 is going to feature support for HTTP/2 server push.&lt;/p&gt;
-
-&lt;p&gt;HTTP/2 has many features designed to make the Web faster. One of those features
-is the server push, the ability to send resources before the client asks for it.
-This feature enables websites to push assets like JavaScript and CSS files
-before waiting for the web page to be loaded and asking for those resources.&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;net/http&lt;/code&gt; package will support server push by exposing a &lt;a href=&#34;https://tip.golang.org/pkg/net/http/#Pusher&#34;&gt;Pusher API&lt;/a&gt;
-that will be supported by HTTP/2 ResponseWriters. This interface is only implemented when HTTP/2 is available.&lt;/p&gt;
-
-&lt;p&gt;In the following handler, we will push &lt;code&gt;main.js&lt;/code&gt; rather than waiting for the page to load
-and inkove the request itself.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;const indexHTML = `&amp;lt;html&amp;gt;
-&amp;lt;head&amp;gt;
-	&amp;lt;title&amp;gt;Hello&amp;lt;/title&amp;gt;
-	&amp;lt;script src=&amp;quot;/main.js&amp;quot;&amp;gt;&amp;lt;/script&amp;gt;
-&amp;lt;/head&amp;gt;
-&amp;lt;body&amp;gt;
-&amp;lt;/body&amp;gt;
-&amp;lt;/html&amp;gt;
-`
-
-http.HandleFunc(&amp;quot;/&amp;quot;, func(w http.ResponseWriter, r *http.Request) {
-    if r.URL.Path != &amp;quot;/&amp;quot; {
-        http.NotFound(w, r)
-        return
-    }
-    pusher, ok := w.(http.Pusher)
-    if ok { // Push is supported. Try pushing rather than waiting for the browser.
-        if err := pusher.Push(&amp;quot;/main.js&amp;quot;, nil); err != nil {
-            log.Printf(&amp;quot;Failed to push: %v&amp;quot;, err)
-        }
-    }
-    fmt.Fprintf(w, indexHTML)
-})
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In the Network tab, you can see that the JavaScript file is loaded by server push rather
-than a GET request.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/http2push.png&#34; alt=&#34;Push&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Push support will be available in Go 1.8
-that is available as &lt;a href=&#34;(https://groups.google.com/forum/#!topic/golang-nuts/QYuo0fai6YE)&#34;&gt;beta&lt;/a&gt;,
-download and give this a try. A full sample program can by found on &lt;a href=&#34;https://gist.github.com/rakyll/eec415977f85d50a493ca8472ba97b68&#34;&gt;this gist&lt;/a&gt;.&lt;/p&gt;
-</description>
+      <description>Go 1.8 is going to feature support for HTTP/2 server push.
+HTTP/2 has many features designed to make the Web faster. One of those features is the server push, the ability to send resources before the client asks for it. This feature enables websites to push assets like JavaScript and CSS files before waiting for the web page to be loaded and asking for those resources.
+net/http package will support server push by exposing a Pusher API that will be supported by HTTP/2 ResponseWriters.</description>
     </item>
     
     <item>
@@ -69,89 +28,10 @@ download and give this a try. A full sample program can by found on &lt;a href=&
       <pubDate>Tue, 25 Oct 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/leakingctx/</guid>
-      <description>&lt;p&gt;The &lt;a href=&#34;https://godoc.org/pkg/context&#34;&gt;context&lt;/a&gt; package makes it possible
-to manage a chain of calls within the same call path by signaling context&amp;rsquo;s
-Done channel.&lt;/p&gt;
-
-&lt;p&gt;In this article, we will examine how to use the context package to
-avoid leaking goroutines.&lt;/p&gt;
-
-&lt;p&gt;Assume, you have a function that starts a goroutine internally. Once this
-function is called, the caller may not be able to terminate the goroutine
-started by the function.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// gen is a broken generator that will leak a goroutine.
-func gen() &amp;lt;-chan int {
-	ch := make(chan int)
-	go func() {
-		var n int
-		for {
-			ch &amp;lt;- n
-			n++
-		}
-	}()
-	return ch
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The generator above starts a goroutine with an infinite loop,
-but the caller consumes the values until n is equal to 5.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// The call site of gen doesn&#39;t have a 
-for n := range gen() {
-    fmt.Println(n)
-    if n == 5 {
-        break
-    }
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Once the caller is done with the generator (when it breaks the loop),
-the goroutine will run forever executing the infinite loop. Our code
-will leak a goroutine.&lt;/p&gt;
-
-&lt;p&gt;We can avoid the problem by signaling the internal goroutine with a
-stop channel but there is a better solution: cancellable contexts.
-The generator can select on a context&amp;rsquo;s Done channel and once the context is
-done, the internal goroutine can be cancelled.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;// gen is a generator that can be cancellable by cancelling the ctx.
-func gen(ctx context.Context) &amp;lt;-chan int {
-	ch := make(chan int)
-	go func() {
-		var n int
-		for {
-			select {
-			case &amp;lt;-ctx.Done():
-				return // avoid leaking of this goroutine when ctx is done.
-			case ch &amp;lt;- n:
-				n++
-			}
-		}
-	}()
-	return ch
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Now, the caller can signal the generator when it is done consuming.
-Once cancel function is called, the internal goroutine will be returned.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;ctx, cancel := context.WithCancel(context.Background())
-defer cancel() // make sure all paths cancel the context to avoid context leak
-
-for n := range gen(ctx) {
-    fmt.Println(n)
-    if n == 5 {
-        cancel()
-        break
-    }
-}
-
-// ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The full program is available as a &lt;a href=&#34;https://gist.github.com/rakyll/1aa860377dab8fd445431bbb3204f600&#34;&gt;gist&lt;/a&gt;.&lt;/p&gt;
-</description>
+      <description>The context package makes it possible to manage a chain of calls within the same call path by signaling context&amp;rsquo;s Done channel.
+In this article, we will examine how to use the context package to avoid leaking goroutines.
+Assume, you have a function that starts a goroutine internally. Once this function is called, the caller may not be able to terminate the goroutine started by the function.
+// gen is a broken generator that will leak a goroutine.</description>
     </item>
     
   </channel>

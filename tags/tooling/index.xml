@@ -2,11 +2,14 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tooling on Go, the unwritten parts</title>
-    <link>https://rakyll.org/tags/tooling/index.xml</link>
+    <link>https://rakyll.org/tags/tooling/</link>
     <description>Recent content in Tooling on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <atom:link href="https://rakyll.org/tags/tooling/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 19 Dec 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/tooling/index.xml" rel="self" type="application/rss+xml" />
+    
     
     <item>
       <title>Mutex profile</title>
@@ -14,101 +17,10 @@
       <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/mutexprofile/</guid>
-      <description>&lt;p&gt;Go 1.8 introduces a new profile, the contended mutex profile, that allows you to
-capture a fraction of the stack traces of goroutines with contended mutexes.&lt;/p&gt;
-
-&lt;p&gt;You need to set the sampling fraction by calling
-&lt;a href=&#34;http://beta.golang.org/pkg/runtime/#SetMutexProfileFraction&#34;&gt;runtime.SetMutexProfileFraction&lt;/a&gt;
-to a value above zero to enable collection.&lt;/p&gt;
-
-&lt;p&gt;Consider the following program:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;import _ &amp;quot;net/http/pprof&amp;quot;
-
-var mu sync.Mutex
-var items = make(map[int]struct{})
-
-runtime.SetMutexProfileFraction(5)
-for i := 0; i &amp;lt; 1000*1000; i++ {
-    go func(i int) {
-        mu.Lock()
-        defer mu.Unlock()
-
-        items[i] = struct{}{}
-    }(i)
-}
-
-http.ListenAndServe(&amp;quot;:8888&amp;quot;, nil)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Run the program, &lt;a href=&#34;http://localhost:8888/debug/pprof/mutex?debug=1&#34;&gt;http://localhost:8888/debug/pprof/mutex&lt;/a&gt; will
-serve the mutex profile. Then, you can use &lt;code&gt;go tool pprof&lt;/code&gt; to examine the profile.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go tool pprof &amp;lt;binary&amp;gt; http://localhost:8888/debug/pprof/mutex?debug=1
-Fetching profile from http://localhost:8888/debug/pprof/mutex
-Saved profile in /Users/jbd/pprof/pprof.mutexprofile.localhost:8888.contentions.delay.002.pb.gz
-Entering interactive mode (type &amp;quot;help&amp;quot; for commands)
-(pprof) list
-Total: 27.15s
-ROUTINE ======================== main.main.func1 in /Users/jbd/src/hello/mutexprofile/main.go
-         0     27.15s (flat, cum)   100% of Total
-         .          .     18:		go func() {
-         .          .     19:			mu.Lock()
-         .          .     20:			defer mu.Unlock()
-         .          .     21:
-         .          .     22:			items[i] = struct{}{}
-         .     27.15s     23:		}()
-         .          .     24:	}
-         .          .     25:	http.ListenAndServe(&amp;quot;:8888&amp;quot;, nil)
-         .          .     26:}
-ROUTINE ======================== runtime.goexit in /Users/jbd/go/src/runtime/asm_amd64.s
-         0     27.15s (flat, cum)   100% of Total
-         .          .   2179:	RET
-         .          .   2180:
-         .          .   2181:// The top-most function running on a goroutine
-         .          .   2182:// returns to goexit+PCQuantum.
-         .          .   2183:TEXT runtime·goexit(SB),NOSPLIT,$0-0
-         .     27.15s   2184:	BYTE	$0x90	// NOP
-         .          .   2185:	CALL	runtime·goexit1(SB)	// does not return
-         .          .   2186:	// traceback from goexit1 must hit code range of goexit
-         .          .   2187:	BYTE	$0x90	// NOP
-         .          .   2188:
-         .          .   2189:TEXT runtime·prefetcht0(SB),NOSPLIT,$0-8
-ROUTINE ======================== sync.(*Mutex).Unlock in /Users/jbd/go/src/sync/mutex.go
-    27.15s     27.15s (flat, cum)   100% of Total
-         .          .    121:			return
-         .          .    122:		}
-         .          .    123:		// Grab the right to wake someone.
-         .          .    124:		new = (old - 1&amp;lt;&amp;lt;mutexWaiterShift) | mutexWoken
-         .          .    125:		if atomic.CompareAndSwapInt32(&amp;amp;m.state, old, new) {
-    27.15s     27.15s    126:			runtime_Semrelease(&amp;amp;m.sema)
-         .          .    127:			return
-         .          .    128:		}
-         .          .    129:		old = m.state
-         .          .    130:	}
-         .          .    131:}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The fraction is automatically set in tests if &lt;code&gt;-mutexprofile&lt;/code&gt; is used. Set
-the flag to write the profile to a file.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;go test -mutexprofile=mutex.out
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Then, the pprof tool can be used to examine the recorded profile.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;go tool pprof &amp;lt;test.binary&amp;gt; mutex.out
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;See the &lt;a href=&#34;http://beta.golang.org/pkg/runtime/pprof/&#34;&gt;runtime/pprof&lt;/a&gt; package for more details about profiling
-and the predefined profiles.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://talks.golang.org/2017/state-of-go.slide#23&#34;&gt;The State of Go 2017 talk&lt;/a&gt;
-also contains a guide how to run benchmarks while capturing the mutex profile. It is worth to take a
-look if you are willing to write benchmarks.&lt;/p&gt;
-
-&lt;p&gt;Happy profiling!&lt;/p&gt;
-</description>
+      <description>Go 1.8 introduces a new profile, the contended mutex profile, that allows you to capture a fraction of the stack traces of goroutines with contended mutexes.
+You need to set the sampling fraction by calling runtime.SetMutexProfileFraction to a value above zero to enable collection.
+Consider the following program:
+import _ &amp;quot;net/http/pprof&amp;quot; var mu sync.Mutex var items = make(map[int]struct{}) runtime.SetMutexProfileFraction(5) for i := 0; i &amp;lt; 1000*1000; i++ { go func(i int) { mu.</description>
     </item>
     
     <item>
@@ -117,41 +29,8 @@ look if you are willing to write benchmarks.&lt;/p&gt;
       <pubDate>Wed, 14 Dec 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/default-gopath/</guid>
-      <description>&lt;p&gt;Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.&lt;/p&gt;
-
-&lt;p&gt;The requirement of setting a GOPATH has been a major issue for Go users
-who installed the Go tools for the first time and got the
-&amp;ldquo;you have to set a GOPATH&amp;rdquo; error in their initial experience with the tools.
-Explaining the GOPATH is and instructing how to set this env variable were both
-distracting new users away from using Go. This was especially true for users who
-are not necessarily developing in Go but using &lt;code&gt;go get&lt;/code&gt; to download commands.&lt;/p&gt;
-
-&lt;p&gt;Go 1.8 is introducing a &lt;a href=&#34;https://github.com/golang/go/issues/17262&#34;&gt;default GOPATH&lt;/a&gt;.
-If you don&amp;rsquo;t set one, the tools will use the default. Default GOPATH is:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;$HOME/go on Unix-like systems&lt;/li&gt;
-&lt;li&gt;%USERPROFILE%\go on Windows&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Even though you don&amp;rsquo;t have care about setting this variable, there are few items
-that still requires your attention.&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;Users still need to add $GOPATH/bin into their PATH to run binaries installed by
-&lt;code&gt;go get&lt;/code&gt; and &lt;code&gt;go install&lt;/code&gt;.&lt;/li&gt;
-&lt;li&gt;The users who are developing with the Go language still need to understand
-that the presence of GOPATH, its location and its structure.&lt;/li&gt;
-&lt;li&gt;If your GOROOT (the location where you checkout the Go&amp;rsquo;s source code)
-is the default GOPATH and if you don&amp;rsquo;t have a GOPATH set, the
-tools will reject to use the default GOPATH not to corrupt your GOROOT.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;You still may prefer to &lt;a href=&#34;https://golang.org/wiki/SettingGOPATH&#34;&gt;set a custom GOPATH&lt;/a&gt;
-if the default is not working for you.&lt;/p&gt;
-
-&lt;p&gt;If a custom GOPATH is set, &lt;code&gt;go env GOPATH&lt;/code&gt; will report its value.&lt;/p&gt;
-</description>
+      <description>Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.
+The requirement of setting a GOPATH has been a major issue for Go users who installed the Go tools for the first time and got the &amp;ldquo;you have to set a GOPATH&amp;rdquo; error in their initial experience with the tools. Explaining the GOPATH is and instructing how to set this env variable were both distracting new users away from using Go.</description>
     </item>
     
     <item>
@@ -160,272 +39,7 @@ if the default is not working for you.&lt;/p&gt;
       <pubDate>Sat, 15 Oct 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/codegen/</guid>
-      <description>
-
-&lt;p&gt;&lt;em&gt;Last week, I was at &lt;a href=&#34;http://www.dotgo.eu/&#34;&gt;dotGo&lt;/a&gt;, participating one of the
-finest Go conferences and catching up with gophers from the other side of the
-Atlantic. I gave a very short lightning talk about inspection of code generation
-with the tools alrady available in the toolchain. This post goes through the talk for
-those who didn&amp;rsquo;t have to priviledge to be at the conference. Slides are also
-available at &lt;a href=&#34;https://go-talks.appspot.com/github.com/rakyll/talks/gcinspect/talk.slide&#34;&gt;go-talks&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
-
-&lt;p&gt;Through the article, we will use the following program:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;package main
-
-import &amp;quot;fmt&amp;quot;
-
-func main() {
-    sum := 1 + 1
-    fmt.Printf(&amp;quot;sum: %v\n&amp;quot;, sum)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;toolchain&#34;&gt;Toolchain&lt;/h3&gt;
-
-&lt;p&gt;Go build is a command that encapsulates tons of things from the user.
-But, it also provides more detailed information about what it does if you ask for it.
-&lt;code&gt;-x&lt;/code&gt; is a flag that makes go build output what is being invoked.
-If you want to see what the components of the toolchain are,
-which sequence they are invoked and which flags being used, use &lt;code&gt;-x&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go build -x
-WORK=/var/folders/00/1b8h8000h01000cxqpysvccm005d21/T/go-build190726544
-mkdir -p $WORK/hello/_obj/
-mkdir -p $WORK/hello/_obj/exe/
-cd /Users/jbd/src/hello
-/Users/jbd/go/pkg/tool/darwin_amd64/compile -o $WORK/hello.a -trimpath $WORK -p main -complete -buildid d934a5702088e0fe5c931a55ff26bec87b80cbdc -D _/Users/jbd/src/hello -I $WORK -pack ./hello.go
-cd .
-/Users/jbd/go/pkg/tool/darwin_amd64/link -o $WORK/hello/_obj/exe/a.out -L $WORK -extld=clang -buildmode=exe -buildid=d934a5702088e0fe5c931a55ff26bec87b80cbdc $WORK/hello.a
-mv $WORK/hello/_obj/exe/a.out hello
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;intermediate-assembly&#34;&gt;Intermediate assembly&lt;/h3&gt;
-
-&lt;p&gt;In Go, there is an intermediate assembly phase before generating the actual arch-specific assembly.
-Compiler takes some Go files, generates the intermediate instructions and escalate it to the &lt;code&gt;obj&lt;/code&gt; package to generate the machine code.
-If you are curious about what compiler generates in this phase, &lt;code&gt;-S&lt;/code&gt; makes the compiler dumps the output.&lt;/p&gt;
-
-&lt;p&gt;The intermediate assembly is generally good reference to understand the cost of a Go line.
-Or it coulbe be a great reference if you want to replace, let&amp;rsquo;s say, a Go function with more optimized assembly equivalent.&lt;/p&gt;
-
-&lt;p&gt;You are seeing the output for the main.main here.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-S&amp;quot;
-# hello
-&amp;quot;&amp;quot;.main t=1 size=179 args=0x0 locals=0x60
-    0x0000 00000 (/Users/jbd/src/hello/hello.go:5)  TEXT    &amp;quot;&amp;quot;.main(SB), $96-0
-    0x0000 00000 (/Users/jbd/src/hello/hello.go:5)  MOVQ    (TLS), CX
-    0x0009 00009 (/Users/jbd/src/hello/hello.go:5)  CMPQ    SP, 16(CX)
-    0x000d 00013 (/Users/jbd/src/hello/hello.go:5)  JLS 169
-    0x0013 00019 (/Users/jbd/src/hello/hello.go:5)  SUBQ    $96, SP
-    0x0017 00023 (/Users/jbd/src/hello/hello.go:5)  MOVQ    BP, 88(SP)
-    0x001c 00028 (/Users/jbd/src/hello/hello.go:5)  LEAQ    88(SP), BP
-    0x0021 00033 (/Users/jbd/src/hello/hello.go:5)  FUNCDATA    $0, gclocals·69c1753bd5f81501d95132d08af04464(SB)
-    0x0021 00033 (/Users/jbd/src/hello/hello.go:5)  FUNCDATA    $1, gclocals·e226d4ae4a7cad8835311c6a4683c14f(SB)
-    0x0021 00033 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $2, &amp;quot;&amp;quot;.autotmp_1+64(SP)
-    0x002a 00042 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $0, &amp;quot;&amp;quot;.autotmp_0+72(SP)
-    0x0033 00051 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $0, &amp;quot;&amp;quot;.autotmp_0+80(SP)
-    0x003c 00060 (/Users/jbd/src/hello/hello.go:7)  LEAQ    type.int(SB), AX
-    0x0043 00067 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, (SP)
-    0x0047 00071 (/Users/jbd/src/hello/hello.go:7)  LEAQ    &amp;quot;&amp;quot;.autotmp_1+64(SP), AX
-    0x004c 00076 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, 8(SP)
-    0x0051 00081 (/Users/jbd/src/hello/hello.go:7)  PCDATA  $0, $1
-    0x0051 00081 (/Users/jbd/src/hello/hello.go:7)  CALL    runtime.convT2E(SB)
-    0x0056 00086 (/Users/jbd/src/hello/hello.go:7)  MOVQ    16(SP), AX
-    0x005b 00091 (/Users/jbd/src/hello/hello.go:7)  MOVQ    24(SP), CX
-    0x0060 00096 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, &amp;quot;&amp;quot;.autotmp_0+72(SP)
-    0x0065 00101 (/Users/jbd/src/hello/hello.go:7)  MOVQ    CX, &amp;quot;&amp;quot;.autotmp_0+80(SP)
-    0x006a 00106 (/Users/jbd/src/hello/hello.go:7)  LEAQ    go.string.&amp;quot;sum: %v\n&amp;quot;(SB), AX
-    0x0071 00113 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, (SP)
-    0x0075 00117 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $8, 8(SP)
-    0x007e 00126 (/Users/jbd/src/hello/hello.go:7)  LEAQ    &amp;quot;&amp;quot;.autotmp_0+72(SP), AX
-    0x0083 00131 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, 16(SP)
-    0x0088 00136 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $1, 24(SP)
-    0x0091 00145 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $1, 32(SP)
-    0x009a 00154 (/Users/jbd/src/hello/hello.go:7)  PCDATA  $0, $1
-    0x009a 00154 (/Users/jbd/src/hello/hello.go:7)  CALL    fmt.Printf(SB)
-    0x009f 00159 (/Users/jbd/src/hello/hello.go:8)  MOVQ    88(SP), BP
-    0x00a4 00164 (/Users/jbd/src/hello/hello.go:8)  ADDQ    $96, SP
-    0x00a8 00168 (/Users/jbd/src/hello/hello.go:8)  RET
-    0x00a9 00169 (/Users/jbd/src/hello/hello.go:8)  NOP
-    0x00a9 00169 (/Users/jbd/src/hello/hello.go:5)  PCDATA  $0, $-1
-    0x00a9 00169 (/Users/jbd/src/hello/hello.go:5)  CALL    runtime.morestack_noctxt(SB)
-    0x00ae 00174 (/Users/jbd/src/hello/hello.go:5)  JMP 0
-    ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If you would like to learn more insights about the intermediate assembly and why
-it is significant in Go, I highly recommend
-&lt;a href=&#34;https://www.youtube.com/watch?v=KINIAgRpkDA&#34;&gt;Rob Pike&amp;rsquo;s The Design of the Go Assembler&lt;/a&gt;
-from GopherCon this year.&lt;/p&gt;
-
-&lt;h3 id=&#34;disassembler&#34;&gt;Disassembler&lt;/h3&gt;
-
-&lt;p&gt;As I mentioned, &lt;code&gt;-S&lt;/code&gt; is only for the intermediate assembly. The actual machine representation is available in the final artifact.
-You can use a disassembler to examine what&amp;rsquo;s inside.
-Use &lt;code&gt;go tool objdump&lt;/code&gt; with a binary or library. You probably also want to use &lt;code&gt;-s&lt;/code&gt; to focus by symbol name.
-In this example, I am dumping the main.main. This is the actual assembly generated for &lt;code&gt;darwin/amd64&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go tool objdump -s main.main hello
-TEXT main.main(SB) /Users/jbd/src/hello/hello.go
-    hello.go:5  0x2040  65488b0c25a0080000  GS MOVQ GS:0x8a0, CX
-    hello.go:5  0x2049  483b6110            CMPQ 0x10(CX), SP
-    hello.go:5  0x204d  0f8696000000        JBE 0x20e9
-    hello.go:5  0x2053  4883ec60            SUBQ $0x60, SP
-    hello.go:5  0x2057  48896c2458          MOVQ BP, 0x58(SP)
-    hello.go:5  0x205c  488d6c2458          LEAQ 0x58(SP), BP
-    hello.go:7  0x2061  48c744244002000000  MOVQ $0x2, 0x40(SP)
-    hello.go:7  0x206a  48c744244800000000  MOVQ $0x0, 0x48(SP)
-    hello.go:7  0x2073  48c744245000000000  MOVQ $0x0, 0x50(SP)
-    hello.go:7  0x207c  488d053d4d0800      LEAQ 0x84d3d(IP), AX
-    ...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;symbols&#34;&gt;Symbols&lt;/h3&gt;
-
-&lt;p&gt;Sometimes, all you need is to check the symbols rather than understanding code or data sections.
-Similar to general-purpose nm tool, Go distributes an nm which allows you to list the symbols in an artifact with annotations and size.
-Pretty handy if you want to see what&amp;rsquo;s in and being exported from a Go binary or library.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go tool nm hello
-...
-f4760 B __cgo_init
-f4768 B __cgo_notify_runtime_init_done
-f4770 B __cgo_thread_start
-4fb70 T __rt0_amd64_darwin
-4e220 T _gosave
-4fb90 T _main
-ad1e0 R _masks
-4fd00 T _nanotime
-4e480 T _setg_gcc
-ad2e0 R _shifts
-624a0 T errors.(*errorString).Error
-62400 T errors.New
-52470 T fmt.(*buffer).WriteRune
-...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;optimizations&#34;&gt;Optimizations&lt;/h3&gt;
-
-&lt;p&gt;With the contribution of the new SSA backend, the team contributed a tool that visualizes all the SSA passes.
-Set GOSSAFUNC env variable with a func name and run the go build command.
-It will generate an ssa.html file which will provide all the steps, compiler has gone through to optimize your code.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ GOSSAFUNC=main go build &amp;amp;&amp;amp; open ssa.html
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Here, there is a visualization of all the passes applied to the main function.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/ssa.png&#34; alt=&#34;SSA optimizations&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Go compiler can also annotate the inlining and escape analysis.
-If you pass &lt;code&gt;-m=2&lt;/code&gt; flag to the compiler, it will output the optimizations or annotations related to these two.
-Here we see the &lt;code&gt;net/context&lt;/code&gt; package related inlining operations and escape analysis.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-m&amp;quot; golang.org/x/net/context
-# golang.org/x/net/context
-../golang.org/x/net/context/context.go:140: can inline Background as: func() Context { return background }
-../golang.org/x/net/context/context.go:149: can inline TODO as: func() Context { return todo }
-../golang.org/x/net/context/go17.go:32: cannot inline WithCancel: non-leaf function
-../golang.org/x/net/context/go17.go:46: cannot inline WithDeadline: non-leaf function
-../golang.org/x/net/context/go17.go:61: cannot inline WithTimeout: non-leaf function
-../golang.org/x/net/context/go17.go:62: inlining call to time.Time.Add method(time.Time) func(time.Duration) time.Time { time.t·2.sec += int64(time.d·3 / time.Duration(1000000000)); var time.nsec·4 int32; time.nsec·4 = &amp;lt;N&amp;gt;; time.nsec·4 = time.t·2.nsec + int32(time.d·3 % time.Duration(1000000000)); if time.nsec·4 &amp;gt;= int32(1000000000) { time.t·2.sec++; time.nsec·4 -= int32(1000000000) } else { if time.nsec·4 &amp;lt; int32(0) { time.t·2.sec--; time.nsec·4 += int32(1000000000) } }; time.t·2.nsec = time.nsec·4; return time.t·2 }
-../golang.org/x/net/context/go17.go:70: cannot inline WithValue: non-leaf function
-../golang.org/x/net/context/context.go:141: background escapes to heap
-../golang.org/x/net/context/context.go:141:     from ~r0 (return) at ../golang.org/x/net/context/context.go:140
-../golang.org/x/net/context/context.go:150: todo escapes to heap
-../golang.org/x/net/context/context.go:150:     from ~r0 (return) at ../golang.org/x/net/context/context.go:149
-../golang.org/x/net/context/go17.go:33: parent escapes to heap
-../golang.org/x/net/context/go17.go:33:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:33
-../golang.org/x/net/context/go17.go:32: leaking param: parent
-../golang.org/x/net/context/go17.go:32:     from parent (interface-converted) at ../golang.org/x/net/context/go17.go:33
-../golang.org/x/net/context/go17.go:32:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:33
-../golang.org/x/net/context/go17.go:47: parent escapes to heap
-../golang.org/x/net/context/go17.go:47:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:47
-../golang.org/x/net/context/go17.go:46: leaking param: parent
-../golang.org/x/net/context/go17.go:46:     from parent (interface-converted) at ../golang.org/x/net/context/go17.go:47
-../golang.org/x/net/context/go17.go:46:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:47
-../golang.org/x/net/context/go17.go:46: leaking param: deadline
-../golang.org/x/net/context/go17.go:46:     from deadline (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:46
-../golang.org/x/net/context/go17.go:48: ctx escapes to heap
-../golang.org/x/net/context/go17.go:48:     from ~r2 (return) at ../golang.org/x/net/context/go17.go:46
-../golang.org/x/net/context/go17.go:61: leaking param: parent
-../golang.org/x/net/context/go17.go:61:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:61
-../golang.org/x/net/context/go17.go:71: parent escapes to heap
-../golang.org/x/net/context/go17.go:71:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:71
-../golang.org/x/net/context/go17.go:70: leaking param: parent
-../golang.org/x/net/context/go17.go:70:     from parent (interface-converted) at ../golang.org/x/net/context/go17.go:71
-../golang.org/x/net/context/go17.go:70:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:71
-../golang.org/x/net/context/go17.go:70: leaking param: key
-../golang.org/x/net/context/go17.go:70:     from key (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:70
-../golang.org/x/net/context/go17.go:70: leaking param: val
-../golang.org/x/net/context/go17.go:70:     from val (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:70
-../golang.org/x/net/context/go17.go:71: context.WithValue(parent, key, val) escapes to heap
-../golang.org/x/net/context/go17.go:71:     from ~r3 (return) at ../golang.org/x/net/context/go17.go:70
-&amp;lt;autogenerated&amp;gt;:1: leaking param: .this
-&amp;lt;autogenerated&amp;gt;:1:  from .this.Deadline() (receiver in indirect call) at &amp;lt;autogenerated&amp;gt;:1
-&amp;lt;autogenerated&amp;gt;:2: leaking param: .this
-&amp;lt;autogenerated&amp;gt;:2:  from .this.Done() (receiver in indirect call) at &amp;lt;autogenerated&amp;gt;:2
-&amp;lt;autogenerated&amp;gt;:3: leaking param: .this
-&amp;lt;autogenerated&amp;gt;:3:  from .this.Err() (receiver in indirect call) at &amp;lt;autogenerated&amp;gt;:3
-&amp;lt;autogenerated&amp;gt;:4: leaking param: key
-&amp;lt;autogenerated&amp;gt;:4:  from .this.Value(key) (parameter to indirect call) at &amp;lt;autogenerated&amp;gt;:4
-&amp;lt;autogenerated&amp;gt;:4: leaking param: .this
-&amp;lt;autogenerated&amp;gt;:4:  from .this.Value(key) (receiver in indirect call) at &amp;lt;autogenerated&amp;gt;:4
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;You can use &lt;code&gt;-m&lt;/code&gt; to see a less verbose output without reasonings, but &lt;a href=&#34;https://twitter.com/Dr2chase/status/788353223522455552&#34;&gt;David Chase&lt;/a&gt; says
-even though &lt;code&gt;-m=2&lt;/code&gt; is not perfect, it is often useful.&lt;/p&gt;
-
-&lt;p&gt;It is worth to mention that you often need to disable optimizations to have a simpler view of what&amp;rsquo;s going on.
-Because, optimazation can change the sequence of operations, add code, remove code or apply transformations to the code.
-With optimizations, it gets harder to map a Go line to the optimized output or it gets harder to do perf testing where you end up chaging more than one thing at a time.
-Disabling optimizations is possible with &lt;code&gt;-N&lt;/code&gt;, and disabling inlining is possible with &lt;code&gt;-l&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-l -N&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Once optimizations are disabled, you can debug without being affected by transformations or do perf
-testing without being affected more than one change at a time.&lt;/p&gt;
-
-&lt;h3 id=&#34;lexer&#34;&gt;Lexer&lt;/h3&gt;
-
-&lt;p&gt;If you are working on the lexer, compiler provides a flag to debug
-the lexer as the lexer is going through the source files.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-x&amp;quot;
-# hello
-lex: PACKAGE
-lex: ident main
-lex: implicit semi
-lex: IMPORT
-lex: string literal
-lex: implicit semi
-lex: FUNC
-lex: ident main
-./hello.go:5 lex: TOKEN &#39;(&#39;
-./hello.go:5 lex: TOKEN &#39;)&#39;
-./hello.go:5 lex: TOKEN &#39;{&#39;
-lex: ident sum
-./hello.go:6 lex: TOKEN COLAS
-lex: integer literal
-./hello.go:6 lex: TOKEN &#39;+&#39;
-lex: integer literal
-lex: implicit semi
-lex: ident fmt
-./hello.go:7 lex: TOKEN &#39;.&#39;
-lex: ident Printf
-./hello.go:7 lex: TOKEN &#39;(&#39;
-lex: string literal
-./hello.go:7 lex: TOKEN &#39;,&#39;
-lex: ident sum
-./hello.go:7 lex: TOKEN &#39;)&#39;
-lex: implicit semi
-./hello.go:8 lex: TOKEN &#39;}&#39;
-lex: implicit semi
-&lt;/code&gt;&lt;/pre&gt;
-</description>
+      <description>Last week, I was at dotGo, participating one of the finest Go conferences and catching up with gophers from the other side of the Atlantic. I gave a very short lightning talk about inspection of code generation with the tools alrady available in the toolchain. This post goes through the talk for those who didn&amp;rsquo;t have to priviledge to be at the conference. Slides are also available at go-talks.</description>
     </item>
     
     <item>
@@ -434,164 +48,9 @@ lex: implicit semi
       <pubDate>Sun, 25 Sep 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/go-tool-flags/</guid>
-      <description>
-
-&lt;p&gt;New to the Go tools? Or do you want to expand your knowledge? This article is
-about the flags for the Go tools everyone should know.&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;Disclaimer: This article might be slightly biased. This is a collection of
-flags I personally use and flags people around me having trouble finding references for.
-If you have more ideas, ping me on &lt;a href=&#34;https://twitter.com/rakyll&#34;&gt;Twitter&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;go-build-x&#34;&gt;$ go build -x&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;-x&lt;/code&gt; lists all the commands go build invokes.&lt;/p&gt;
-
-&lt;p&gt;If you are curious about the Go toolchain, or using a cross-C compiler and
-wondering about flags passed to the external compiler, or suspicious about
-a linker bug; use &lt;code&gt;-x&lt;/code&gt; to see all the invocations.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go build -x
-WORK=/var/folders/00/1b8h8000h01000cxqpysvccm005d21/T/go-build600909754
-mkdir -p $WORK/hello/perf/_obj/
-mkdir -p $WORK/hello/perf/_obj/exe/
-cd /Users/jbd/src/hello/perf
-/Users/jbd/go/pkg/tool/darwin_amd64/compile -o $WORK/hello/perf.a -trimpath $WORK -p main -complete -buildid bbf8e880e7dd4114f42a7f57717f9ea5cc1dd18d -D _/Users/jbd/src/hello/perf -I $WORK -pack ./perf.go
-cd .
-/Users/jbd/go/pkg/tool/darwin_amd64/link -o $WORK/hello/perf/_obj/exe/a.out -L $WORK -extld=clang -buildmode=exe -buildid=bbf8e880e7dd4114f42a7f57717f9ea5cc1dd18d $WORK/hello/perf.a
-mv $WORK/hello/perf/_obj/exe/a.out perf
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;go-build-gcflags&#34;&gt;$ go build -gcflags&lt;/h3&gt;
-
-&lt;p&gt;Used to pass flags to the Go compiler. &lt;code&gt;go tool compile -help&lt;/code&gt; lists all
-the flags that can be passed to the compiler.&lt;/p&gt;
-
-&lt;p&gt;For example, to disable compiler optimizations and inlining, you can use
-the following the gcflags.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go build -gcflags=&amp;quot;-N -l&amp;quot;
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;go-test-v&#34;&gt;$ go test -v&lt;/h3&gt;
-
-&lt;p&gt;It provides chatty output for the testing. It prints the test name,
-its status (failed or passed), how much it took to run the test, any logs
-from the test case, etc.&lt;/p&gt;
-
-&lt;p&gt;go test without the &lt;code&gt;-v&lt;/code&gt; flag is highly quiet, I always use it with &lt;code&gt;-v&lt;/code&gt; turned on.
-Sample output:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go test -v context
-=== RUN   TestBackground
---- PASS: TestBackground (0.00s)
-=== RUN   TestTODO
---- PASS: TestTODO (0.00s)
-=== RUN   TestWithCancel
---- PASS: TestWithCancel (0.10s)
-=== RUN   TestParentFinishesChild
---- PASS: TestParentFinishesChild (0.00s)
-=== RUN   TestChildFinishesFirst
---- PASS: TestChildFinishesFirst (0.00s)
-=== RUN   TestDeadline
---- PASS: TestDeadline (0.16s)
-=== RUN   TestTimeout
---- PASS: TestTimeout (0.16s)
-=== RUN   TestCanceledTimeout
---- PASS: TestCanceledTimeout (0.10s)
-...
-PASS
-ok  	context	2.426s
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;go-test-race&#34;&gt;$ go test -race&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&#34;https://blog.golang.org/race-detector&#34;&gt;Go&amp;rsquo;s race detector&lt;/a&gt; is available
-from the Go tools via &lt;code&gt;-race&lt;/code&gt;. go test also supports this flag and reports races.
-Use this flag during development to detect the races.&lt;/p&gt;
-
-&lt;h3 id=&#34;go-test-run&#34;&gt;$ go test -run&lt;/h3&gt;
-
-&lt;p&gt;You can filter tests to run by regex and the &lt;code&gt;-run&lt;/code&gt; flag. The following command
-will only &lt;a href=&#34;https://blog.golang.org/examples&#34;&gt;test examples&lt;/a&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go test -run=Example
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;go-test-coverprofile&#34;&gt;$ go test -coverprofile&lt;/h3&gt;
-
-&lt;p&gt;You can output a cover profile as you are testing a package, then use go tool to
-visualize them on a browser.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go test -coverprofile=c.out &amp;amp;&amp;amp; go tool cover -html=c.out
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The command above will create a coverage profile and open the results page in
-the browser. The visualized results will look like the page below:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/context-coverage.png&#34; alt=&#34;context coverage&#34; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&#34;go-test-exec&#34;&gt;$ go test -exec&lt;/h3&gt;
-
-&lt;p&gt;It is a lesser known feature in Go that you can intercept the tools with another
-program by using the &lt;code&gt;-exec&lt;/code&gt; flag. This flag allows you to delegate some work to an
-external program from the Go tool.&lt;/p&gt;
-
-&lt;p&gt;A commonly required scenario for this flag is when you need more than just executing
-the tests on the host machine. The Android builder for Go, uses &lt;code&gt;-exec&lt;/code&gt; to push the
-test binaries to an Android device by using &lt;code&gt;adb&lt;/code&gt; and collects the results.
-&lt;a href=&#34;https://github.com/golang/go/blob/master/misc/android/go_android_exec.go&#34;&gt;Android exec program&lt;/a&gt;
-can be used as a reference.&lt;/p&gt;
-
-&lt;h3 id=&#34;go-get-u&#34;&gt;$ go get -u&lt;/h3&gt;
-
-&lt;p&gt;If you run go-get for a package that is already in your GOPATH, go-get
-is not going to update the package to its latest version.
-&lt;code&gt;-u&lt;/code&gt; forces the tool to sync with the latest version of the repo.&lt;/p&gt;
-
-&lt;p&gt;If you are a library author, you might like to write your installation
-instructions with a &lt;code&gt;-u&lt;/code&gt; flag, e.g. the way &lt;a href=&#34;https://github.com/golang/lint#installation&#34;&gt;golint&lt;/a&gt; does.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go get -u github.com/golang/lint/golint
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;go-get-d&#34;&gt;$ go get -d&lt;/h3&gt;
-
-&lt;p&gt;If you just want to clone a repo to your GOPATH and skip the building
-and installation phase, use &lt;code&gt;-d&lt;/code&gt;. It downloads the package and stops
-before trying to build or install it.&lt;/p&gt;
-
-&lt;p&gt;I often use it as a replacement for git clone for repos with vanity URLs,
-because it clones the repo to its proper GOPATH.
-For example,&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go get -d golang.org/x/oauth2/...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;will clone the package to $GOPATH/src/golang.org/x/oauth2. Given golang.org/x/oauth2 is a
-vanity URL, go-getting the repo is useful rather than trying to figure out
-where the actual repo is (go.googlesource.com/oauth2).&lt;/p&gt;
-
-&lt;h3 id=&#34;go-get-t&#34;&gt;$ go get -t&lt;/h3&gt;
-
-&lt;p&gt;If your package has additional dependencies for tests, &lt;code&gt;-t&lt;/code&gt; will allow you to
-download them during go-get.
-If you don&amp;rsquo;t pass &lt;code&gt;-t&lt;/code&gt;, go get will only download the dependencies for your non-test code.&lt;/p&gt;
-
-&lt;h3 id=&#34;go-list-f&#34;&gt;$ go list -f&lt;/h3&gt;
-
-&lt;p&gt;Allows you to list Go packages with a custom format. It is highly useful
-for writing bash scripts.&lt;/p&gt;
-
-&lt;p&gt;The following command will print the dependencies of the runtime package:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;go list -f &#39;{{.Deps}}&#39; runtime
-[runtime/internal/atomic runtime/internal/sys unsafe]
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;More formatting ideas can be found at
-&lt;a href=&#34;http://dave.cheney.net/2014/09/14/go-list-your-swiss-army-knife&#34;&gt;Dave Cheney&amp;rsquo;s article&lt;/a&gt; on &lt;code&gt;go list&lt;/code&gt;.&lt;/p&gt;
-</description>
+      <description>New to the Go tools? Or do you want to expand your knowledge? This article is about the flags for the Go tools everyone should know.
+Disclaimer: This article might be slightly biased. This is a collection of flags I personally use and flags people around me having trouble finding references for. If you have more ideas, ping me on Twitter.
+$ go build -x -x lists all the commands go build invokes.</description>
     </item>
     
     <item>
@@ -600,31 +59,10 @@ for writing bash scripts.&lt;/p&gt;
       <pubDate>Thu, 08 Sep 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/examples-coverage/</guid>
-      <description>&lt;p&gt;Go programming language provides many unique good features to &lt;a href=&#34;https://blog.golang.org/examples&#34;&gt;
-write and maintain examples&lt;/a&gt; for your packages backed by the testing tools.&lt;/p&gt;
-
-&lt;p&gt;As an addition to the test coverage and test coverage report, &lt;code&gt;go test&lt;/code&gt;
-also can provide coverage for testable examples.&lt;/p&gt;
-
-&lt;p&gt;Use the following commands in your package to use the
-&lt;code&gt;-run&lt;/code&gt; flag to only the match the example tests and view the results
-in your browser.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go test -v -run=Example -coverprofile=c.out &amp;amp;&amp;amp; go tool cover -html=c.out
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Please note that the coverage is reported for Examples with an Output block.
-Examples without an &amp;ldquo;Output&amp;rdquo; block will not be tested and reported.&lt;/p&gt;
-
-&lt;p&gt;Here is what the &lt;a href=&#34;https://rakyll.org/att/example-coverage.html&#34;&gt;coverage&lt;/a&gt; looks like
-for the strings package from the stdlib.&lt;/p&gt;
-
-&lt;p&gt;High example coverage is probably not a neccesary signal
-and not all lines are supposed to be documented with an example
-but it might give you an idea whether you are missing out a significant
-non-obvious case that needs to be documented
-more comphensively.&lt;/p&gt;
-</description>
+      <description>Go programming language provides many unique good features to write and maintain examples for your packages backed by the testing tools.
+As an addition to the test coverage and test coverage report, go test also can provide coverage for testable examples.
+Use the following commands in your package to use the -run flag to only the match the example tests and view the results in your browser.
+$ go test -v -run=Example -coverprofile=c.</description>
     </item>
     
     <item>
@@ -633,63 +71,10 @@ more comphensively.&lt;/p&gt;
       <pubDate>Fri, 02 Sep 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/instruments/</guid>
-      <description>&lt;p&gt;Apple has a suite of instrumentation and tracing tools for performance
-analysis avaiable as a part of their Xcode tooling set. In this article,
-we will use &lt;a href=&#34;https://developer.apple.com/library/prerelease/content/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/&#34;&gt;Instruments&lt;/a&gt;
-to record and analyze the CPU profile of a Go program.&lt;/p&gt;
-
-&lt;p&gt;Instruments also provide a large set of macOS-specific tracing and profiling
-if you have performance issues specifically on darwin.&lt;/p&gt;
-
-&lt;p&gt;Some of these specific profiles are:&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;System trace: Collects comprehensive information about system calls,
-scheduling, user-kernel space transitions. (Available only on OSX.)&lt;/li&gt;
-&lt;li&gt;System usage: Gives very detailed output about I/O system activity.
-(Available only on iOS.)&lt;/li&gt;
-&lt;li&gt;File Activity: Monitors file and directory activity such as open/close,
-permission modifications, creation, copying and moving.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Instruments provide a rich and very easy to use UI to display profiles.
-I highly recommend it as an addition to existing profiler UIs and vizualizers.&lt;/p&gt;
-
-&lt;p&gt;Now, let&amp;rsquo;s profile a Go program.&lt;/p&gt;
-
-&lt;p&gt;Launch the Instruments app and select &amp;ldquo;Time Profiler&amp;rdquo;.&lt;/p&gt;
-
-&lt;p&gt;Create a target with your Go binary and arguments and env variables
-you want to start the binary with. In this tutorial, I will use the
-following program.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;go get -u github.com/rakyll/hey
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;We will use &lt;code&gt;hey&lt;/code&gt; to make 10000 requests with 200 goroutines
-to the target provided in the arguments.&lt;/p&gt;
-
-&lt;p&gt;The target I have for &lt;code&gt;hey&lt;/code&gt; looks like what&amp;rsquo;s below.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/instruments-target.png&#34; alt=&#34;Instruments target&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Once you have a target, you can click on the record button to start
-recording samples. Once enough samples are collected, stop or it will
-eventually stop when the program finishes.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&#34;https://rakyll.org/img/instruments-results.png&#34; alt=&#34;Instruments results&#34; /&gt;&lt;/p&gt;
-
-&lt;p&gt;You can filter by symbol name, user vs kernel callstacks, time span,
-physical or logical CPU and more. You can also double click any of the symbols listed
-to jump to the source code.&lt;/p&gt;
-
-&lt;p&gt;Please note that Go programs cannot work with every profile available
-on Instruments. But there are a few profiles that absolutely can improve
-your profiling experience. With stack frame pointers enabled by default in Go 1.7,
-it became easier for tools like Instruments to capture backtraces more efficiently.&lt;/p&gt;
-
-&lt;p&gt;Happy profiling!&lt;/p&gt;
-</description>
+      <description>Apple has a suite of instrumentation and tracing tools for performance analysis avaiable as a part of their Xcode tooling set. In this article, we will use Instruments to record and analyze the CPU profile of a Go program.
+Instruments also provide a large set of macOS-specific tracing and profiling if you have performance issues specifically on darwin.
+Some of these specific profiles are:
+ System trace: Collects comprehensive information about system calls, scheduling, user-kernel space transitions.</description>
     </item>
     
     <item>
@@ -698,82 +83,9 @@ it became easier for tools like Instruments to capture backtraces more efficient
       <pubDate>Sat, 27 Aug 2016 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/eg/</guid>
-      <description>&lt;p&gt;If you are willing to make large scale refactoring in your
-Go programs, automating the refactoring tasks is more desirable than
-manual editing. &lt;code&gt;eg&lt;/code&gt; is a program that allows you to perform transformations
-based on template Go files.&lt;/p&gt;
-
-&lt;p&gt;To install the tool, run the following:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ go get golang.org/x/tools/cmd/eg
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;&lt;code&gt;eg&lt;/code&gt; requires a template file to look for which transformation it should
-apply to your source code. What&amp;rsquo;s nice is that the template file is a Go file
-with little annotations.&lt;/p&gt;
-
-&lt;p&gt;Consider the following Go program:&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;$ cat $GOPATH/src/hello/hello.go
-package hello
-
-import &amp;quot;time&amp;quot;
-
-// ExtendWith50000ns adds 50000ns to t.
-func ExtendWith50000ns(t time.Time) time.Time {
-	return t.Add(time.Duration(50000))
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Assume you want to eliminate the unnecessary time.Duration casting at ExtendWith50000ns
-and as a good practice, you would also like to add a unit to the duration rather than
-just passing 50000.&lt;/p&gt;
-
-&lt;p&gt;&lt;code&gt;eg&lt;/code&gt; requires a template file where you define before and afters that represents the
-transformation.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;$ cat T.template
-package template
-
-import (
-    &amp;quot;time&amp;quot;
-)
-
-func before(t time.Time, d time.Duration) time.Time {
-    // if already time.Duration, do not cast.
-    return t.Add(time.Duration(d))
-}
-
-func after(t time.Time, d time.Duration) time.Time  {
-    return t.Add(d * time.Nanosecond)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;And run the &lt;code&gt;eg&lt;/code&gt; command on your hello package to apply it at every occurrence of this pattern.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ eg -w -t T.template hello
-=== /Users/jbd/src/hello/hello.go (1 matches)
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Voila!&lt;/p&gt;
-
-&lt;p&gt;The file now contains a duration that is not casted unnecessarily and it has a unit.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code class=&#34;language-go&#34;&gt;$ cat $GOPATH/src/hello/hello.go
-package hello
-
-import &amp;quot;time&amp;quot;
-
-// ExtendWith50000ns adds 50000ns to t.
-func ExtendWith50000ns(t time.Time) time.Time {
-	return t.Add(50000 * time.Nanosecond)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;Note: There are many &lt;a href=&#34;https://github.com/golang/tools/tree/master/refactor/eg/testdata&#34;&gt;.template files&lt;/a&gt;
-underneath the package for testing purposes but they can also be used as a
-reference how to write other transformation templates.&lt;/p&gt;
-</description>
+      <description>If you are willing to make large scale refactoring in your Go programs, automating the refactoring tasks is more desirable than manual editing. eg is a program that allows you to perform transformations based on template Go files.
+To install the tool, run the following:
+$ go get golang.org/x/tools/cmd/eg  eg requires a template file to look for which transformation it should apply to your source code. What&amp;rsquo;s nice is that the template file is a Go file with little annotations.</description>
     </item>
     
     <item>
@@ -782,120 +94,9 @@ reference how to write other transformation templates.&lt;/p&gt;
       <pubDate>Tue, 08 Sep 2015 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/cross-compilation/</guid>
-      <description>
-
-&lt;p&gt;Note: This article extends &lt;a href=&#34;http://dave.cheney.net/2015/03/03/cross-compilation-just-got-a-whole-lot-better-in-go-1-5&#34;&gt;Dave Cheney’s Go 1.5 cross compilers&lt;/a&gt; post.&lt;/p&gt;
-
-&lt;p&gt;Cross compilers got easier with Go 1.5.
-You don’t have to bootstrap the standard library and toolchain as you
-used to do prior to 1.5.&lt;/p&gt;
-
-&lt;h3 id=&#34;if-cgo-is-not-required&#34;&gt;If cgo is not required&lt;/h3&gt;
-
-&lt;p&gt;The go tool won’t require any bootstrapping if cgo is not required.
-That allows you to target the following program to any GOOS/GOARCH without
-requiring you to do any additional work. Invoke &lt;code&gt;go build&lt;/code&gt;.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cat main.go
-package main
-import &amp;quot;fmt&amp;quot;
-func main() {
-    fmt.Println(&amp;quot;hello world&amp;quot;)
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;In order to target android/arm, run the following command.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ GOOS=android GOARCH=arm GOARM=7 go build .
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The produced binary is targeting ARMv7 processors that runs Android.
-All possible GOOS and GOARCH values are listed on the &lt;a href=&#34;https://golang.org/doc/install/source#environment&#34;&gt;environment docs&lt;/a&gt;.&lt;/p&gt;
-
-&lt;h3 id=&#34;if-cgo-is-required&#34;&gt;If cgo is required&lt;/h3&gt;
-
-&lt;p&gt;If you need to have cgo enabled, the go tool allows you to provide
-custom C and C++ compilers via CC and CXX environment variables.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ CGO_ENABLED=1 CC=android-armeabi-gcc CXX=android-armeabi-g++ \
-    GOOS=android GOARCH=arm GOARM=7 go build .
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The toolchain will invoke android-armeabi-gcc and android-armeabi-g++
-if it is required to compile any part of the package with a C or C++ compiler.
-Consider the following program with a slightly different main function.
-Rather than outputting &amp;ldquo;hello world&amp;rdquo; to the standard I/O,
-it will use Android system libraries to write &amp;ldquo;hello world&amp;rdquo; to the system log.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ cat main.go
-// +build android
-
-package main
-
-// #cgo LDFLAGS: -llog
-//
-// #include &amp;lt;android/log.h&amp;gt;
-//
-// void hello() {
-//   __android_log_print(
-//     ANDROID_LOG_INFO, &amp;quot;MyProgram&amp;quot;, &amp;quot;hello world&amp;quot;);
-// }
-import &amp;quot;C&amp;quot;
-func main() {
-    C.hello()
-}
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If you build the program with the command above and examine the build
-with -x, you can observe that cgo is delegating the C compilation to
-arm-linux-androideabi-gcc.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ CGO_ENABLED=1 \
-CC=arm-linux-androideabi-gcc \
-CXX=arm-linux-androideabi-g++ \
-GOOS=android GOARCH=arm GOARM=7 go build -x .
-...
-CGO_LDFLAGS=”-g” “-O2” “-llog” /Users/jbd/go/pkg/tool/darwin_amd64/cgo -objdir $WORK/github.com/rakyll/hello/_obj/ -importpath github.com/rakyll/hello — -I $WORK/github.com/rakyll/hello/_obj/ main.go
-arm-linux-androideabi-gcc -I . -fPIC -marm -pthread -fmessage-length=0 -print-libgcc-file-name
-arm-linux-androideabi-gcc -I . -fPIC -marm -pthread -fmessage-length=0 -I $WORK/github.com/rakyll/hello/_obj/ -g -O2 -o $WORK/github.com/rakyll/hello/_obj/_cgo_main.o -c $WORK/github.com/rakyll/hello/_obj/_cgo_main.c
-...
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;h3 id=&#34;pre-building-the-standard-library&#34;&gt;Pre-building the standard library&lt;/h3&gt;
-
-&lt;p&gt;The go tool also provides a utility if you would like to pre-build the
-standard library, targeting a specific GOOS and GOARCH.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ CGO_ENABLED=1 \
-    CC=arm-linux-androideabi-gcc \
-    CXX=arm-linux-androideabi-g++ \
-    GOOS=android GOARCH=arm GOARM=7 go install std
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;The standard library targeting android/armv7 will be available at $GOROOT/pkg/android_arm.&lt;/p&gt;
-
-&lt;pre&gt;&lt;code&gt;$ ls $GOROOT/pkg/android_arm
-archive    fmt.a      math       runtime.a
-bufio.a    go         math.a     sort.a
-bytes.a    hash       mime       strconv.a
-compress   hash.a     mime.a     strings.a
-container  html       net        sync
-crypto     html.a     net.a      sync.a
-crypto.a   image      os         syscall.a
-database   image.a    os.a       testing
-debug      index      path       testing.a
-encoding   internal   path.a     text
-encoding.a io         reflect.a  time.a
-errors.a   io.a       regexp     unicode
-expvar.a   log        regexp.a   unicode.a
-flag.a     log.a      runtime
-&lt;/code&gt;&lt;/pre&gt;
-
-&lt;p&gt;If you prefer not to pre-build and install the standard library to the GOROOT,
-required libraries will be built while building user packages.
-But, the standard libraries builds are not preserved for future use at this
-stage and they will be rebuilt each time you run &lt;code&gt;go build&lt;/code&gt;.&lt;/p&gt;
-</description>
+      <description>Note: This article extends Dave Cheney’s Go 1.5 cross compilers post.
+Cross compilers got easier with Go 1.5. You don’t have to bootstrap the standard library and toolchain as you used to do prior to 1.5.
+If cgo is not required The go tool won’t require any bootstrapping if cgo is not required. That allows you to target the following program to any GOOS/GOARCH without requiring you to do any additional work.</description>
     </item>
     
   </channel>
