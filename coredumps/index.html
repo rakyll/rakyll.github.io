@@ -73,30 +73,26 @@
 			 	<h1>Debugging Go core dumps</h1>
 			  <span class="post-date">Mon, May 22, 2017</span>
 			      <p>Debugging is highly useful to examine the execution flow
-and to understand the current state of a program. Debugging
-of core dumps is another diagnostics aid to debug the misbehavior
-of production services.</p>
+and to understand the current state of a program.</p>
 
-<p>Why to debug core dumps?</p>
+<p>Core files is a file that contains the memory dump of a running
+process and its process status. It is primarily used for post-mortem
+debugging of a program, as well as to understand a program&rsquo;s state
+while it is still running. These two cases make debugging of core dumps
+a good diagnostics aid to postmortem and analyze production
+services.</p>
 
-<ul>
-<li>You may have running programs that has crashed unexpectedly,
-and you want to investigate why.</li>
-<li>There might be issues that are only reproducible during
-production time and you want to understand the state of a
-program while it is running in a specific environment.</li>
-</ul>
-
-<p>I will use a simple hello world web server in this demo,
-but in real life things might get very complicated easily.
+<p>I will use a simple hello world web server in this article,
+but in real life our programs might get very
+complicated easily.
 The availability of core dump analysis gives you an
 opportunity to resurrect a program from specific snapshot
-and analyze it.</p>
+and look into cases that might only reproducible in certain
+conditions/environments.</p>
 
-<p><strong>Note</strong>: This flow only works on Linux at this point,
+<p><strong>Note</strong>: This flow only works on Linux at this point end-to-end,
 I am not quite sure about the other Unixys but it is not
-yet supported on macOS. OTOH, there is macOS- and Windows-
-specific work going on to support these platforms.</p>
+yet supported on macOS. Windows is not supported at this point.</p>
 
 <p>Before we begin, you need to make sure that your ulimit
 for core dumps are at a reasonable level. It is by default
@@ -158,7 +154,7 @@ by default but gives you this option  on Ctrl+backslash when
 will be written.</p>
 
 <p>Another option is to retrieve a core dump from a running process
-without  having to sacrifice and kill a process.
+without  having to kill a process.
 With <code>gcore</code>, it is possible to get the core
 files without crashing. Let’s start the server again:</p>
 

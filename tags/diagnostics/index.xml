@@ -17,9 +17,8 @@
       <pubDate>Mon, 22 May 2017 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/coredumps/</guid>
-      <description>Debugging is highly useful to examine the execution flow and to understand the current state of a program. Debugging of core dumps is another diagnostics aid to debug the misbehavior of production services.
-Why to debug core dumps?
- You may have running programs that has crashed unexpectedly, and you want to investigate why. There might be issues that are only reproducible during production time and you want to understand the state of a program while it is running in a specific environment.</description>
+      <description>Debugging is highly useful to examine the execution flow and to understand the current state of a program.
+Core files is a file that contains the memory dump of a running process and its process status. It is primarily used for post-mortem debugging of a program, as well as to understand a program&amp;rsquo;s state while it is still running. These two cases make debugging of core dumps a good diagnostics aid to postmortem and analyze production services.</description>
     </item>
     
   </channel>
