@@ -76,6 +76,162 @@
   
   <div class="post">
     <h1 class="post-title">
+      <a href="https://rakyll.org/coredumps/">
+        Debugging Go core dumps
+      </a>
+    </h1>
+
+    <span class="post-date">Mon, May 22, 2017</span>
+
+    <p>Debugging is highly useful to examine the execution flow
+and to understand the current state of a program. Debugging
+of core dumps is another diagnostics aid to debug the misbehavior
+of production services.</p>
+
+<p>Why to debug core dumps?</p>
+
+<ul>
+<li>You may have running programs that has crashed unexpectedly,
+and you want to investigate why.</li>
+<li>There might be issues that are only reproducible during
+production time and you want to understand the state of a
+program while it is running in a specific environment.</li>
+</ul>
+
+<p>I will use a simple hello world web server in this demo,
+but in real life things might get very complicated easily.
+The availability of core dump analysis gives you an
+opportunity to resurrect a program from specific snapshot
+and analyze it.</p>
+
+<p><strong>Note</strong>: This flow only works on Linux at this point,
+I am not quite sure about the other Unixys but it is not
+yet supported on macOS. OTOH, there is macOS- and Windows-
+specific work going on to support these platforms.</p>
+
+<p>Before we begin, you need to make sure that your ulimit
+for core dumps are at a reasonable level. It is by default
+0 which means the max core file size can only be zero.
+I usually set it to unlimited on my development machine by typing:</p>
+
+<pre><code>$ ulimit -c unlimited
+</code></pre>
+
+<p>Then, make sure you have <a href="https://github.com/derekparker/delve">delve</a>
+installed on your machine.</p>
+
+<p>Here is a <code>main.go</code> that contains a simple handler and it starts an HTTP server.</p>
+
+<pre><code>$ cat main.go
+package main
+
+import (
+	&quot;fmt&quot;
+	&quot;log&quot;
+	&quot;net/http&quot;
+)
+
+func main() {
+	http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, &quot;hello world\n&quot;)
+	})
+	log.Fatal(http.ListenAndServe(&quot;localhost:7777&quot;, nil))
+}
+</code></pre>
+
+<p>Let&rsquo;s build this and have a binary.</p>
+
+<pre><code>$ go build .
+</code></pre>
+
+<p>Let’s assume, in the future, there is something messy going on with
+this server but you are not so sure about what it might be.
+You might have instrumented your program in various ways but it
+might not be enough for getting any clue from the existing
+instrumentation data.</p>
+
+<p>Basically, in a situation like this, it would be nice to have a
+snapshot of the current process, and then use that snapshot to dive
+into to the current state of your program with your existing debugging
+tools.</p>
+
+<p>There are several ways to obtain a core file. You might have been
+already familiar with crash dumps, these are basically core dumps
+written to disk when a program is crashing. Go doesn&rsquo;t enable crash dumps
+by default but gives you this option  on Ctrl+backslash when
+<code>GOTRACEBACK</code> env variable is set to &ldquo;crash&rdquo;.</p>
+
+<pre><code>$ GOTRACEBACK=crash ./hello
+(Ctrl+\)
+</code></pre>
+
+<p>It will crash the program with stack trace printed and core dump file
+will be written.</p>
+
+<p>Another option is to retrieve a core dump from a running process
+without  having to sacrifice and kill a process.
+With <code>gcore</code>, it is possible to get the core
+files without crashing. Let’s start the server again:</p>
+
+<pre><code>$ ./hello &amp;
+$ gcore 546 # 546 is the PID of hello.
+</code></pre>
+
+<p>We have a dump without crashing the process. The next step
+is to load the core file to delve and start analyzing.</p>
+
+<pre><code>$ dlv core ./hello core.546
+</code></pre>
+
+<p>Alright, this is it! This is no different than the typical delve interactive.
+You can backtrace, list, see variables, and  more.</p>
+
+<pre><code>(dlv) bt
+ 0  0x0000000000457774 in runtime.raise
+    at /usr/lib/go/src/runtime/sys_linux_amd64.s:110
+ 1  0x000000000043f7fb in runtime.dieFromSignal
+    at /usr/lib/go/src/runtime/signal_unix.go:323
+ 2  0x000000000043f9a1 in runtime.crash
+    at /usr/lib/go/src/runtime/signal_unix.go:409
+ 3  0x000000000043e982 in runtime.sighandler
+    at /usr/lib/go/src/runtime/signal_sighandler.go:129
+ 4  0x000000000043f2d1 in runtime.sigtrampgo
+    at /usr/lib/go/src/runtime/signal_unix.go:257
+ 5  0x00000000004579d3 in runtime.sigtramp
+    at /usr/lib/go/src/runtime/sys_linux_amd64.s:262
+ 6  0x00007ff68afec330 in (nil)
+    at :0
+ 7  0x000000000040f2d6 in runtime.notetsleep
+    at /usr/lib/go/src/runtime/lock_futex.go:209
+ 8  0x0000000000435be5 in runtime.sysmon
+    at /usr/lib/go/src/runtime/proc.go:3866
+ 9  0x000000000042ee2e in runtime.mstart1
+    at /usr/lib/go/src/runtime/proc.go:1182
+10  0x000000000042ed04 in runtime.mstart
+    at /usr/lib/go/src/runtime/proc.go:1152
+
+(dlv) ls
+&gt; runtime.raise() /usr/lib/go/src/runtime/sys_linux_amd64.s:110 (PC: 0x457774)
+   105:		SYSCALL
+   106:		MOVL	AX, DI	// arg 1 tid
+   107:		MOVL	sig+0(FP), SI	// arg 2
+   108:		MOVL	$200, AX	// syscall - tkill
+   109:		SYSCALL
+=&gt; 110:		RET
+   111:
+   112:	TEXT runtime·raiseproc(SB),NOSPLIT,$0
+   113:		MOVL	$39, AX	// syscall - getpid
+   114:		SYSCALL
+   115:		MOVL	AX, DI	// arg 1 pid
+</code></pre>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
       <a href="https://rakyll.org/grpc-trace/">
         Automatic Stackdriver Tracing for gRPC
       </a>

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Diagnostics on Go, the unwritten parts</title>
+    <link>https://rakyll.org/tags/diagnostics/</link>
+    <description>Recent content in Diagnostics on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 22 May 2017 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/diagnostics/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Debugging Go core dumps</title>
+      <link>https://rakyll.org/coredumps/</link>
+      <pubDate>Mon, 22 May 2017 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/coredumps/</guid>
+      <description>Debugging is highly useful to examine the execution flow and to understand the current state of a program. Debugging of core dumps is another diagnostics aid to debug the misbehavior of production services.
+Why to debug core dumps?
+ You may have running programs that has crashed unexpectedly, and you want to investigate why. There might be issues that are only reproducible during production time and you want to understand the state of a program while it is running in a specific environment.</description>
+    </item>
+    
+  </channel>
+</rss>

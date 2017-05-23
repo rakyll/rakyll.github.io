@@ -21,6 +21,15 @@
     </item>
     
     <item>
+      <title>Diagnostics</title>
+      <link>https://rakyll.org/tags/diagnostics/</link>
+      <pubDate>Mon, 22 May 2017 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/tags/diagnostics/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>Go1.8</title>
       <link>https://rakyll.org/tags/go1.8/</link>
       <pubDate>Wed, 14 Dec 2016 11:27:27 -0400</pubDate>
@@ -104,7 +113,7 @@
     <item>
       <title>Tooling</title>
       <link>https://rakyll.org/tags/tooling/</link>
-      <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
+      <pubDate>Mon, 22 May 2017 11:27:27 -0400</pubDate>
       
       <guid>https://rakyll.org/tags/tooling/</guid>
       <description></description>
