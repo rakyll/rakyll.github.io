@@ -173,7 +173,9 @@ is to load the core file to delve and start analyzing.</p>
 </code></pre>
 
 <p>Alright, this is it! This is no different than the typical delve interactive.
-You can backtrace, list, see variables, and  more.</p>
+You can backtrace, list, see variables, and  more. Some features will be disabled
+given a core dump is a snapshot and not a currently running process, but
+the execution flow and the program state will be entirely accessible.</p>
 
 <pre><code>(dlv) bt
  0  0x0000000000457774 in runtime.raise
