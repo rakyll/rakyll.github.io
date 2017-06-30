@@ -3,7 +3,7 @@
 <head>
   <link href="http://gmpg.org/xfn/11" rel="profile">
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="generator" content="Hugo 0.21-DEV" />
+  <meta name="generator" content="Hugo 0.24-DEV" />
 
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
@@ -122,7 +122,7 @@ we use the &ldquo;Application Default Credentials&rdquo;.</p>
 <p>In order to initiate the greeter client, use the Stackdriver Trace
 client interceptor we are providing:</p>
 
-<pre><code>conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
+<pre><code>conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(tc.GRPCClientInterceptor()))
 if err != nil {
     log.Fatalf(&quot;did not connect: %v&quot;, err)
 }
@@ -145,7 +145,7 @@ if err != nil {
 <p>On the server side, in order to be able to recieve the traces (and keep propagating), use the server interceptor we are providing when initializing
 a server:</p>
 
-<pre><code>s := grpc.NewServer(grpc.UnaryInterceptor(trace.GRPCServerInterceptor(tc)))
+<pre><code>s := grpc.NewServer(grpc.UnaryInterceptor(tc.GRPCServerInterceptor()))
 </code></pre>
 
 <p>Then, the server handlers will be able to access the <code>trace.Span</code>

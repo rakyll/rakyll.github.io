@@ -3,7 +3,7 @@
 <head>
   <link href="http://gmpg.org/xfn/11" rel="profile">
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <meta name="generator" content="Hugo 0.21-DEV" />
+  <meta name="generator" content="Hugo 0.24-DEV" />
 
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
@@ -73,6 +73,114 @@
 <div class="posts">
 
 
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/custom-profiles/">
+        Custom pprof profiles
+      </a>
+    </h1>
+
+    <span class="post-date">Fri, Jun 30, 2017</span>
+
+    <p>Go provides several pprof profiles out of thet box to gather
+profiling data from Go programs.</p>
+
+<p>The builtin profiles provided by the <a href="https://golang.org/pkg/runtime/pprof/">runtime/pprof</a> package:</p>
+
+<ul>
+<li><strong>profile</strong>: CPU profile determines where a program spends its time while actively consuming CPU cycles (as opposed while sleeping or waiting for I/O).</li>
+<li><strong>heap</strong>: Heap profile reports the currently live allocations; used to monitor current memory usage or check for memory leaks.</li>
+<li><strong>threadcreate</strong>: Thread creation profile reports the sections of the program that lead the creation of new OS threads.</li>
+<li><strong>goroutine</strong>: Goroutine profile report the stack traces of all current goroutines.</li>
+<li><strong>block</strong>: Block profile show where goroutines block waiting on synchronization primitives (including timer channels). Block profile is not enabled by default; use runtime.SetBlockProfileRate to enable it.</li>
+<li><strong>mutex</strong>: Mutex profile reports the lock contentions. When you think your CPU is not fully utilized due to a mutex contention, use this profile. Mutex profile is not enabled by default, see runtime.SetMutexProfileFraction to enable.</li>
+</ul>
+
+<p>Additional to the builtin profiles, <a href="https://golang.org/pkg/runtime/pprof/">runtime/pprof</a> package allows you to export your custom profiles, and instrument your code to record
+execution stacks that contributes to this profile.</p>
+
+<p>Imagine we have a blob server, and we are writing a Go client for it. And our users want to be able to profile the opened blobs on the client. We can create a profile and record the events of blob opening and closing, so the user can tell how many open blobs they are at any time.</p>
+
+<p>Here is a blobstore package that allows you to open some blobs. We will create a new custom profile and start
+recording execution stacks that contributes to opening of blobs:</p>
+
+<pre><code class="language-go">package blobstore
+
+import &quot;runtime/pprof&quot;
+
+var openBlobProfile = pprof.NewProfile(&quot;blobstore.Open&quot;)
+
+// Open opens a blob, all opened blobs need
+// to be closed when no longer in use.
+func Open(name string) (*Blob, error) {
+	blob := &amp;Blob{name: name}
+	// TODO: Initialize the blob...
+
+	openBlobProfile.Add(blob, 2) // add the current execution stack to the profile
+	return blob, nil
+}
+</code></pre>
+
+<p>And once users want to close the blob, we need to remove the execution stack associated with the current blob from the profile:</p>
+
+<pre><code class="language-go">// Close closes the blob and frees the
+// underlying resources.
+func (b *Blob) Close() error {
+	// TODO: Free other resources.
+	openBlobProfile.Remove(b)
+	return nil
+}
+</code></pre>
+
+<p>And now, from the programs using this package, we should be able to retrieve <code>blobstore.Open</code> profile data  and use our daily pprof tools to examine and visualize them.</p>
+
+<p>Let&rsquo;s write a small main program than opens some blobs:</p>
+
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;math/rand&quot;
+	&quot;net/http&quot;
+	_ &quot;net/http/pprof&quot; // as a side effect, registers the pprof endpoints.
+	&quot;time&quot;
+
+	&quot;myproject.org/blobstore&quot;
+)
+
+func main() {
+	for i := 0; i &lt; 1000; i++ {
+		name := fmt.Sprintf(&quot;task-blob-%d&quot;, i)
+		go func() {
+			b, err := blobstore.Open(name)
+			if err != nil {
+				// TODO: Handle error.
+			}
+			defer b.Close()
+
+			// TODO: Perform some wrork, write to the blob.
+		}()
+	}
+	http.ListenAndServe(&quot;localhost:8888&quot;, nil)
+}
+</code></pre>
+
+<p>Start the server, then use go tool to read and visualize the profile data:</p>
+
+<pre><code>$ go tool pprof http://localhost:8888/debug/pprof/blobstore.Open
+(pprof) top
+Showing nodes accounting for 800, 100% of 800 total
+      flat  flat%   sum%        cum   cum%
+       800   100%   100%        800   100%  main.main.func1 /Users/jbd/src/hello/main.go
+</code></pre>
+
+<p>You will see that there are 800 open blobs and all openings are coming from main.main.func1. In this small example, there is nothing more to see, but in a complex server you can examine the hottest spots that works with an open blob and find out bottlenecks or leaks.</p>
+
+
+  </div>
+  
+  
   
   <div class="post">
     <h1 class="post-title">
@@ -287,7 +395,7 @@ we use the &ldquo;Application Default Credentials&rdquo;.</p>
 <p>In order to initiate the greeter client, use the Stackdriver Trace
 client interceptor we are providing:</p>
 
-<pre><code>conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(trace.GRPCClientInterceptor()))
+<pre><code>conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(tc.GRPCClientInterceptor()))
 if err != nil {
     log.Fatalf(&quot;did not connect: %v&quot;, err)
 }
@@ -310,7 +418,7 @@ if err != nil {
 <p>On the server side, in order to be able to recieve the traces (and keep propagating), use the server interceptor we are providing when initializing
 a server:</p>
 
-<pre><code>s := grpc.NewServer(grpc.UnaryInterceptor(trace.GRPCServerInterceptor(tc)))
+<pre><code>s := grpc.NewServer(grpc.UnaryInterceptor(tc.GRPCServerInterceptor()))
 </code></pre>
 
 <p>Then, the server handlers will be able to access the <code>trace.Span</code>

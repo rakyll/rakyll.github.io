@@ -70,7 +70,6 @@ a {
   color: #375EAB;
   text-decoration: none;
   font-weight: bold;
-  
 }
 /* `:focus` is linked to `:hover` for basic accessibility */
 a:hover,
@@ -91,12 +90,12 @@ h1 {
   color: #000;
 }
 h2 {
-  margin-top: 1rem;
-  font-size: 1.5rem;
+  margin-top: 2.5rem;
+  font-size: 1.7rem;
 }
 h3 {
   margin-top: 1.5rem;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
 }
 h4, h5, h6 {
   margin-top: 1rem;
