@@ -84,8 +84,8 @@ pre, code {
 .sidebar {
   text-align: center;
   padding: 2rem 1rem;
-  color: #ebebeb;
-  background-color: #353535;
+  color: #333;
+  border-left: solid 1px #eee;
 }
 @media (min-width: 48em) {
   .sidebar {
@@ -100,15 +100,16 @@ pre, code {
 
 /* Sidebar links */
 .sidebar a {
-  color: #fff;
+  color: #333;
 }
 
 /* About section */
 .sidebar-about h1 {
-  color: #fff;
+  color: #333;
   margin-top: 0;
-  font-family: "Abril Fatface", serif;
+  font-family: 'PT Serif', serif;
   font-size: 2.5rem;
+  margin-bottom: 3rem;
 }
 
 /* Sidebar nav */

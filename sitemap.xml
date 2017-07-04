@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://rakyll.org/profiler-labels/</loc>
+    <lastmod>2017-07-03T11:27:27-04:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://rakyll.org/custom-profiles/</loc>
     <lastmod>2017-06-30T11:27:27-04:00</lastmod>
   </url>
@@ -134,13 +139,13 @@
   
   <url>
     <loc>https://rakyll.org/tags/diagnostics/</loc>
-    <lastmod>2017-06-30T11:27:27-04:00</lastmod>
+    <lastmod>2017-07-03T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://rakyll.org/</loc>
-    <lastmod>2017-06-30T11:27:27-04:00</lastmod>
+    <lastmod>2017-07-03T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -188,7 +193,7 @@
   
   <url>
     <loc>https://rakyll.org/tags/stdlib/</loc>
-    <lastmod>2016-12-10T11:27:27-04:00</lastmod>
+    <lastmod>2017-07-03T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -206,7 +211,7 @@
   
   <url>
     <loc>https://rakyll.org/tags/tooling/</loc>
-    <lastmod>2017-06-30T11:27:27-04:00</lastmod>
+    <lastmod>2017-07-03T11:27:27-04:00</lastmod>
     <priority>0</priority>
   </url>
   

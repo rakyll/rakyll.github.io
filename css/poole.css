@@ -79,19 +79,19 @@ a:focus {
 
 /* Headings */
 h1, h2, h3, h4, h5, h6 {
+  font-family: 'PT Serif', serif;
   margin-bottom: .5rem;
-  font-weight: bold;
   line-height: 1.25;
   color: #4c4c4c;
   text-rendering: optimizeLegibility;
 }
 h1 {
-  font-size: 2.4rem;
+  font-size: 2.2rem;
   color: #000;
 }
 h2 {
-  margin-top: 2.5rem;
-  font-size: 1.7rem;
+  margin-top: 3.0rem;
+  font-size: 1.5rem;
 }
 h3 {
   margin-top: 1.5rem;
@@ -105,7 +105,7 @@ h4, h5, h6 {
 /* Body text */
 p {
   margin-top: 0;
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 strong {

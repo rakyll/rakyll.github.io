@@ -6,10 +6,19 @@
     <description>Recent content in Tooling on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 30 Jun 2017 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Mon, 03 Jul 2017 11:27:27 -0400</lastBuildDate>
     
 	<atom:link href="https://rakyll.org/tags/tooling/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Profiler labels in Go</title>
+      <link>https://rakyll.org/profiler-labels/</link>
+      <pubDate>Mon, 03 Jul 2017 11:27:27 -0400</pubDate>
+      
+      <guid>https://rakyll.org/profiler-labels/</guid>
+      <description>Go 1.9 is introducing profiler labels, a way to add arbitrary key-values to the samples collected by the CPU profiler. CPU profilers collect and output hot spots where the CPU spent most time in when executing. A typical CPU profiler output is primarily reports the location of these spots as function name, source file/line, etc. By looking at the data, you can also examine which parts of the code invoked these spots.</description>
+    </item>
     
     <item>
       <title>Custom pprof profiles</title>
