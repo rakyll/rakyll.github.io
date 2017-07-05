@@ -219,7 +219,7 @@ In this article, I will dig into how to use the streaming gRPC Go client to talk
       <description>I started this blog to fill the gaps in knowledge transmission and provide useful everyday tips about the Go programming language, its packages and tools.
 About me I am an engineer working on the Go programming language.
 I am primarily focused on Go&amp;rsquo;s diagnostics tools and libraries.
-Before Go, I worked on various platform teams and API infrastructure at Google for about four years. And before joining to Google, for the first eight years of my career, I worked for companies of various sizes mostly focusing on platforms and telecom infrastructure.</description>
+Before Go, I worked on various platform teams and API infrastructure at Google for about four years. And before joining to Google, for the first eight years of my career, I worked for companies of various sizes mostly focusing on developer platforms and technical infrastructure.</description>
     </item>
     
     <item>
