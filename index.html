@@ -135,12 +135,12 @@ func main() {
 }
 </code></pre>
 
-<p>Collect CPU profile data from the server.</p>
+<p>Collect some CPU samples from the server.</p>
 
 <pre><code>$ go tool pprof http://localhost:5555/debug/pprof/profile
 </code></pre>
 
-<p>Once the interactive mode starts, you can list the recorded tags by the <code>tags</code> command.</p>
+<p>Once the interactive mode starts, you can list the recorded labels by the <code>tags</code> command. Note that pprof tools call them <em>tags</em> even though they are named labels in the Go standard library.</p>
 
 <pre><code>(pprof) tags
 http-path: Total 80
