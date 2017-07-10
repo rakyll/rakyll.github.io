@@ -6,6 +6,8 @@
     <description>Recent content in Project on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
     <lastBuildDate>Wed, 11 Jan 2017 11:27:27 -0400</lastBuildDate>
     
 	<atom:link href="https://rakyll.org/tags/project/index.xml" rel="self" type="application/rss+xml" />
@@ -15,7 +17,7 @@
       <title>Go 1.8 development stats</title>
       <link>https://rakyll.org/go18cls/</link>
       <pubDate>Wed, 11 Jan 2017 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/go18cls/</guid>
       <description>Go 1.8 is going to to launched in February 2017. There is a sizable list of new features and improvements on the release notes. While these notes is the best summary to see what has happened in the last 6 months, I will try to give you some stats to give you a sense of the size of the work. I have examined all the changes merged into the tree during the Go 1.</description>
     </item>

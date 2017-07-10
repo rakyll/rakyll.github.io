@@ -6,6 +6,8 @@
     <description>Recent content in Diagnostics on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
     <lastBuildDate>Mon, 03 Jul 2017 11:27:27 -0400</lastBuildDate>
     
 	<atom:link href="https://rakyll.org/tags/diagnostics/index.xml" rel="self" type="application/rss+xml" />
@@ -15,7 +17,7 @@
       <title>Profiler labels in Go</title>
       <link>https://rakyll.org/profiler-labels/</link>
       <pubDate>Mon, 03 Jul 2017 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/profiler-labels/</guid>
       <description>Go 1.9 is introducing profiler labels, a way to add arbitrary key-values to the samples collected by the CPU profiler. CPU profilers collect and output hot spots where the CPU spent most time in when executing. A typical CPU profiler output is primarily reports the location of these spots as function name, source file/line, etc. By looking at the data, you can also examine which parts of the code invoked these spots.</description>
     </item>
@@ -24,7 +26,7 @@
       <title>Custom pprof profiles</title>
       <link>https://rakyll.org/custom-profiles/</link>
       <pubDate>Fri, 30 Jun 2017 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/custom-profiles/</guid>
       <description>Go provides several pprof profiles out of thet box to gather profiling data from Go programs.
 The builtin profiles provided by the runtime/pprof package:
@@ -35,7 +37,7 @@ The builtin profiles provided by the runtime/pprof package:
       <title>Debugging Go core dumps</title>
       <link>https://rakyll.org/coredumps/</link>
       <pubDate>Mon, 22 May 2017 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/coredumps/</guid>
       <description>Debugging is highly useful to examine the execution flow and to understand the current state of a program.
 Core files is a file that contains the memory dump of a running process and its process status. It is primarily used for post-mortem debugging of a program, as well as to understand a program&amp;rsquo;s state while it is still running. These two cases make debugging of core dumps a good diagnostics aid to postmortem and analyze production services.</description>

@@ -6,6 +6,8 @@
     <description>Recent content in Coventions on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
     <lastBuildDate>Thu, 08 Dec 2016 11:27:27 -0400</lastBuildDate>
     
 	<atom:link href="https://rakyll.org/tags/coventions/index.xml" rel="self" type="application/rss+xml" />
@@ -15,7 +17,7 @@
       <title>Deprecation notices in Go</title>
       <link>https://rakyll.org/deprecated/</link>
       <pubDate>Thu, 08 Dec 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/deprecated/</guid>
       <description>In Go, for a long time, we didn&amp;rsquo;t have a convention to label the deprecated APIs. In the past years, there is new convention emerged to add deprecation notices to the docs.
 Today, standard library uses this specific format.

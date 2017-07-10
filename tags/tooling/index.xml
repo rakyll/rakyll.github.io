@@ -6,6 +6,8 @@
     <description>Recent content in Tooling on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
     <lastBuildDate>Mon, 03 Jul 2017 11:27:27 -0400</lastBuildDate>
     
 	<atom:link href="https://rakyll.org/tags/tooling/index.xml" rel="self" type="application/rss+xml" />
@@ -15,7 +17,7 @@
       <title>Profiler labels in Go</title>
       <link>https://rakyll.org/profiler-labels/</link>
       <pubDate>Mon, 03 Jul 2017 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/profiler-labels/</guid>
       <description>Go 1.9 is introducing profiler labels, a way to add arbitrary key-values to the samples collected by the CPU profiler. CPU profilers collect and output hot spots where the CPU spent most time in when executing. A typical CPU profiler output is primarily reports the location of these spots as function name, source file/line, etc. By looking at the data, you can also examine which parts of the code invoked these spots.</description>
     </item>
@@ -24,7 +26,7 @@
       <title>Custom pprof profiles</title>
       <link>https://rakyll.org/custom-profiles/</link>
       <pubDate>Fri, 30 Jun 2017 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/custom-profiles/</guid>
       <description>Go provides several pprof profiles out of thet box to gather profiling data from Go programs.
 The builtin profiles provided by the runtime/pprof package:
@@ -35,7 +37,7 @@ The builtin profiles provided by the runtime/pprof package:
       <title>Debugging Go core dumps</title>
       <link>https://rakyll.org/coredumps/</link>
       <pubDate>Mon, 22 May 2017 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/coredumps/</guid>
       <description>Debugging is highly useful to examine the execution flow and to understand the current state of a program.
 Core files is a file that contains the memory dump of a running process and its process status. It is primarily used for post-mortem debugging of a program, as well as to understand a program&amp;rsquo;s state while it is still running. These two cases make debugging of core dumps a good diagnostics aid to postmortem and analyze production services.</description>
@@ -45,7 +47,7 @@ Core files is a file that contains the memory dump of a running process and its 
       <title>Mutex profile</title>
       <link>https://rakyll.org/mutexprofile/</link>
       <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/mutexprofile/</guid>
       <description>Go 1.8 introduces a new profile, the contended mutex profile, that allows you to capture a fraction of the stack traces of goroutines with contended mutexes.
 You need to set the sampling fraction by calling runtime.SetMutexProfileFraction to a value above zero to enable collection.
@@ -57,7 +59,7 @@ import _ &amp;quot;net/http/pprof&amp;quot; var mu sync.Mutex var items = make(m
       <title>The default GOPATH</title>
       <link>https://rakyll.org/default-gopath/</link>
       <pubDate>Wed, 14 Dec 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/default-gopath/</guid>
       <description>Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.
 The requirement of setting a GOPATH has been a major issue for Go users who installed the Go tools for the first time and got the &amp;ldquo;you have to set a GOPATH&amp;rdquo; error in their initial experience with the tools. Explaining the GOPATH is and instructing how to set this env variable were both distracting new users away from using Go.</description>
@@ -67,7 +69,7 @@ The requirement of setting a GOPATH has been a major issue for Go users who inst
       <title>Debugging code generation in Go</title>
       <link>https://rakyll.org/codegen/</link>
       <pubDate>Sat, 15 Oct 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/codegen/</guid>
       <description>Last week, I was at dotGo, participating one of the finest Go conferences and catching up with gophers from the other side of the Atlantic. I gave a very short lightning talk about inspection of code generation with the tools alrady available in the toolchain. This post goes through the talk for those who didn&amp;rsquo;t have to priviledge to be at the conference. Slides are also available at go-talks.</description>
     </item>
@@ -76,7 +78,7 @@ The requirement of setting a GOPATH has been a major issue for Go users who inst
       <title>Go tooling essentials</title>
       <link>https://rakyll.org/go-tool-flags/</link>
       <pubDate>Sun, 25 Sep 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/go-tool-flags/</guid>
       <description>New to the Go tools? Or do you want to expand your knowledge? This article is about the flags for the Go tools everyone should know.
 Disclaimer: This article might be slightly biased. This is a collection of flags I personally use and flags people around me having trouble finding references for. If you have more ideas, ping me on Twitter.
@@ -87,7 +89,7 @@ $ go build -x -x lists all the commands go build invokes.</description>
       <title>Examples coverage</title>
       <link>https://rakyll.org/examples-coverage/</link>
       <pubDate>Thu, 08 Sep 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/examples-coverage/</guid>
       <description>Go programming language provides many unique good features to write and maintain examples for your packages backed by the testing tools.
 As an addition to the test coverage and test coverage report, go test also can provide coverage for testable examples.
@@ -99,7 +101,7 @@ $ go test -v -run=Example -coverprofile=c.</description>
       <title>Using Instruments to profile Go programs</title>
       <link>https://rakyll.org/instruments/</link>
       <pubDate>Fri, 02 Sep 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/instruments/</guid>
       <description>Apple has a suite of instrumentation and tracing tools for performance analysis avaiable as a part of their Xcode tooling set. In this article, we will use Instruments to record and analyze the CPU profile of a Go program.
 Instruments also provide a large set of macOS-specific tracing and profiling if you have performance issues specifically on darwin.
@@ -111,7 +113,7 @@ Some of these specific profiles are:
       <title>Apply transformations to Go code with eg</title>
       <link>https://rakyll.org/eg/</link>
       <pubDate>Sat, 27 Aug 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/eg/</guid>
       <description>If you are willing to make large scale refactoring in your Go programs, automating the refactoring tasks is more desirable than manual editing. eg is a program that allows you to perform transformations based on template Go files.
 To install the tool, run the following:
@@ -122,7 +124,7 @@ $ go get golang.org/x/tools/cmd/eg  eg requires a template file to look for whic
       <title>Go cross compilation</title>
       <link>https://rakyll.org/cross-compilation/</link>
       <pubDate>Tue, 08 Sep 2015 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/cross-compilation/</guid>
       <description>Note: This article extends Dave Cheney’s Go 1.5 cross compilers post.
 Cross compilers got easier with Go 1.5. You don’t have to bootstrap the standard library and toolchain as you used to do prior to 1.5.

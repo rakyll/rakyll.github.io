@@ -6,6 +6,8 @@
     <description>Recent content in Stdlib on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
     <lastBuildDate>Mon, 03 Jul 2017 11:27:27 -0400</lastBuildDate>
     
 	<atom:link href="https://rakyll.org/tags/stdlib/index.xml" rel="self" type="application/rss+xml" />
@@ -15,7 +17,7 @@
       <title>Profiler labels in Go</title>
       <link>https://rakyll.org/profiler-labels/</link>
       <pubDate>Mon, 03 Jul 2017 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/profiler-labels/</guid>
       <description>Go 1.9 is introducing profiler labels, a way to add arbitrary key-values to the samples collected by the CPU profiler. CPU profilers collect and output hot spots where the CPU spent most time in when executing. A typical CPU profiler output is primarily reports the location of these spots as function name, source file/line, etc. By looking at the data, you can also examine which parts of the code invoked these spots.</description>
     </item>
@@ -24,7 +26,7 @@
       <title>HTTP/2 Server Push</title>
       <link>https://rakyll.org/http2push/</link>
       <pubDate>Sat, 10 Dec 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/http2push/</guid>
       <description>Go 1.8 is going to feature support for HTTP/2 server push.
 HTTP/2 has many features designed to make the Web faster. One of those features is the server push, the ability to send resources before the client asks for it. This feature enables websites to push assets like JavaScript and CSS files before waiting for the web page to be loaded and asking for those resources.
@@ -35,7 +37,7 @@ net/http package will support server push by exposing a Pusher API that will be 
       <title>Using contexts to avoid leaking goroutines</title>
       <link>https://rakyll.org/leakingctx/</link>
       <pubDate>Tue, 25 Oct 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/leakingctx/</guid>
       <description>The context package makes it possible to manage a chain of calls within the same call path by signaling context&amp;rsquo;s Done channel.
 In this article, we will examine how to use the context package to avoid leaking goroutines.

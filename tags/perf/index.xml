@@ -6,6 +6,8 @@
     <description>Recent content in Perf on Go, the unwritten parts</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
     <lastBuildDate>Mon, 19 Dec 2016 11:27:27 -0400</lastBuildDate>
     
 	<atom:link href="https://rakyll.org/tags/perf/index.xml" rel="self" type="application/rss+xml" />
@@ -15,7 +17,7 @@
       <title>Mutex profile</title>
       <link>https://rakyll.org/mutexprofile/</link>
       <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
-      
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/mutexprofile/</guid>
       <description>Go 1.8 introduces a new profile, the contended mutex profile, that allows you to capture a fraction of the stack traces of goroutines with contended mutexes.
 You need to set the sampling fraction by calling runtime.SetMutexProfileFraction to a value above zero to enable collection.
