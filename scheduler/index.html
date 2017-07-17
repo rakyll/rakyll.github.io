@@ -105,7 +105,7 @@ Go scheduler uses the following terminology for goroutines, threads and processo
 </ul>
 
 <p>There is a P-specific local and a global goroutine queue.
-Each M should be assigned to a P. Ps don&rsquo;t may not have Ms if they are blocked or in a system call.
+Each M should be assigned to a P. Ps may have no Ms if they are blocked or in a system call.
 At any time, there are at most GOMAXPROCS number of P. At any time, only one M can run per P.
 More Ms can be created by the scheduler if required.</p>
 
