@@ -8,10 +8,20 @@
     <language>en-us</language>
     <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
     <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
-    <lastBuildDate>Mon, 03 Jul 2017 11:27:27 -0400</lastBuildDate>
+    <lastBuildDate>Sun, 16 Jul 2017 11:27:27 -0400</lastBuildDate>
     
 	<atom:link href="https://rakyll.org/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Go&#39;s work-stealing scheduler</title>
+      <link>https://rakyll.org/scheduler/</link>
+      <pubDate>Sun, 16 Jul 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/scheduler/</guid>
+      <description>Go scheduler&amp;rsquo;s job is to distribute runnable goroutines over multiple worker OS threads that runs on one or more processors. In multi-threaded computation, two paradigms have emerged in scheduling: work sharing and work stealing.
+ Work-sharing: When a processor generates new threads, it attempts to migrate some of them to the other processors with the hopes of them being utilized by the idle/underutilized processors. Work-stealing: An underutilized processor actively looks for other processor&amp;rsquo;s threads and &amp;ldquo;steal&amp;rdquo; some.</description>
+    </item>
     
     <item>
       <title>Profiler labels in Go</title>
