@@ -126,7 +126,7 @@ More Ms can be created by the scheduler if required.</p>
 At each round of scheduling, the search happens in the following order:</p>
 
 <pre><code>runtime.schedule() {
-    // check the global runnable queue for a G.
+    // only 1/61 of the time, check the global runnable queue for a G.
     // if not found, check the local queue.
     // if not found,
     //     try to steal from other Ps.
