@@ -595,7 +595,7 @@ one process and share common resources to report logs and errors.</p>
 harder to follow a call starting from the user&rsquo;s entry point until a
 response is served. To address this problem, Google invented
 <a href="https://research.google.com/pubs/pub36356.html">Dapper</a> to instrument and analyze its production services. Dapper-like
-distrubuted tracing systems allow you to trace a user request from
+distributed tracing systems allow you to trace a user request from
 the entry point to the response.</p>
 
 <p>Distribute tracing helps us to:</p>
@@ -655,7 +655,7 @@ if err != nil {
 }
 </code></pre>
 
-<p>On the server side, in order to be able to recieve the traces (and keep propagating), use the server interceptor we are providing when initializing
+<p>On the server side, in order to be able to receive the traces (and keep propagating), use the server interceptor we are providing when initializing
 a server:</p>
 
 <pre><code>s := grpc.NewServer(grpc.UnaryInterceptor(tc.GRPCServerInterceptor()))
@@ -693,13 +693,13 @@ for more information and examples.</p>
 
 <h2 id="what-s-next">What&rsquo;s next?</h2>
 
-<p>In the past few months, I have been priviledged to work on Go distributed tracing
+<p>In the past few months, I have been privileged to work on Go distributed tracing
 APIs on a part-time basis. We experimented a lot, addressed many critical open
 questions, and worked hard to achieve a very minimal backend-agnostic tracing
 API for the entire Go ecosystem.</p>
 
-<p>Achieving common APIs will make distributed tracing more accesible, make our
-libraries trace-aware and create oppurtunity to reuse our utilities. I am looking forward to share this work in the upcoming weeks.</p>
+<p>Achieving common APIs will make distributed tracing more accessible, make our
+libraries trace-aware and create opportunity to reuse our utilities. I am looking forward to share this work in the upcoming weeks.</p>
 
 
   </div>
@@ -1498,11 +1498,11 @@ for n := range gen(ctx) {
 <p><em>Last week, I was at <a href="http://www.dotgo.eu/">dotGo</a>, participating one of the
 finest Go conferences and catching up with gophers from the other side of the
 Atlantic. I gave a very short lightning talk about inspection of code generation
-with the tools alrady available in the toolchain. This post goes through the talk for
-those who didn&rsquo;t have to priviledge to be at the conference. Slides are also
+with the tools already available in the toolchain. This post goes through the talk for
+those who didn&rsquo;t have the priviledge to be at the conference. Slides are also
 available at <a href="https://go-talks.appspot.com/github.com/rakyll/talks/gcinspect/talk.slide">go-talks</a>.</em></p>
 
-<p>Through the article, we will use the following program:</p>
+<p>Throughout this article, we will use the following program:</p>
 
 <pre><code>package main
 
@@ -1516,7 +1516,7 @@ func main() {
 
 <h3 id="toolchain">Toolchain</h3>
 
-<p>Go build is a command that encapsulates tons of things from the user.
+<p>Go build is a command that encapsulates tons of things for the user.
 But, it also provides more detailed information about what it does if you ask for it.
 <code>-x</code> is a flag that makes go build output what is being invoked.
 If you want to see what the components of the toolchain are,
@@ -1536,11 +1536,11 @@ mv $WORK/hello/_obj/exe/a.out hello
 <h3 id="intermediate-assembly">Intermediate assembly</h3>
 
 <p>In Go, there is an intermediate assembly phase before generating the actual arch-specific assembly.
-Compiler takes some Go files, generates the intermediate instructions and escalate it to the <code>obj</code> package to generate the machine code.
-If you are curious about what compiler generates in this phase, <code>-S</code> makes the compiler dumps the output.</p>
+The compiler takes some Go files, generates the intermediate instructions and escalates it to the <code>obj</code> package to generate the machine code.
+If you are curious about what compiler generates in this phase, <code>-S</code> makes the compiler dump the output.</p>
 
-<p>The intermediate assembly is generally good reference to understand the cost of a Go line.
-Or it coulbe be a great reference if you want to replace, let&rsquo;s say, a Go function with more optimized assembly equivalent.</p>
+<p>The intermediate assembly is generally a good reference to understand the cost of a Go line.
+Or it could be be a great reference if you want to replace, let&rsquo;s say, a Go function with a more optimized assembly equivalent.</p>
 
 <p>You are seeing the output for the main.main here.</p>
 
@@ -1617,8 +1617,8 @@ TEXT main.main(SB) /Users/jbd/src/hello/hello.go
 
 <h3 id="symbols">Symbols</h3>
 
-<p>Sometimes, all you need is to check the symbols rather than understanding code or data sections.
-Similar to general-purpose nm tool, Go distributes an nm which allows you to list the symbols in an artifact with annotations and size.
+<p>Sometimes, all you need is to check the symbols rather than understand the code or data sections.
+Similar to the general-purpose nm tool, Go distributes an nm which allows you to list the symbols in an artifact with annotations and size.
 Pretty handy if you want to see what&rsquo;s in and being exported from a Go binary or library.</p>
 
 <pre><code>$ go tool nm hello
@@ -1642,8 +1642,8 @@ ad2e0 R _shifts
 <h3 id="optimizations">Optimizations</h3>
 
 <p>With the contribution of the new SSA backend, the team contributed a tool that visualizes all the SSA passes.
-Set GOSSAFUNC env variable with a func name and run the go build command.
-It will generate an ssa.html file which will provide all the steps, compiler has gone through to optimize your code.</p>
+Set the GOSSAFUNC env variable with a func name and run the go build command.
+It will generate an ssa.html file that shows all the steps the compiler has gone through to optimize your code.</p>
 
 <pre><code>$ GOSSAFUNC=main go build &amp;&amp; open ssa.html
 </code></pre>
@@ -1652,8 +1652,8 @@ It will generate an ssa.html file which will provide all the steps, compiler has
 
 <p><img src="/img/ssa.png" alt="SSA optimizations" /></p>
 
-<p>Go compiler can also annotate the inlining and escape analysis.
-If you pass <code>-m=2</code> flag to the compiler, it will output the optimizations or annotations related to these two.
+<p>The Go compiler can also annotate the inlining and escape analysis.
+If you pass the <code>-m=2</code> flag to the compiler, it will output the optimizations or annotations related to these two.
 Here we see the <code>net/context</code> package related inlining operations and escape analysis.</p>
 
 <pre><code>$ go build -gcflags=&quot;-m&quot; golang.org/x/net/context
@@ -1711,9 +1711,8 @@ Here we see the <code>net/context</code> package related inlining operations and
 <p>You can use <code>-m</code> to see a less verbose output without reasonings, but <a href="https://twitter.com/Dr2chase/status/788353223522455552">David Chase</a> says
 even though <code>-m=2</code> is not perfect, it is often useful.</p>
 
-<p>It is worth to mention that you often need to disable optimizations to have a simpler view of what&rsquo;s going on.
-Because, optimazation can change the sequence of operations, add code, remove code or apply transformations to the code.
-With optimizations, it gets harder to map a Go line to the optimized output or it gets harder to do perf testing where you end up chaging more than one thing at a time.
+<p>It is worth it to mention that you often need to disable optimizations to have a simpler view of what&rsquo;s going on, since optimization can change the sequence of operations, add code, remove code or apply transformations to the code.
+With optimizations, it gets harder to map a Go line to the optimized output and it gets harder to do perf testing where you end up changing more than one thing at a time.
 Disabling optimizations is possible with <code>-N</code>, and disabling inlining is possible with <code>-l</code>.</p>
 
 <pre><code>$ go build -gcflags=&quot;-l -N&quot;
@@ -1724,8 +1723,8 @@ testing without being affected more than one change at a time.</p>
 
 <h3 id="lexer">Lexer</h3>
 
-<p>If you are working on the lexer, compiler provides a flag to debug
-the lexer as the lexer is going through the source files.</p>
+<p>If you are working on the lexer, the compiler provides a flag to debug
+the lexer as it goes through the source files.</p>
 
 <pre><code>$ go build -gcflags=&quot;-x&quot;
 # hello

@@ -71,7 +71,7 @@ The requirement of setting a GOPATH has been a major issue for Go users who inst
       <pubDate>Sat, 15 Oct 2016 11:27:27 -0400</pubDate>
       <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
       <guid>https://rakyll.org/codegen/</guid>
-      <description>Last week, I was at dotGo, participating one of the finest Go conferences and catching up with gophers from the other side of the Atlantic. I gave a very short lightning talk about inspection of code generation with the tools alrady available in the toolchain. This post goes through the talk for those who didn&amp;rsquo;t have to priviledge to be at the conference. Slides are also available at go-talks.</description>
+      <description>Last week, I was at dotGo, participating one of the finest Go conferences and catching up with gophers from the other side of the Atlantic. I gave a very short lightning talk about inspection of code generation with the tools already available in the toolchain. This post goes through the talk for those who didn&amp;rsquo;t have the priviledge to be at the conference. Slides are also available at go-talks.</description>
     </item>
     
     <item>

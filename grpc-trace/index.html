@@ -86,7 +86,7 @@ one process and share common resources to report logs and errors.</p>
 harder to follow a call starting from the user&rsquo;s entry point until a
 response is served. To address this problem, Google invented
 <a href="https://research.google.com/pubs/pub36356.html">Dapper</a> to instrument and analyze its production services. Dapper-like
-distrubuted tracing systems allow you to trace a user request from
+distributed tracing systems allow you to trace a user request from
 the entry point to the response.</p>
 
 <p>Distribute tracing helps us to:</p>
@@ -146,7 +146,7 @@ if err != nil {
 }
 </code></pre>
 
-<p>On the server side, in order to be able to recieve the traces (and keep propagating), use the server interceptor we are providing when initializing
+<p>On the server side, in order to be able to receive the traces (and keep propagating), use the server interceptor we are providing when initializing
 a server:</p>
 
 <pre><code>s := grpc.NewServer(grpc.UnaryInterceptor(tc.GRPCServerInterceptor()))
@@ -184,13 +184,13 @@ for more information and examples.</p>
 
 <h2 id="what-s-next">What&rsquo;s next?</h2>
 
-<p>In the past few months, I have been priviledged to work on Go distributed tracing
+<p>In the past few months, I have been privileged to work on Go distributed tracing
 APIs on a part-time basis. We experimented a lot, addressed many critical open
 questions, and worked hard to achieve a very minimal backend-agnostic tracing
 API for the entire Go ecosystem.</p>
 
-<p>Achieving common APIs will make distributed tracing more accesible, make our
-libraries trace-aware and create oppurtunity to reuse our utilities. I am looking forward to share this work in the upcoming weeks.</p>
+<p>Achieving common APIs will make distributed tracing more accessible, make our
+libraries trace-aware and create opportunity to reuse our utilities. I am looking forward to share this work in the upcoming weeks.</p>
 
 			</div>
 
