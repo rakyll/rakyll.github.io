@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rpc on Go, the unwritten parts</title>
+    <link>https://rakyll.org/tags/rpc/</link>
+    <description>Recent content in Rpc on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
+    <lastBuildDate>Wed, 22 Mar 2017 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/rpc/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Automatic Stackdriver Tracing for gRPC</title>
+      <link>https://rakyll.org/grpc-trace/</link>
+      <pubDate>Wed, 22 Mar 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/grpc-trace/</guid>
+      <description>In monolithic systems, it is relatively easy to collect diagnostic data from the building blocks of a program. All modules live within one process and share common resources to report logs and errors.
+Once you are distributing your system into microservices, it becomes harder to follow a call starting from the user&amp;rsquo;s entry point until a response is served. To address this problem, Google invented Dapper to instrument and analyze its production services.</description>
+    </item>
+    
+    <item>
+      <title>Bidirectional gRPC streaming for Go</title>
+      <link>https://rakyll.org/grpc-streaming/</link>
+      <pubDate>Tue, 30 Aug 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/grpc-streaming/</guid>
+      <description>Disclaimer: This article is not about a core Go package or tool but gRPC.
+gRPC provides support for implementing streaming endpoints as well as streaming support in their clients. Bidirectional streaming is useful if you want both server and client to be able to communicate to the other side independently in a full duplex fashion.
+In this article, I will dig into how to use the streaming gRPC Go client to talk to a streaming API endpoint.</description>
+    </item>
+    
+  </channel>
+</rss>

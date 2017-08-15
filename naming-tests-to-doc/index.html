@@ -1,0 +1,118 @@
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.24-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>Naming tests to self-document &middot; Go, the unwritten parts</title>
+  
+
+  
+  <link rel="stylesheet" href="https://rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+  
+  <link href="https://rakyll.org/index.xml" rel="alternate" type="application/rss+xml" title="Go, the unwritten parts" />
+</head>
+
+	<body class=" layout-reverse">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+
+
+    <div class="sidebar-about">
+      <a href="https://rakyll.org/"><h1>Go, the unwritten parts</h1></a>
+      <p class="lead">
+      Articles mostly about Go and what I am currently working on.
+      Conventions, best practices, little known practical tips.
+      </p>
+      <p>by <a href="https://twitter.com/rakyll">JBD</a></p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="https://github.com/rakyll/">GitHub</a></li>
+      
+    </ul>
+
+    <p class="small">
+      Subscribe to the <a rel="license" href="/index.xml">feed</a>.
+    </p>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+      The blog is served by the amazing <a href="https://gohugo.io">Hugo</a>.
+    </p>
+  </div>
+</div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>Naming tests to self-document</h1>
+			  <span class="post-date">Fri, Feb 3, 2017</span>
+			      <p>Go doesn&rsquo;t specifically enforce you how you choose your test names.
+Tests are a significant contributors for the maintainability
+of your code. Tests not just providing correctness checking
+but also are useful in self documenting your code and its usage.
+On top of that, tests are the single best source to read about
+responsibilities of a type, function, etc.
+This is where naming tests better can help the internal documentation
+and therefore the maintainability of your code.</p>
+
+<p>Emphasize the role of what you are testing rather than naming
+after the inputs and outputs.</p>
+
+<pre><code class="language-wrong">func TestTitleIllegalChar(t *testing.T) {}
+</code></pre>
+
+<p>Instead, explain that the doc needs to be able to escape illegal
+characters on edit.</p>
+
+<pre><code>func TestTitleEscape(t *testing.T) {}
+</code></pre>
+
+<p>With this rename, we also self-document how the illegal characters
+on the title will be handled.</p>
+
+<p>We sometimes pick very inclusive test names and write big table-driven
+tests. If you are running table-driven tests, you can convert them to
+<a href="https://blog.golang.org/subtests">subtests</a> and name the individual cases.
+Then <code>go test -v</code> can pick those name and its output will act as a spec of
+your type, function, etc.</p>
+
+			</div>
+
+			<p>If you have any suggestions or comments, please ping <a href="https://twitter.com/rakyll">@rakyll<a/>.</p>
+
+			
+
+		</div>
+
+  </body>
+</html>

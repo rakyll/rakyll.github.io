@@ -1,0 +1,200 @@
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.24-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>Profiler labels in Go &middot; Go, the unwritten parts</title>
+  
+
+  
+  <link rel="stylesheet" href="https://rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+  
+  <link href="https://rakyll.org/index.xml" rel="alternate" type="application/rss+xml" title="Go, the unwritten parts" />
+</head>
+
+	<body class=" layout-reverse">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+
+
+    <div class="sidebar-about">
+      <a href="https://rakyll.org/"><h1>Go, the unwritten parts</h1></a>
+      <p class="lead">
+      Articles mostly about Go and what I am currently working on.
+      Conventions, best practices, little known practical tips.
+      </p>
+      <p>by <a href="https://twitter.com/rakyll">JBD</a></p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="https://github.com/rakyll/">GitHub</a></li>
+      
+    </ul>
+
+    <p class="small">
+      Subscribe to the <a rel="license" href="/index.xml">feed</a>.
+    </p>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+      The blog is served by the amazing <a href="https://gohugo.io">Hugo</a>.
+    </p>
+  </div>
+</div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>Profiler labels in Go</h1>
+			  <span class="post-date">Mon, Jul 3, 2017</span>
+			      
+
+<p>Go 1.9 is introducing <a href="https://github.com/golang/proposal/blob/master/design/17280-profile-labels.md">profiler labels</a>, a way to add arbitrary key-values to the samples collected by the CPU profiler. CPU profilers collect and output hot spots where the CPU spent most time in when executing. A typical CPU profiler output is primarily reports the location of these spots as function name, source file/line, etc. By looking at the data, you can also examine which parts of the code invoked these spots. You can also filter by invokers to have more granular understanding of certain execution paths.</p>
+
+<p>Even though locality information is useful to spot expensive execution paths, it is not always essentially enough when debugging a performance problem. A significant percentage of Go programmers uses Go to write servers, and it is even more complex to point out performance issues in a server. It is hard to isolate certain execution paths from others, or hard to understand whether it is only a certain path creating trouble (e.g. a user or a specific handler).</p>
+
+<p>With 1.9, Go is introducing a new feature that allows you to record additional information to provide more context about the execution path. You will be able to record <a href="http://beta.golang.org/pkg/runtime/pprof/#LabelSet">any set of labels</a>, as a part of the profiling data. Then, use these labels to examine the profiler output more precisely.</p>
+
+<p>You can benefit from profiler labels in many cases. Some of the obvious ones:</p>
+
+<ul>
+<li>You don&rsquo;t want to leak your software abstractions into the examination of the profiling data; e.g. a profiling dashboard of a web server will be useful if it displays handler URL paths, rather than function names from the Go code.</li>
+<li>Execution stack location is not enough to understand the originator of work; e.g. a consumer that reads from a message queue does work originated somewhere else, the consumer can set labels to identify the originator.</li>
+<li>Context-bound information is required to debug profiling problems.</li>
+</ul>
+
+<h2 id="adding-labels">Adding labels</h2>
+
+<p>The <code>runtime/pprof</code> package will export several new APIs to let users add labels. Most users will use <a href="http://beta.golang.org/pkg/runtime/pprof/#Do">Do</a> which takes a context, extends it with labels, records these labels when f is executing:</p>
+
+<pre><code class="language-go">func Do(ctx context.Context, labels LabelSet, f func(context.Context))
+</code></pre>
+
+<p>Do only set the given label set during the execution of the current goroutine. If you want to start goroutines in <code>f</code>, you can propagate the labels by passing the context argument of the function.</p>
+
+<pre><code>labels := pprof.Labels(&quot;worker&quot;, &quot;purge&quot;)
+pprof.Do(ctx, labels, func(ctx context.Context) {
+    // Do some work...
+
+    go update(ctx) // propagates labels in ctx.
+})
+</code></pre>
+
+<p>The work above will be labeled with worker:purge.</p>
+
+<h2 id="examining-the-profiler-output">Examining the profiler output</h2>
+
+<p>This section will demonstrate how to examine the recorded samples by profiler labels. Once you annotate your code with labels, it is time to profile and consume the profiler data with tag filters.</p>
+
+<p>I will use the <code>net/http/pprof</code> package to capture samples in this demo, see the <a href="https://blog.golang.org/profiling-go-programs">Profiling Go programs</a> article for more options.</p>
+
+<pre><code class="language-go">package main
+
+import _ &quot;net/http/pprof&quot;
+
+func main() {
+    // All the other code...
+    log.Fatal(http.ListenAndServe(&quot;localhost:5555&quot;, nil))
+}
+</code></pre>
+
+<p>Collect some CPU samples from the server.</p>
+
+<pre><code>$ go tool pprof http://localhost:5555/debug/pprof/profile
+</code></pre>
+
+<p>Once the interactive mode starts, you can list the recorded labels by the <code>tags</code> command. Note that pprof tools call them <em>tags</em> even though they are named labels in the Go standard library.</p>
+
+<pre><code>(pprof) tags
+http-path: Total 80
+        70 (87.50%): /messages
+        10 (12.50%): /user
+
+worker: Total 158
+       158 (  100%): purge
+</code></pre>
+
+<p>As you can see, there are two label keys (http-path, worker) and several values recorded for each. http-path key is coming from HTTP handlers I annotated, and worker:purge is originated at the code above.</p>
+
+<p>By filtering by labels, we can focus only on the samples collected from the <code>/user</code> handler.</p>
+
+<pre><code>(pprof) tagfocus=&quot;http-path:/user&quot;
+(pprof) top10 -cum
+Showing nodes accounting for 0.10s, 3.05% of 3.28s total
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      0.10s  3.05%  main.generateID.func1 /Users/jbd/src/hello/main.go
+     0.01s   0.3%   0.3%      0.08s  2.44%  runtime.concatstring2 /Users/jbd/go/src/runtime/string.go
+     0.06s  1.83%  2.13%      0.07s  2.13%  runtime.concatstrings /Users/jbd/go/src/runtime/string.go
+     0.01s   0.3%  2.44%      0.02s  0.61%  runtime.mallocgc /Users/jbd/go/src/runtime/malloc.go
+         0     0%  2.44%      0.02s  0.61%  runtime.slicebytetostring /Users/jbd/go/src/runtime/string.go
+         0     0%  2.44%      0.02s  0.61%  strconv.FormatInt /Users/jbd/go/src/strconv/itoa.go
+         0     0%  2.44%      0.02s  0.61%  strconv.Itoa /Users/jbd/go/src/strconv/itoa.go
+         0     0%  2.44%      0.02s  0.61%  strconv.formatBits /Users/jbd/go/src/strconv/itoa.go
+     0.01s   0.3%  2.74%      0.01s   0.3%  runtime.memmove /Users/jbd/go/src/runtime/memmove_amd64.s
+     0.01s   0.3%  3.05%      0.01s   0.3%  runtime.nextFreeFast /Users/jbd/go/src/runtime/malloc.go
+</code></pre>
+
+<p>The listing contains only samples labeled with http-path:/user. So we can easily understand the most expensive execution paths from the user handler.</p>
+
+<p>You can also use tagshow, taghide, and tagignore commands as other filtering options. For example, tagignore allows you to match anything but the given regex.
+The filter below will match anything but the user handler; worker:purge and http-path:/messages in this case.</p>
+
+<pre><code>(pprof) tagfocus=
+(pprof) tagignore=&quot;http-path:/user&quot;
+(pprof) tags
+http-path: Total 70
+        70 (  100%): /messages
+
+worker: Total 158
+       158 (  100%): purge
+</code></pre>
+
+<p>If you visualize the filtered samples, the output will show how much each label is contributing to the final cost.</p>
+
+<p><img src="/img/pprof-labels-pdf.png" alt="Pprof labels visualized" /></p>
+
+<p>You can see that worker:purge used 0.07s, and messages handler used 0.03s in the generateID function during the collection of the profiling data.</p>
+
+<h2 id="try-it-yourself">Try it yourself!</h2>
+
+<p>Profiler labels allows us to add additional information to the profiler data that is not available at the current execution stack. Try them by downloading the <a href="https://golang.org/dl/#unstable">Go 1.9 beta</a> if you need more dimensions in your profiler output. Also, try the <a href="http://godoc.org/github.com/rakyll/goutil/pprofutil">pprofutil</a> package to automatically add HTTP path label to your handlers.</p>
+
+			</div>
+
+			<p>If you have any suggestions or comments, please ping <a href="https://twitter.com/rakyll">@rakyll<a/>.</p>
+
+			
+
+		</div>
+
+  </body>
+</html>

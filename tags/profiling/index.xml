@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Profiling on Go, the unwritten parts</title>
+    <link>https://rakyll.org/tags/profiling/</link>
+    <description>Recent content in Profiling on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
+    <lastBuildDate>Fri, 02 Sep 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/profiling/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Using Instruments to profile Go programs</title>
+      <link>https://rakyll.org/instruments/</link>
+      <pubDate>Fri, 02 Sep 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/instruments/</guid>
+      <description>Apple has a suite of instrumentation and tracing tools for performance analysis available as a part of their Xcode tooling set. In this article, we will use Instruments to record and analyze the CPU profile of a Go program.
+Instruments also provide a large set of macOS-specific tracing and profiling if you have performance issues specifically on darwin.
+Some of these specific profiles are:
+ System trace: Collects comprehensive information about system calls, scheduling, user-kernel space transitions.</description>
+    </item>
+    
+  </channel>
+</rss>

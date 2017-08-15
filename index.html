@@ -1,0 +1,2712 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.24-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>Go, the unwritten parts</title>
+  
+
+  
+  <link rel="stylesheet" href="https://rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+  
+  <link href="https://rakyll.org/index.xml" rel="alternate" type="application/rss+xml" title="Go, the unwritten parts" />
+</head>
+
+<body class=" layout-reverse">
+
+<div class="sidebar">
+  <div class="container sidebar-sticky">
+
+
+    <div class="sidebar-about">
+      <a href="https://rakyll.org/"><h1>Go, the unwritten parts</h1></a>
+      <p class="lead">
+      Articles mostly about Go and what I am currently working on.
+      Conventions, best practices, little known practical tips.
+      </p>
+      <p>by <a href="https://twitter.com/rakyll">JBD</a></p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="https://github.com/rakyll/">GitHub</a></li>
+      
+    </ul>
+
+    <p class="small">
+      Subscribe to the <a rel="license" href="/index.xml">feed</a>.
+    </p>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+      The blog is served by the amazing <a href="https://gohugo.io">Hugo</a>.
+    </p>
+  </div>
+</div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+    <div class="content container">
+<div class="posts">
+
+
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/latency-profiling/">
+        The future of latency profiling in Go
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Jul 18, 2017</span>
+
+    
+
+<p><em>Note: This article contains non-finalized ideas; we may end up not implementing any of this but ideally we should do work towards the direction explained here.</em></p>
+
+<p>Go is the language to write servers, Go is the language to write microservices. Yet, we haven&rsquo;t done much in the past for the latency analysis, and observability/diagnostics of request/RPC performance.</p>
+
+<p>GopherCon 2017 was an opportunity for me to discuss our roadmap for latency analysis. I have talked many whose main job is to provide instrumentation solutions to the ecosystem.
+A few common problems have been pointed out by pretty much everyone I talked to:</p>
+
+<ol>
+<li>Instrumentation requires manual labor. Go code cannot be auto-instrumented by intercepting calls.</li>
+<li>Lack of a standard library package; third party packages cannot provide out-of-the-box instrumentation without external dependencies.</li>
+<li>Dropped traces; libraries don&rsquo;t know how to propagate traces to the outside world. We need a <code>context.Context</code> key to propagate traces and be able to discover the current trace by looking into the incoming context.</li>
+<li>Lack of standard library support; e.g. packages like <code>database/sql</code> can be instrumented to create spans for each ExecContext if the given context has already has a trace ID.</li>
+<li>Lack of diagnostics data available from runtime per trace ID. It would be ideal to be able to record runtime events (e.g. scheduling events) with trace IDs and then pull them to further investigate low-level runtime events happened in the lifetime of a request.</li>
+</ol>
+
+<p>Apart from the Go-specific issues, we often came back to the problem of the wild fragmentation in the tracing community and how the lack of the compatibility among tracing backends damage the possibility of establishing more in the library space.
+There is not much we can do beyond the boundaries of Go other than advocating for a requirement to fix fragmentation which I already personally do.</p>
+
+<h2 id="instrumentation">Instrumentation</h2>
+
+<p>We are currently not interested to solve (1) in a fashion other languages do by providing primitives that can intercept every call. Initially there is a lot to be done by creating a common instrumentation library and putting manual spans in place. A common instrumentation layer also solves the problems explained at (2) and (3).</p>
+
+<p>To address these items, we will propose a package with a trace context representation, FromContext/NewContext to propagate trace context via context.Context, and a small API to create/end/annotate spans.</p>
+
+<p>Users will be able to start and stop trace collection in a Go program dynamically; and export collected trace data.</p>
+
+<p>Users will need to write transformation code if they would like to follow an existing distributed trace (e.g. an existing Zipkin trace propagated via an incoming HTTP request&rsquo;s header).</p>
+
+<p>Once we establish a package, we can revise the standard library packages to see where we can inject out-of-the-box instrumentation. Some existing ideas:</p>
+
+<ul>
+<li><code>database/sql</code>: A span can be created for each ExecContext and finished when exec is completed to measure latency.</li>
+<li><code>os/exec</code>: A span can be created for CommandContext to measure command exec latency.</li>
+<li><code>net/http</code>: http.Transport can create spans for outgoing requests.</li>
+</ul>
+
+<p>The next steps for <code>net/http</code> is to be able to propagate traces via http.Request. Ideally we want http.Transport to inject the right trace context header to the outgoing requests and http.Handlers to extract trace contexts into req.Context. The wild fragmentation in the tracing backends don&rsquo;t help us much here. Each backend requires a different encoding/decoding to serialize/deserialize trace contexts and different HTTP headers to put them in place. There is an ongoing effort to <a href="https://github.com/TraceContext/tracecontext-spec/pull/1/files">unify</a> things in this area and we will wait for it rather than trying to meet the backend-specific requirements.</p>
+
+<p>There is also an experimental work to annotate runtime events recorded by the execution tracer with trace IDs, which will address the basic requirements of (5). If you need to collect more precise data on what else is happening in the lifetime of a trace, you will be optionally record runtime events and attach them to the current trace.</p>
+
+<h2 id="visualization">Visualization</h2>
+
+<p>Nothing has been planned so far to visualize the per-node data. We expect the exported data can be transformed into the data format of the user&rsquo;s existing distributed tracing backend and visualized there. For those who are looking for a local env setup, I suggest <a href="https://github.com/openzipkin/docker-zipkin#running">Zipkin</a> given it is very easy to run it locally as a standalone service. I am in also favor of maintaining high-quality transformation drivers for Zipkin or OpenTracing somewhere outside of the standard lib.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We have clearer idea what we want to achieve in the scope of Go for latency profiling. The next steps are converting these ideas into proposals and discuss them with the broader Go community, give feedback to the tracing community for the standardization efforts, and create awareness of these concepts and tools.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/scheduler/">
+        Go&#39;s work-stealing scheduler
+      </a>
+    </h1>
+
+    <span class="post-date">Sun, Jul 16, 2017</span>
+
+    
+
+<p>Go scheduler&rsquo;s job is to distribute runnable goroutines over
+multiple worker OS threads that runs on one or more processors.
+In multi-threaded computation, two paradigms have emerged in scheduling: work sharing and work stealing.</p>
+
+<ul>
+<li><strong>Work-sharing</strong>: When a processor generates new threads, it attempts to migrate some of them to the other processors with the hopes of them being utilized by the idle/underutilized processors.</li>
+<li><strong>Work-stealing</strong>: An underutilized processor actively looks for other processor&rsquo;s threads and &ldquo;steal&rdquo; some.</li>
+</ul>
+
+<p>The migration of threads occurs less frequently with work stealing
+than with work sharing. When all processors have work to run, no threads are being migrated. And as soon as there is an idle processor, migration is considered.</p>
+
+<p>Go has a work-stealing scheduler since 1.1, contributed by Dmitry Vyukov. This article will go in depth explaining what work-stealing schedulers are and how Go implements one.</p>
+
+<h2 id="scheduling-basics">Scheduling basics</h2>
+
+<p>Go has an M:N scheduler that can also utilize multiple processors. At
+any time, M goroutines need to be scheduled on N OS threads that runs on at most GOMAXPROCS numbers of processors.
+Go scheduler uses the following terminology for goroutines, threads and processors:</p>
+
+<ul>
+<li>G: goroutine</li>
+<li>M: OS thread (machine)</li>
+<li>P: processor</li>
+</ul>
+
+<p>There is a P-specific local and a global goroutine queue.
+Each M should be assigned to a P. Ps may have no Ms if they are blocked or in a system call.
+At any time, there are at most GOMAXPROCS number of P. At any time, only one M can run per P.
+More Ms can be created by the scheduler if required.</p>
+
+<p><img src="/img/scheduler-concepts.png" alt="Scheduler basics" /></p>
+
+<p>Each round of scheduling is simply finding a runnable goroutine and executing it.
+At each round of scheduling, the search happens in the following order:</p>
+
+<pre><code>runtime.schedule() {
+    // only 1/61 of the time, check the global runnable queue for a G.
+    // if not found, check the local queue.
+    // if not found,
+    //     try to steal from other Ps.
+    //     if not, check the global runnable queue.
+    //     if not found, poll network.
+}
+</code></pre>
+
+<p>Once a runnable G is found, it is executed until it is blocked.</p>
+
+<p>Note: It looks like the global queue has an advantage over the local queue
+but checking global queue once a while is crucial to avoid M is only scheduling
+from the local queue until there are no locally queued goroutines left.</p>
+
+<h2 id="stealing">Stealing</h2>
+
+<p>When a new G is created or an existing G becomes runnable, it is pushed onto a list of runnable goroutines of current P. When P finishes executing G, it tries to pop a G from own list of runnable goroutines. If the list is now empty, P chooses a random other processor (P) and tries to steal a half of runnable goroutines from its queue.</p>
+
+<p><img src="/img/scheduler-stealing.png" alt="P2 steals from P1" /></p>
+
+<p>In the case above, P2 cannot find any runnable goroutines. Therefore, it randomly picks another processor (P1) and steal three goroutines to its own local queue. P2 will be able to run these goroutines and scheduler work will be more fairly distributed between multiple processors.</p>
+
+<h2 id="spinning-threads">Spinning threads</h2>
+
+<p>The scheduler always wants to distribute as much as runnable goroutines to Ms to utilize the processors but at the
+same time we need to park excessive work to conserve CPU and power. Contradictory to this, scheduler should also need to be able to scale to high-throughput and CPU intense programs.</p>
+
+<p>Constant preemption is both expensive and is a problem for high-throughput programs if the performance is critical. OS threads shouldn&rsquo;t frequently hand-off runnable goroutines between each other, because it leads to increased latency. Additional to that in the presence of syscalls, OS threads need to be constantly blocked and unblocked. This is costly and adds a lot of overhead.</p>
+
+<p>In order to minimize the hand-off, Go scheduler implements &ldquo;spinning threads&rdquo;. Spinning threads consume a little extra CPU power but they minimize the preemption of the OS threads.
+A thread is spinning if:</p>
+
+<ul>
+<li>An M with a P assignment is looking for a runnable goroutine.</li>
+<li>An M without a P assignment is looking for available Ps.</li>
+<li>Scheduler also unparks an additional thread and spins it when it is readying a goroutine if there is an idle P and there are no other spinning threads.</li>
+</ul>
+
+<p>There are at most GOMAXPROCS spinning Ms at any time. When a spinning thread finds work, it takes itself out of spinning state.</p>
+
+<p>Idle threads with a P assignment don&rsquo;t block if there are idle Ms without a P assignment. When new goroutines are created or an M is being blocked, scheduler ensures that there is at least one spinning M. This ensures that there are no runnable goroutines that can be otherwise running; and avoids excessive M blocking/unblocking.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Go scheduler does a lot to avoid excessive preemption of OS threads by scheduling them to the right and underutilized processors by stealing, as well as implementing &ldquo;spinning&rdquo; threads to avoid high occurrence of blocked/unblocked transitions.</p>
+
+<p>Scheduling events can be traced by the <a href="https://golang.org/cmd/trace/">execution tracer</a>. You can investigate what&rsquo;s going on if you happen to believe you have poor processor utilization.</p>
+
+<h3 id="references">References</h3>
+
+<ul>
+<li><a href="https://github.com/golang/go/blob/master/src/runtime/proc.go">The Go runtime scheduler source</a></li>
+<li><a href="https://golang.org/s/go11sched">Scalable Go Scheduler design document</a></li>
+<li><a href="https://morsmachine.dk/go-scheduler">The Go scheduler by Daniel Morsing</a></li>
+</ul>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/profiler-labels/">
+        Profiler labels in Go
+      </a>
+    </h1>
+
+    <span class="post-date">Mon, Jul 3, 2017</span>
+
+    
+
+<p>Go 1.9 is introducing <a href="https://github.com/golang/proposal/blob/master/design/17280-profile-labels.md">profiler labels</a>, a way to add arbitrary key-values to the samples collected by the CPU profiler. CPU profilers collect and output hot spots where the CPU spent most time in when executing. A typical CPU profiler output is primarily reports the location of these spots as function name, source file/line, etc. By looking at the data, you can also examine which parts of the code invoked these spots. You can also filter by invokers to have more granular understanding of certain execution paths.</p>
+
+<p>Even though locality information is useful to spot expensive execution paths, it is not always essentially enough when debugging a performance problem. A significant percentage of Go programmers uses Go to write servers, and it is even more complex to point out performance issues in a server. It is hard to isolate certain execution paths from others, or hard to understand whether it is only a certain path creating trouble (e.g. a user or a specific handler).</p>
+
+<p>With 1.9, Go is introducing a new feature that allows you to record additional information to provide more context about the execution path. You will be able to record <a href="http://beta.golang.org/pkg/runtime/pprof/#LabelSet">any set of labels</a>, as a part of the profiling data. Then, use these labels to examine the profiler output more precisely.</p>
+
+<p>You can benefit from profiler labels in many cases. Some of the obvious ones:</p>
+
+<ul>
+<li>You don&rsquo;t want to leak your software abstractions into the examination of the profiling data; e.g. a profiling dashboard of a web server will be useful if it displays handler URL paths, rather than function names from the Go code.</li>
+<li>Execution stack location is not enough to understand the originator of work; e.g. a consumer that reads from a message queue does work originated somewhere else, the consumer can set labels to identify the originator.</li>
+<li>Context-bound information is required to debug profiling problems.</li>
+</ul>
+
+<h2 id="adding-labels">Adding labels</h2>
+
+<p>The <code>runtime/pprof</code> package will export several new APIs to let users add labels. Most users will use <a href="http://beta.golang.org/pkg/runtime/pprof/#Do">Do</a> which takes a context, extends it with labels, records these labels when f is executing:</p>
+
+<pre><code class="language-go">func Do(ctx context.Context, labels LabelSet, f func(context.Context))
+</code></pre>
+
+<p>Do only set the given label set during the execution of the current goroutine. If you want to start goroutines in <code>f</code>, you can propagate the labels by passing the context argument of the function.</p>
+
+<pre><code>labels := pprof.Labels(&quot;worker&quot;, &quot;purge&quot;)
+pprof.Do(ctx, labels, func(ctx context.Context) {
+    // Do some work...
+
+    go update(ctx) // propagates labels in ctx.
+})
+</code></pre>
+
+<p>The work above will be labeled with worker:purge.</p>
+
+<h2 id="examining-the-profiler-output">Examining the profiler output</h2>
+
+<p>This section will demonstrate how to examine the recorded samples by profiler labels. Once you annotate your code with labels, it is time to profile and consume the profiler data with tag filters.</p>
+
+<p>I will use the <code>net/http/pprof</code> package to capture samples in this demo, see the <a href="https://blog.golang.org/profiling-go-programs">Profiling Go programs</a> article for more options.</p>
+
+<pre><code class="language-go">package main
+
+import _ &quot;net/http/pprof&quot;
+
+func main() {
+    // All the other code...
+    log.Fatal(http.ListenAndServe(&quot;localhost:5555&quot;, nil))
+}
+</code></pre>
+
+<p>Collect some CPU samples from the server.</p>
+
+<pre><code>$ go tool pprof http://localhost:5555/debug/pprof/profile
+</code></pre>
+
+<p>Once the interactive mode starts, you can list the recorded labels by the <code>tags</code> command. Note that pprof tools call them <em>tags</em> even though they are named labels in the Go standard library.</p>
+
+<pre><code>(pprof) tags
+http-path: Total 80
+        70 (87.50%): /messages
+        10 (12.50%): /user
+
+worker: Total 158
+       158 (  100%): purge
+</code></pre>
+
+<p>As you can see, there are two label keys (http-path, worker) and several values recorded for each. http-path key is coming from HTTP handlers I annotated, and worker:purge is originated at the code above.</p>
+
+<p>By filtering by labels, we can focus only on the samples collected from the <code>/user</code> handler.</p>
+
+<pre><code>(pprof) tagfocus=&quot;http-path:/user&quot;
+(pprof) top10 -cum
+Showing nodes accounting for 0.10s, 3.05% of 3.28s total
+      flat  flat%   sum%        cum   cum%
+         0     0%     0%      0.10s  3.05%  main.generateID.func1 /Users/jbd/src/hello/main.go
+     0.01s   0.3%   0.3%      0.08s  2.44%  runtime.concatstring2 /Users/jbd/go/src/runtime/string.go
+     0.06s  1.83%  2.13%      0.07s  2.13%  runtime.concatstrings /Users/jbd/go/src/runtime/string.go
+     0.01s   0.3%  2.44%      0.02s  0.61%  runtime.mallocgc /Users/jbd/go/src/runtime/malloc.go
+         0     0%  2.44%      0.02s  0.61%  runtime.slicebytetostring /Users/jbd/go/src/runtime/string.go
+         0     0%  2.44%      0.02s  0.61%  strconv.FormatInt /Users/jbd/go/src/strconv/itoa.go
+         0     0%  2.44%      0.02s  0.61%  strconv.Itoa /Users/jbd/go/src/strconv/itoa.go
+         0     0%  2.44%      0.02s  0.61%  strconv.formatBits /Users/jbd/go/src/strconv/itoa.go
+     0.01s   0.3%  2.74%      0.01s   0.3%  runtime.memmove /Users/jbd/go/src/runtime/memmove_amd64.s
+     0.01s   0.3%  3.05%      0.01s   0.3%  runtime.nextFreeFast /Users/jbd/go/src/runtime/malloc.go
+</code></pre>
+
+<p>The listing contains only samples labeled with http-path:/user. So we can easily understand the most expensive execution paths from the user handler.</p>
+
+<p>You can also use tagshow, taghide, and tagignore commands as other filtering options. For example, tagignore allows you to match anything but the given regex.
+The filter below will match anything but the user handler; worker:purge and http-path:/messages in this case.</p>
+
+<pre><code>(pprof) tagfocus=
+(pprof) tagignore=&quot;http-path:/user&quot;
+(pprof) tags
+http-path: Total 70
+        70 (  100%): /messages
+
+worker: Total 158
+       158 (  100%): purge
+</code></pre>
+
+<p>If you visualize the filtered samples, the output will show how much each label is contributing to the final cost.</p>
+
+<p><img src="/img/pprof-labels-pdf.png" alt="Pprof labels visualized" /></p>
+
+<p>You can see that worker:purge used 0.07s, and messages handler used 0.03s in the generateID function during the collection of the profiling data.</p>
+
+<h2 id="try-it-yourself">Try it yourself!</h2>
+
+<p>Profiler labels allows us to add additional information to the profiler data that is not available at the current execution stack. Try them by downloading the <a href="https://golang.org/dl/#unstable">Go 1.9 beta</a> if you need more dimensions in your profiler output. Also, try the <a href="http://godoc.org/github.com/rakyll/goutil/pprofutil">pprofutil</a> package to automatically add HTTP path label to your handlers.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/custom-profiles/">
+        Custom pprof profiles
+      </a>
+    </h1>
+
+    <span class="post-date">Fri, Jun 30, 2017</span>
+
+    <p>Go provides several pprof profiles out of thet box to gather
+profiling data from Go programs.</p>
+
+<p>The builtin profiles provided by the <a href="https://golang.org/pkg/runtime/pprof/">runtime/pprof</a> package:</p>
+
+<ul>
+<li><strong>profile</strong>: CPU profile determines where a program spends its time while actively consuming CPU cycles (as opposed while sleeping or waiting for I/O).</li>
+<li><strong>heap</strong>: Heap profile reports the currently live allocations; used to monitor current memory usage or check for memory leaks.</li>
+<li><strong>threadcreate</strong>: Thread creation profile reports the sections of the program that lead the creation of new OS threads.</li>
+<li><strong>goroutine</strong>: Goroutine profile report the stack traces of all current goroutines.</li>
+<li><strong>block</strong>: Block profile show where goroutines block waiting on synchronization primitives (including timer channels). Block profile is not enabled by default; use runtime.SetBlockProfileRate to enable it.</li>
+<li><strong>mutex</strong>: Mutex profile reports the lock contentions. When you think your CPU is not fully utilized due to a mutex contention, use this profile. Mutex profile is not enabled by default, see runtime.SetMutexProfileFraction to enable.</li>
+</ul>
+
+<p>Additional to the builtin profiles, <a href="https://golang.org/pkg/runtime/pprof/">runtime/pprof</a> package allows you to export your custom profiles, and instrument your code to record
+execution stacks that contributes to this profile.</p>
+
+<p>Imagine we have a blob server, and we are writing a Go client for it. And our users want to be able to profile the opened blobs on the client. We can create a profile and record the events of blob opening and closing, so the user can tell how many open blobs they are at any time.</p>
+
+<p>Here is a blobstore package that allows you to open some blobs. We will create a new custom profile and start
+recording execution stacks that contributes to opening of blobs:</p>
+
+<pre><code class="language-go">package blobstore
+
+import &quot;runtime/pprof&quot;
+
+var openBlobProfile = pprof.NewProfile(&quot;blobstore.Open&quot;)
+
+// Open opens a blob, all opened blobs need
+// to be closed when no longer in use.
+func Open(name string) (*Blob, error) {
+	blob := &amp;Blob{name: name}
+	// TODO: Initialize the blob...
+
+	openBlobProfile.Add(blob, 2) // add the current execution stack to the profile
+	return blob, nil
+}
+</code></pre>
+
+<p>And once users want to close the blob, we need to remove the execution stack associated with the current blob from the profile:</p>
+
+<pre><code class="language-go">// Close closes the blob and frees the
+// underlying resources.
+func (b *Blob) Close() error {
+	// TODO: Free other resources.
+	openBlobProfile.Remove(b)
+	return nil
+}
+</code></pre>
+
+<p>And now, from the programs using this package, we should be able to retrieve <code>blobstore.Open</code> profile data  and use our daily pprof tools to examine and visualize them.</p>
+
+<p>Let&rsquo;s write a small main program than opens some blobs:</p>
+
+<pre><code>package main
+
+import (
+	&quot;fmt&quot;
+	&quot;math/rand&quot;
+	&quot;net/http&quot;
+	_ &quot;net/http/pprof&quot; // as a side effect, registers the pprof endpoints.
+	&quot;time&quot;
+
+	&quot;myproject.org/blobstore&quot;
+)
+
+func main() {
+	for i := 0; i &lt; 1000; i++ {
+		name := fmt.Sprintf(&quot;task-blob-%d&quot;, i)
+		go func() {
+			b, err := blobstore.Open(name)
+			if err != nil {
+				// TODO: Handle error.
+			}
+			defer b.Close()
+
+			// TODO: Perform some wrork, write to the blob.
+		}()
+	}
+	http.ListenAndServe(&quot;localhost:8888&quot;, nil)
+}
+</code></pre>
+
+<p>Start the server, then use go tool to read and visualize the profile data:</p>
+
+<pre><code>$ go tool pprof http://localhost:8888/debug/pprof/blobstore.Open
+(pprof) top
+Showing nodes accounting for 800, 100% of 800 total
+      flat  flat%   sum%        cum   cum%
+       800   100%   100%        800   100%  main.main.func1 /Users/jbd/src/hello/main.go
+</code></pre>
+
+<p>You will see that there are 800 open blobs and all openings are coming from main.main.func1. In this small example, there is nothing more to see, but in a complex server you can examine the hottest spots that works with an open blob and find out bottlenecks or leaks.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/coredumps/">
+        Debugging Go core dumps
+      </a>
+    </h1>
+
+    <span class="post-date">Mon, May 22, 2017</span>
+
+    <p>Debugging is highly useful to examine the execution flow
+and to understand the current state of a program.</p>
+
+<p>Core files is a file that contains the memory dump of a running
+process and its process status. It is primarily used for post-mortem
+debugging of a program, as well as to understand a program&rsquo;s state
+while it is still running. These two cases make debugging of core dumps
+a good diagnostics aid to postmortem and analyze production
+services.</p>
+
+<p>I will use a simple hello world web server in this article,
+but in real life our programs might get very
+complicated easily.
+The availability of core dump analysis gives you an
+opportunity to resurrect a program from specific snapshot
+and look into cases that might only reproducible in certain
+conditions/environments.</p>
+
+<p><strong>Note</strong>: This flow only works on Linux at this point end-to-end,
+I am not quite sure about the other Unixes but it is not
+yet supported on macOS. Windows is not supported at this point.</p>
+
+<p>Before we begin, you need to make sure that your ulimit
+for core dumps are at a reasonable level. It is by default
+0 which means the max core file size can only be zero.
+I usually set it to unlimited on my development machine by typing:</p>
+
+<pre><code>$ ulimit -c unlimited
+</code></pre>
+
+<p>Then, make sure you have <a href="https://github.com/derekparker/delve">delve</a>
+installed on your machine.</p>
+
+<p>Here is a <code>main.go</code> that contains a simple handler and it starts an HTTP server.</p>
+
+<pre><code>$ cat main.go
+package main
+
+import (
+	&quot;fmt&quot;
+	&quot;log&quot;
+	&quot;net/http&quot;
+)
+
+func main() {
+	http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprint(w, &quot;hello world\n&quot;)
+	})
+	log.Fatal(http.ListenAndServe(&quot;localhost:7777&quot;, nil))
+}
+</code></pre>
+
+<p>Let&rsquo;s build this and have a binary.</p>
+
+<pre><code>$ go build .
+</code></pre>
+
+<p>Let’s assume, in the future, there is something messy going on with
+this server but you are not so sure about what it might be.
+You might have instrumented your program in various ways but it
+might not be enough for getting any clue from the existing
+instrumentation data.</p>
+
+<p>Basically, in a situation like this, it would be nice to have a
+snapshot of the current process, and then use that snapshot to dive
+into to the current state of your program with your existing debugging
+tools.</p>
+
+<p>There are several ways to obtain a core file. You might have been
+already familiar with crash dumps, these are basically core dumps
+written to disk when a program is crashing. Go doesn&rsquo;t enable crash dumps
+by default but gives you this option  on Ctrl+backslash when
+<code>GOTRACEBACK</code> env variable is set to &ldquo;crash&rdquo;.</p>
+
+<pre><code>$ GOTRACEBACK=crash ./hello
+(Ctrl+\)
+</code></pre>
+
+<p>It will crash the program with stack trace printed and core dump file
+will be written.</p>
+
+<p>Another option is to retrieve a core dump from a running process
+without  having to kill a process.
+With <code>gcore</code>, it is possible to get the core
+files without crashing. Let’s start the server again:</p>
+
+<pre><code>$ ./hello &amp;
+$ gcore 546 # 546 is the PID of hello.
+</code></pre>
+
+<p>We have a dump without crashing the process. The next step
+is to load the core file to delve and start analyzing.</p>
+
+<pre><code>$ dlv core ./hello core.546
+</code></pre>
+
+<p>Alright, this is it! This is no different than the typical delve interactive.
+You can backtrace, list, see variables, and  more. Some features will be disabled
+given a core dump is a snapshot and not a currently running process, but
+the execution flow and the program state will be entirely accessible.</p>
+
+<pre><code>(dlv) bt
+ 0  0x0000000000457774 in runtime.raise
+    at /usr/lib/go/src/runtime/sys_linux_amd64.s:110
+ 1  0x000000000043f7fb in runtime.dieFromSignal
+    at /usr/lib/go/src/runtime/signal_unix.go:323
+ 2  0x000000000043f9a1 in runtime.crash
+    at /usr/lib/go/src/runtime/signal_unix.go:409
+ 3  0x000000000043e982 in runtime.sighandler
+    at /usr/lib/go/src/runtime/signal_sighandler.go:129
+ 4  0x000000000043f2d1 in runtime.sigtrampgo
+    at /usr/lib/go/src/runtime/signal_unix.go:257
+ 5  0x00000000004579d3 in runtime.sigtramp
+    at /usr/lib/go/src/runtime/sys_linux_amd64.s:262
+ 6  0x00007ff68afec330 in (nil)
+    at :0
+ 7  0x000000000040f2d6 in runtime.notetsleep
+    at /usr/lib/go/src/runtime/lock_futex.go:209
+ 8  0x0000000000435be5 in runtime.sysmon
+    at /usr/lib/go/src/runtime/proc.go:3866
+ 9  0x000000000042ee2e in runtime.mstart1
+    at /usr/lib/go/src/runtime/proc.go:1182
+10  0x000000000042ed04 in runtime.mstart
+    at /usr/lib/go/src/runtime/proc.go:1152
+
+(dlv) ls
+&gt; runtime.raise() /usr/lib/go/src/runtime/sys_linux_amd64.s:110 (PC: 0x457774)
+   105:		SYSCALL
+   106:		MOVL	AX, DI	// arg 1 tid
+   107:		MOVL	sig+0(FP), SI	// arg 2
+   108:		MOVL	$200, AX	// syscall - tkill
+   109:		SYSCALL
+=&gt; 110:		RET
+   111:
+   112:	TEXT runtime·raiseproc(SB),NOSPLIT,$0
+   113:		MOVL	$39, AX	// syscall - getpid
+   114:		SYSCALL
+   115:		MOVL	AX, DI	// arg 1 pid
+</code></pre>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/grpc-trace/">
+        Automatic Stackdriver Tracing for gRPC
+      </a>
+    </h1>
+
+    <span class="post-date">Wed, Mar 22, 2017</span>
+
+    
+
+<p>In monolithic systems, it is relatively easy to collect diagnostic
+data from the building blocks of a program. All modules live within
+one process and share common resources to report logs and errors.</p>
+
+<p>Once you are distributing your system into microservices, it becomes
+harder to follow a call starting from the user&rsquo;s entry point until a
+response is served. To address this problem, Google invented
+<a href="https://research.google.com/pubs/pub36356.html">Dapper</a> to instrument and analyze its production services. Dapper-like
+distributed tracing systems allow you to trace a user request from
+the entry point to the response.</p>
+
+<p>Distribute tracing helps us to:</p>
+
+<ul>
+<li>Diagnose and improve latency problems.</li>
+<li>See the integration problems that are only visible in production.</li>
+<li>See the fundamental architectural problems, e.g. critical bottlenecks
+that were not obvious without looking at the tracing data.</li>
+</ul>
+
+<p>As a gRPC user, you are deploying distributed production services and
+being able to trace a user request end-to-end can easily be a critical
+fundamental requirement.</p>
+
+<p>In this article, we are going to modify the <a href="https://github.com/grpc/grpc-go/tree/master/examples/helloworld">helloworld</a>
+example from the gRPC Go package to add tracing.</p>
+
+<p>Import the trace package:</p>
+
+<pre><code>import &quot;cloud.google.com/go/trace&quot;
+</code></pre>
+
+<p>Initiate a trace client:</p>
+
+<pre><code>ctx := context.Background()
+tc, err := trace.NewClient(ctx, &quot;project-id&quot;)
+if err != nil {
+    log.Fatal(err)
+}
+</code></pre>
+
+<p>See the <a href="https://godoc.org/cloud.google.com/go#pkg-examples">examples</a>
+to learn how to set the auth. In the example above,
+we use the &ldquo;Application Default Credentials&rdquo;.</p>
+
+<p>In order to initiate the greeter client, use the Stackdriver Trace
+client interceptor we are providing:</p>
+
+<pre><code>conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithUnaryInterceptor(tc.GRPCClientInterceptor()))
+if err != nil {
+    log.Fatalf(&quot;did not connect: %v&quot;, err)
+}
+defer conn.Close()
+c := pb.NewGreeterClient(conn)
+</code></pre>
+
+<p>All the outgoing requests from <code>c</code> will be automatically traced:</p>
+
+<pre><code>span := tc.NewSpan(&quot;/foo&quot;)
+defer span.FinishWait() // use span.Finish() if your client is a long-running process.
+
+ctx = trace.NewContext(ctx, span)
+r, err := c.SayHello(ctx, &amp;pb.HelloRequest{Name: name})
+if err != nil {
+    log.Fatalf(&quot;could not greet: %v&quot;, err)
+}
+</code></pre>
+
+<p>On the server side, in order to be able to receive the traces (and keep propagating), use the server interceptor we are providing when initializing
+a server:</p>
+
+<pre><code>s := grpc.NewServer(grpc.UnaryInterceptor(tc.GRPCServerInterceptor()))
+</code></pre>
+
+<p>Then, the server handlers will be able to access the <code>trace.Span</code>
+instances from the current calling context:</p>
+
+<pre><code>func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	span := trace.FromContext(ctx)
+    // TODO: Use the span directly or keep using the context
+    // to make more outgoing calls from this handler.
+    // If you don't finish the span, it will be auto-finished
+    // once this function returns.
+
+	return &amp;pb.HelloReply{Message: &quot;Hello &quot; + in.Name}, nil
+}
+</code></pre>
+
+<p>A single-hop from the client to server looks like below on the
+Stackdriver Trace console:</p>
+
+<p><img src="/img/trace1.png" alt="Tracing" /></p>
+
+<p>But things are getting more exciting as you begin to depend on
+more services to serve your user requests:</p>
+
+<p><img src="/img/trace2.png" alt="Tracing" /></p>
+
+<p>Similar to the gRPC interceptors, I also contributed a few HTTP utilities
+to enable tracing support for your HTTP-speaking microservices.
+See <a href="https://godoc.org/cloud.google.com/go/trace#Client.NewHTTPClient">NewHTTPClient</a> and
+<a href="https://godoc.org/cloud.google.com/go/trace#Client.HTTPHandler">HTTPHandler</a>
+for more information and examples.</p>
+
+<h2 id="what-s-next">What&rsquo;s next?</h2>
+
+<p>In the past few months, I have been privileged to work on Go distributed tracing
+APIs on a part-time basis. We experimented a lot, addressed many critical open
+questions, and worked hard to achieve a very minimal backend-agnostic tracing
+API for the entire Go ecosystem.</p>
+
+<p>Achieving common APIs will make distributed tracing more accessible, make our
+libraries trace-aware and create opportunity to reuse our utilities. I am looking forward to share this work in the upcoming weeks.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/naming-tests-to-doc/">
+        Naming tests to self-document
+      </a>
+    </h1>
+
+    <span class="post-date">Fri, Feb 3, 2017</span>
+
+    <p>Go doesn&rsquo;t specifically enforce you how you choose your test names.
+Tests are a significant contributors for the maintainability
+of your code. Tests not just providing correctness checking
+but also are useful in self documenting your code and its usage.
+On top of that, tests are the single best source to read about
+responsibilities of a type, function, etc.
+This is where naming tests better can help the internal documentation
+and therefore the maintainability of your code.</p>
+
+<p>Emphasize the role of what you are testing rather than naming
+after the inputs and outputs.</p>
+
+<pre><code class="language-wrong">func TestTitleIllegalChar(t *testing.T) {}
+</code></pre>
+
+<p>Instead, explain that the doc needs to be able to escape illegal
+characters on edit.</p>
+
+<pre><code>func TestTitleEscape(t *testing.T) {}
+</code></pre>
+
+<p>With this rename, we also self-document how the illegal characters
+on the title will be handled.</p>
+
+<p>We sometimes pick very inclusive test names and write big table-driven
+tests. If you are running table-driven tests, you can convert them to
+<a href="https://blog.golang.org/subtests">subtests</a> and name the individual cases.
+Then <code>go test -v</code> can pick those name and its output will act as a spec of
+your type, function, etc.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/style-packages/">
+        Style guideline for Go packages
+      </a>
+    </h1>
+
+    <span class="post-date">Sat, Jan 14, 2017</span>
+
+    
+
+<p>Go is about naming and organization as much as everything else in the language.
+Well-organized Go code is easy to discover,
+use and read. Well-organized code is as critical as well designed APIs. The location, name,
+and the structure of your packages are the first elements your users see and interact with.</p>
+
+<p>This document&rsquo;s goal is to guide you with common good practices not to set rules.
+You will always need to use your own judgement to pick the most elegant solution
+for your specific case.</p>
+
+<h2 id="packages">Packages</h2>
+
+<p>All Go code is organized into packages. A package in Go is simply a directory/folder with one or more
+<code>.go</code> files inside of it. Go packages provide isolation and organization of code similar to
+how directories/folders organize files on a computer.</p>
+
+<p>All Go code lives in a package and a package is the entry point to access Go code. Understanding
+and establishing good practices around packages is important to write effective Go code.</p>
+
+<hr />
+
+<h2 id="package-organization">Package Organization</h2>
+
+<p>Let&rsquo;s begin with suggestions how you should organize Go code and explain conventions about
+locating Go packages.</p>
+
+<h3 id="use-multiple-files">Use multiple files</h3>
+
+<p>A package is a directory with one or more Go files.
+Feel free to separate your code into as many files as logically
+make sense for optimal readability.</p>
+
+<p>For example, an HTTP package might have been separated into different files
+according to the HTTP aspect the file handles.
+In the following example, an HTTP package is broken down into a few files:
+header types and code, cookie types and code, the actual HTTP implementation, and
+documentation of the package.</p>
+
+<pre><code>- doc.go       // package documentation
+- headers.go   // HTTP headers types and code
+- cookies.go   // HTTP cookies types and code
+- http.go      // HTTP client implementation, request and response types, etc.
+</code></pre>
+
+<h3 id="keep-types-close">Keep types close</h3>
+
+<p>As a rule of thumb, keep types closer to where they are used. This makes it easy for
+any maintainer (not just the original author) to find a type.
+A good place for a Header struct type might be in <code>headers.go</code>.</p>
+
+<pre><code>$ cat headers.go
+package http
+
+// Header represents an HTTP header.
+type Header struct {...}
+</code></pre>
+
+<p>Even though, the Go language doesn&rsquo;t restrict where you define types,
+it is often a good practice to keep the core types grouped at the top of a file.</p>
+
+<h3 id="organize-by-responsibility">Organize by responsibility</h3>
+
+<p>A common practise from other languages is to organize types together in a package
+called models or types. In Go, we organize code by their functional responsibilities.</p>
+
+<pre><code class="language-wrong">package models // DON'T DO IT!!!
+
+// User represents a user in the system.
+type User struct {...}
+</code></pre>
+
+<p>Rather than creating a models package and declare all entity types there,
+a User type should live in a service-layer package.</p>
+
+<pre><code>package mngtservice
+
+// User represents a user in the system.
+type User struct {...}
+
+func UsersByQuery(ctx context.Context, q *Query) ([]*User, *Iterator, error)
+
+func UserIDByEmail(ctx context.Context, email string) (int64, error)
+</code></pre>
+
+<h3 id="optimize-for-godoc">Optimize for godoc</h3>
+
+<p>It is a great exercise to use godoc in the early phases of your package&rsquo;s API design to see
+how your concepts will be rendered on doc. Sometimes, the visualization also has an impact
+on the design. Godoc is the way your users will consume a package, so it is ok to tweak
+things to make them more accessible. Run <code>godoc -http=&lt;hostport&gt;</code> to start a godoc server locally.</p>
+
+<h3 id="provide-examples-to-fill-the-gaps">Provide examples to fill the gaps</h3>
+
+<p>In some cases, you may not be able to provide all related types from a single package. It might be noisy
+to do so, or you might want to publish concrete implementations of a common interface from a separate
+package, or those types could be owned by a third-party package.
+Give examples to help the user to discover and understand how they are used together.</p>
+
+<pre><code>$ godoc cloud.google.com/go/datastore
+func NewClient(ctx context.Context, projectID string, opts ...option.ClientOption) (*Client, error)
+...
+</code></pre>
+
+<p>NewClient works with option.ClientOptions but it is neither the datastore package
+nor the option package that export all the option types.</p>
+
+<pre><code>$ godoc google.golang.org/extraoption
+func WithCustomValue(v string) option.ClientOption
+...
+</code></pre>
+
+<p>If your API requires many non-standard packages to be imported, it is often useful to add
+a <a href="https://blog.golang.org/examples">Go example</a> to give your users some working code.</p>
+
+<p>Examples are a good way to increase visibility of a less discoverable package.
+For example, an example for datastore.NewClient might reference the extraoption package.</p>
+
+<h3 id="don-t-export-from-main">Don&rsquo;t export from main</h3>
+
+<p>An identifier may be <a href="https://golang.org/ref/spec#Exported_identifiers">exported</a>
+to permit access to it from another package.</p>
+
+<p>Main packages are not importable, so exporting identifiers from main packages is unnecessary.
+Don&rsquo;t export identifiers from a main package if you are building the package to a binary.</p>
+
+<p>Exceptions to this rule might be the main packages built into a .so, or a .a or Go plugin.
+In such cases, Go code might be used from other languages via
+<a href="https://golang.org/cmd/cgo/#hdr-C_references_to_Go">cgo&rsquo;s export functionality</a>
+and exporting identifiers are required.</p>
+
+<hr />
+
+<h2 id="package-naming">Package Naming</h2>
+
+<p>A package name and import path are both significant identifiers of your package
+and represent everything your package contains. Naming your packages canonically
+not just improves your code quality but also your users&rsquo;.</p>
+
+<h3 id="lowercase-only">Lowercase only</h3>
+
+<p>Package names should be lowercase. Don&rsquo;t use snake_case or camelCase in package names.
+The Go blog has a <a href="https://blog.golang.org/package-names">comprehensive guide</a> about naming packages
+with a good variety of examples.</p>
+
+<h3 id="short-but-representative-names">Short, but representative names</h3>
+
+<p>Package names should be short, but should be unique and representative.
+Users of the package should be able to grasp its purpose from just the package&rsquo;s name.</p>
+
+<p>Avoid overly broad package names like &ldquo;common&rdquo; and &ldquo;util&rdquo;.</p>
+
+<pre><code class="language-wrong">import &quot;pkgs.org/common&quot; // DON'T!!!
+</code></pre>
+
+<p>Avoid duplicate names in cases where user may need to import the same package.</p>
+
+<p>If you cannot avoid a bad name, it is very likely that there is a problem
+with your overall structure and code organization.</p>
+
+<h3 id="clean-import-paths">Clean import paths</h3>
+
+<p>Avoid exposing your custom repository structure to your users. Align
+well with the GOPATH conventions. Avoid having src/, pkg/
+sections in your import paths.</p>
+
+<pre><code class="language-wrong">github.com/user/repo/src/httputil   // DON'T DO IT, AVOID SRC!!
+
+github.com/user/repo/gosrc/httputil // DON'T DO IT, AVOID GOSRC!!
+</code></pre>
+
+<h3 id="no-plurals">No plurals</h3>
+
+<p>In go, package names are not plural. This is surprising to programmers who came
+from other languages and are retaining an old habit of pluralizing names.
+Don&rsquo;t name a package httputils, but httputil!</p>
+
+<pre><code class="language-wrong">package httputils  // DON'T DO IT, USE SINGULAR FORM!!
+</code></pre>
+
+<h3 id="renames-should-follow-the-same-rules">Renames should follow the same rules</h3>
+
+<p>If you are importing more than one packages with the same name, you can locally
+rename the package names. The renames should follow the same rules mentioned
+on this article. There is no rule which package you should rename. If you are
+renaming the standard package library, it is nice to add a go prefix to make the name
+self document that it is &ldquo;Go standard library&rsquo;s&rdquo; package, e.g. <code>gourl</code>, <code>goioutil</code>.</p>
+
+<pre><code>import (
+    gourl &quot;net/url&quot;
+
+    &quot;myother.com/url&quot;
+)
+</code></pre>
+
+<h3 id="enforce-vanity-urls">Enforce vanity URLs</h3>
+
+<p><code>go get</code> supports getting packages by a URL that is different than the URL
+of the package&rsquo;s repo. These URLs are called vanity URLs and require you to
+serve a page with specific meta tags the Go tools recognize.
+You can serve a package with a custom domain and path using vanity URLs.</p>
+
+<p>For example,</p>
+
+<pre><code>$ go get cloud.google.com/go/datastore
+</code></pre>
+
+<p>checks out the source code from <code>https://code.googlesource.com/gocloud</code> behind
+the scenes and puts it in your workspace under $GOPATH/src/cloud.google.com/go/datastore.</p>
+
+<p>Given code.googlesource.com/gocloud is already serving this package, would it
+be possible to go get the package from that URL? The answer is no, if you enforce
+the vanity URL.</p>
+
+<p>To do that, add an import statement to the package. The go tool will reject
+any import of this package from any other path and will display a friendly
+error to the user. If you don&rsquo;t enforce your vanity URLs, there will be two
+copies of your package that cannot work together due to the different namespace.</p>
+
+<pre><code>package datastore // import &quot;cloud.google.com/go/datastore&quot;
+</code></pre>
+
+<hr />
+
+<h2 id="package-documentation">Package Documentation</h2>
+
+<p>Always document the package. Package documentation is a top-level comment
+immediately preceding the package clause. For non-main packages, godoc always starts with
+&ldquo;Package {pkgname}&rdquo; and follows with a description. For main packages, documentation
+should explain the binary.</p>
+
+<pre><code>// Package ioutil implements some I/O utility functions.
+package ioutil
+
+// Command gops lists all the processes running on your system.
+package main
+
+// Sample helloworld demonstrates how to use x.
+package main
+</code></pre>
+
+<h3 id="use-doc-go">Use doc.go</h3>
+
+<p>Sometimes, package docs can get very lengthy, especially when they provide details
+of usage and guidelines.
+Move the package godoc to a <code>doc.go</code> file.
+(See an example of a <a href="https://github.com/GoogleCloudPlatform/google-cloud-go/blob/master/datastore/doc.go">doc.go</a>.)</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/go18cls/">
+        Go 1.8 development stats
+      </a>
+    </h1>
+
+    <span class="post-date">Wed, Jan 11, 2017</span>
+
+    
+
+<p>Go 1.8 is going to to launched in February 2017. There is a sizable list of
+<a href="https://beta.golang.org/doc/go1.8">new features and improvements</a> on the release notes.
+While these notes is the best summary to see what has happened in the last 6 months,
+I will try to give you some stats to give you a sense of the size of the work.
+I have examined all the changes merged into the tree during the Go 1.8 window and
+will highlight some of the interesting and significant ones.</p>
+
+<p>There has been 2049 commits I have examined to gather these results.
+<a href="https://go-review.googlesource.com/#/c/35111/">c/35111</a> is the last commit
+I have included in the data set.</p>
+
+<h2 id="contributors">Contributors</h2>
+
+<p>There have been 201 contributors involved during the development of 1.8 👏👏👏</p>
+
+<p>But, more than 55% of the commits came from the top 10 contributors.</p>
+
+<pre><code>| Author               | Changes |
+|----------------------|---------|
+| Brad Fitzpatrick     | 225     |
+| Russ Cox             | 140     |
+| Josh Bleecher Snyder | 137     |
+| Robert Griesemer     | 129     |
+| Ian Lance Taylor     | 117     |
+| Austin Clements      | 111     |
+| Matthew Dempsky      | 94      |
+| David Crawshaw       | 69      |
+| Keith Randall        | 65      |
+| Cherry Zhang         | 55      |
+</code></pre>
+
+<p>There is only one non-Googler in the top 10, Josh Bleecher Snyder.</p>
+
+<h2 id="reviews">Reviews</h2>
+
+<p>Go has a reputation of having comprehensive and thoughtful code reviews.
+Each change list needs at least one reviewer, for controversial topics the number grows easily.
+The average number of reviewers for each change was 3.41 people during this cycle.</p>
+
+<p>1160 changes got a LGTM without anyone requiring to leave any comment,
+most of these changes are coming from already tenured contributors.</p>
+
+<p>There also have been noisier changes. Top three of them with most reviewers are:</p>
+
+<ul>
+<li><a href="https://go-review.googlesource.com/#/c/16551/">c/16551</a>: Addition of os.Executable</li>
+<li><a href="https://go-review.googlesource.com/#/c/29397/">c/29397</a>: Far jumps are handled on ARM, big ARM binaries are fine now.</li>
+<li><a href="https://go-review.googlesource.com/#/c/32019/">c/32019</a>: Implementation of the default GOPATH</li>
+</ul>
+
+<p>The average number of comments left on a change is 3.51.</p>
+
+<p>Half of the changes took 8 hours or less to submit from its creation.
+Of course, there been some long standing changes that have waited for long
+(even for a year) and finally made their way to this release but the
+review stage has been quite productive in most cases.</p>
+
+<h2 id="size">Size</h2>
+
+<p>The size of a change is the sum of lines added and lines deleted.
+Average size for a change during 1.8 development was 190.73 lines.
+If you look at the distribution though, half of the changes are
+smaller than 25 lines.</p>
+
+<h3 id="the-biggest-changes">The biggest changes</h3>
+
+<p>Most sizeable changes are often going to the compiler. Here are the top 3 biggest changes in 1.8:</p>
+
+<ul>
+<li><a href="https://go-review.googlesource.com/#/c/29168/">c/29168</a>: Deletion of the old compiler backend</li>
+<li><a href="https://go-review.googlesource.com/#/c/28978/">c/28978</a>: SSA backend for s390x</li>
+<li><a href="https://go-review.googlesource.com/#/c/31478/">c/31478</a>: SSA backend for mips</li>
+</ul>
+
+<h3 id="minor-fixes">Minor fixes</h3>
+
+<p>How many times you have spotted a problem but ignored it because you were ashamed
+of opening a single line commit? There are 390 changes that are under 5 lines in 1.8.
+There is no such thing called little contribution in Go, almost 20% of the
+changes were teeny-tiny.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/mutexprofile/">
+        Mutex profile
+      </a>
+    </h1>
+
+    <span class="post-date">Mon, Dec 19, 2016</span>
+
+    <p>Go 1.8 introduces a new profile, the contended mutex profile, that allows you to
+capture a fraction of the stack traces of goroutines with contended mutexes.</p>
+
+<p>You need to set the sampling fraction by calling
+<a href="http://beta.golang.org/pkg/runtime/#SetMutexProfileFraction">runtime.SetMutexProfileFraction</a>
+to a value above zero to enable collection.</p>
+
+<p>Consider the following program:</p>
+
+<pre><code>import _ &quot;net/http/pprof&quot;
+
+var mu sync.Mutex
+var items = make(map[int]struct{})
+
+runtime.SetMutexProfileFraction(5)
+for i := 0; i &lt; 1000*1000; i++ {
+    go func(i int) {
+        mu.Lock()
+        defer mu.Unlock()
+
+        items[i] = struct{}{}
+    }(i)
+}
+
+http.ListenAndServe(&quot;:8888&quot;, nil)
+</code></pre>
+
+<p>Run the program, <a href="http://localhost:8888/debug/pprof/mutex?debug=1">http://localhost:8888/debug/pprof/mutex</a> will
+serve the mutex profile. Then, you can use <code>go tool pprof</code> to examine the profile.</p>
+
+<pre><code>$ go tool pprof &lt;binary&gt; http://localhost:8888/debug/pprof/mutex?debug=1
+Fetching profile from http://localhost:8888/debug/pprof/mutex
+Saved profile in /Users/jbd/pprof/pprof.mutexprofile.localhost:8888.contentions.delay.002.pb.gz
+Entering interactive mode (type &quot;help&quot; for commands)
+(pprof) list
+Total: 27.15s
+ROUTINE ======================== main.main.func1 in /Users/jbd/src/hello/mutexprofile/main.go
+         0     27.15s (flat, cum)   100% of Total
+         .          .     18:		go func() {
+         .          .     19:			mu.Lock()
+         .          .     20:			defer mu.Unlock()
+         .          .     21:
+         .          .     22:			items[i] = struct{}{}
+         .     27.15s     23:		}()
+         .          .     24:	}
+         .          .     25:	http.ListenAndServe(&quot;:8888&quot;, nil)
+         .          .     26:}
+ROUTINE ======================== runtime.goexit in /Users/jbd/go/src/runtime/asm_amd64.s
+         0     27.15s (flat, cum)   100% of Total
+         .          .   2179:	RET
+         .          .   2180:
+         .          .   2181:// The top-most function running on a goroutine
+         .          .   2182:// returns to goexit+PCQuantum.
+         .          .   2183:TEXT runtime·goexit(SB),NOSPLIT,$0-0
+         .     27.15s   2184:	BYTE	$0x90	// NOP
+         .          .   2185:	CALL	runtime·goexit1(SB)	// does not return
+         .          .   2186:	// traceback from goexit1 must hit code range of goexit
+         .          .   2187:	BYTE	$0x90	// NOP
+         .          .   2188:
+         .          .   2189:TEXT runtime·prefetcht0(SB),NOSPLIT,$0-8
+ROUTINE ======================== sync.(*Mutex).Unlock in /Users/jbd/go/src/sync/mutex.go
+    27.15s     27.15s (flat, cum)   100% of Total
+         .          .    121:			return
+         .          .    122:		}
+         .          .    123:		// Grab the right to wake someone.
+         .          .    124:		new = (old - 1&lt;&lt;mutexWaiterShift) | mutexWoken
+         .          .    125:		if atomic.CompareAndSwapInt32(&amp;m.state, old, new) {
+    27.15s     27.15s    126:			runtime_Semrelease(&amp;m.sema)
+         .          .    127:			return
+         .          .    128:		}
+         .          .    129:		old = m.state
+         .          .    130:	}
+         .          .    131:}
+</code></pre>
+
+<p>The fraction is automatically set in tests if <code>-mutexprofile</code> is used. Set
+the flag to write the profile to a file.</p>
+
+<pre><code>go test -mutexprofile=mutex.out
+</code></pre>
+
+<p>Then, the pprof tool can be used to examine the recorded profile.</p>
+
+<pre><code>go tool pprof &lt;test.binary&gt; mutex.out
+</code></pre>
+
+<p>See the <a href="http://beta.golang.org/pkg/runtime/pprof/">runtime/pprof</a> package for more details about profiling
+and the predefined profiles.</p>
+
+<p><a href="https://talks.golang.org/2017/state-of-go.slide#23">The State of Go 2017 talk</a>
+also contains a guide how to run benchmarks while capturing the mutex profile. It is worth to take a
+look if you are willing to write benchmarks.</p>
+
+<p>Happy profiling!</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/default-gopath/">
+        The default GOPATH
+      </a>
+    </h1>
+
+    <span class="post-date">Wed, Dec 14, 2016</span>
+
+    <p>Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.</p>
+
+<p>The requirement of setting a GOPATH has been a major issue for Go users
+who installed the Go tools for the first time and got the
+&ldquo;you have to set a GOPATH&rdquo; error in their initial experience with the tools.
+Explaining the GOPATH is and instructing how to set this env variable were both
+distracting new users away from using Go. This was especially true for users who
+are not necessarily developing in Go but using <code>go get</code> to download commands.</p>
+
+<p>Go 1.8 is introducing a <a href="https://github.com/golang/go/issues/17262">default GOPATH</a>.
+If you don&rsquo;t set one, the tools will use the default. Default GOPATH is:</p>
+
+<ul>
+<li>$HOME/go on Unix-like systems</li>
+<li>%USERPROFILE%\go on Windows</li>
+</ul>
+
+<p>Even though you don&rsquo;t have care about setting this variable, there are few items
+that still requires your attention.</p>
+
+<ul>
+<li>Users still need to add $GOPATH/bin into their PATH to run binaries installed by
+<code>go get</code> and <code>go install</code>.</li>
+<li>The users who are developing with the Go language still need to understand
+that the presence of GOPATH, its location and its structure.</li>
+<li>If your GOROOT (the location where you checkout the Go&rsquo;s source code)
+is the default GOPATH and if you don&rsquo;t have a GOPATH set, the
+tools will reject to use the default GOPATH not to corrupt your GOROOT.</li>
+</ul>
+
+<p>You still may prefer to <a href="https://golang.org/wiki/SettingGOPATH">set a custom GOPATH</a>
+if the default is not working for you.</p>
+
+<p>If a custom GOPATH is set, <code>go env GOPATH</code> will report its value.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/http2push/">
+        HTTP/2 Server Push
+      </a>
+    </h1>
+
+    <span class="post-date">Sat, Dec 10, 2016</span>
+
+    <p>Go 1.8 is going to feature support for HTTP/2 server push.</p>
+
+<p>HTTP/2 has many features designed to make the Web faster. One of those features
+is the server push, the ability to send resources before the client asks for it.
+This feature enables websites to push assets like JavaScript and CSS files
+before waiting for the web page to be loaded and asking for those resources.</p>
+
+<p><code>net/http</code> package will support server push by exposing a <a href="https://tip.golang.org/pkg/net/http/#Pusher">Pusher API</a>
+that will be supported by HTTP/2 ResponseWriters. This interface is only implemented when HTTP/2 is available.</p>
+
+<p>In the following handler, we will push <code>main.js</code> rather than waiting for the page to load
+and invoke the request itself.</p>
+
+<pre><code class="language-go">const indexHTML = `&lt;html&gt;
+&lt;head&gt;
+	&lt;title&gt;Hello&lt;/title&gt;
+	&lt;script src=&quot;/main.js&quot;&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+`
+
+http.HandleFunc(&quot;/&quot;, func(w http.ResponseWriter, r *http.Request) {
+    if r.URL.Path != &quot;/&quot; {
+        http.NotFound(w, r)
+        return
+    }
+    pusher, ok := w.(http.Pusher)
+    if ok { // Push is supported. Try pushing rather than waiting for the browser.
+        if err := pusher.Push(&quot;/main.js&quot;, nil); err != nil {
+            log.Printf(&quot;Failed to push: %v&quot;, err)
+        }
+    }
+    fmt.Fprintf(w, indexHTML)
+})
+</code></pre>
+
+<p>In the Network tab, you can see that the JavaScript file is loaded by server push rather
+than a GET request.</p>
+
+<p><img src="/img/http2push.png" alt="Push" /></p>
+
+<p>Push support will be available in Go 1.8
+that is available as <a href="(https://groups.google.com/forum/#!topic/golang-nuts/QYuo0fai6YE)">beta</a>,
+download and give this a try. A full sample program can by found on <a href="https://gist.github.com/rakyll/eec415977f85d50a493ca8472ba97b68">this gist</a>.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/deprecated/">
+        Deprecation notices in Go
+      </a>
+    </h1>
+
+    <span class="post-date">Thu, Dec 8, 2016</span>
+
+    <p>In Go, for a long time, we didn&rsquo;t have a convention to label the deprecated APIs.
+In the past years, there is new convention emerged to add deprecation notices to the docs.</p>
+
+<p>Today, standard library uses this specific format.</p>
+
+<p>As an example, Go 1.8 deprecates <a href="https://tip.golang.org/pkg/database/sql/driver/#Execer"><code>sql/driver.Execer</code></a>
+and adds a deprecation notice to its godoc.</p>
+
+<pre><code>// Execer is an optional interface that may be implemented by a Conn.
+//
+// If a Conn does not implement Execer, the sql package's DB.Exec will
+// first prepare a query, execute the statement, and then close the
+// statement.
+//
+// Exec may return ErrSkip.
+//
+// Deprecated: Drivers should implement ExecerContext instead (or additionally).
+type Execer interface {
+	Exec(query string, args []Value) (Result, error)
+}
+</code></pre>
+
+<p>The deprecation notice should be in the godoc, begin with string &ldquo;Deprecated: &ldquo; and follow with
+a tip for replacement.</p>
+
+<pre><code>// Deprecated: Use strings.HasPrefix instead.
+</code></pre>
+
+<p>User are expected to follow the tip and switch to the new recommended API.</p>
+
+<p>Additional to the notices, there is an effort going on to discourage users
+to keep depending on the deprecated APIs.</p>
+
+<p>See the following items for the ongoing work:</p>
+
+<ul>
+<li><a href="https://github.com/golang/go/issues/17056">Proposal to hide deprecated APIs by default</a></li>
+<li><a href="https://github.com/golang/gddo/issues/456">Hiding deprecated APIs on godoc.org</a></li>
+<li><a href="https://github.com/golang/lint/issues/238">Reporting deprecated APIs with golint</a></li>
+</ul>
+
+<p>In conclusion, please use this specific format to add deprecation notices. Not &ldquo;DEPRECATED&rdquo; or
+not &ldquo;This type is deprecated&rdquo;. Soon, you will be able to enjoy the tooling support that yells at your
+users to stop depending on your deprecated APIs.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/leakingctx/">
+        Using contexts to avoid leaking goroutines
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Oct 25, 2016</span>
+
+    <p>The <a href="https://godoc.org/pkg/context">context</a> package makes it possible
+to manage a chain of calls within the same call path by signaling context&rsquo;s
+Done channel.</p>
+
+<p>In this article, we will examine how to use the context package to
+avoid leaking goroutines.</p>
+
+<p>Assume, you have a function that starts a goroutine internally. Once this
+function is called, the caller may not be able to terminate the goroutine
+started by the function.</p>
+
+<pre><code class="language-go">// gen is a broken generator that will leak a goroutine.
+func gen() &lt;-chan int {
+	ch := make(chan int)
+	go func() {
+		var n int
+		for {
+			ch &lt;- n
+			n++
+		}
+	}()
+	return ch
+}
+</code></pre>
+
+<p>The generator above starts a goroutine with an infinite loop,
+but the caller consumes the values until n is equal to 5.</p>
+
+<pre><code class="language-go">// The call site of gen doesn't have a 
+for n := range gen() {
+    fmt.Println(n)
+    if n == 5 {
+        break
+    }
+}
+</code></pre>
+
+<p>Once the caller is done with the generator (when it breaks the loop),
+the goroutine will run forever executing the infinite loop. Our code
+will leak a goroutine.</p>
+
+<p>We can avoid the problem by signaling the internal goroutine with a
+stop channel but there is a better solution: cancellable contexts.
+The generator can select on a context&rsquo;s Done channel and once the context is
+done, the internal goroutine can be cancelled.</p>
+
+<pre><code class="language-go">// gen is a generator that can be cancellable by cancelling the ctx.
+func gen(ctx context.Context) &lt;-chan int {
+	ch := make(chan int)
+	go func() {
+		var n int
+		for {
+			select {
+			case &lt;-ctx.Done():
+				return // avoid leaking of this goroutine when ctx is done.
+			case ch &lt;- n:
+				n++
+			}
+		}
+	}()
+	return ch
+}
+</code></pre>
+
+<p>Now, the caller can signal the generator when it is done consuming.
+Once cancel function is called, the internal goroutine will be returned.</p>
+
+<pre><code>ctx, cancel := context.WithCancel(context.Background())
+defer cancel() // make sure all paths cancel the context to avoid context leak
+
+for n := range gen(ctx) {
+    fmt.Println(n)
+    if n == 5 {
+        cancel()
+        break
+    }
+}
+
+// ...
+</code></pre>
+
+<p>The full program is available as a <a href="https://gist.github.com/rakyll/1aa860377dab8fd445431bbb3204f600">gist</a>.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/codegen/">
+        Debugging code generation in Go
+      </a>
+    </h1>
+
+    <span class="post-date">Sat, Oct 15, 2016</span>
+
+    
+
+<p><em>Last week, I was at <a href="http://www.dotgo.eu/">dotGo</a>, participating one of the
+finest Go conferences and catching up with gophers from the other side of the
+Atlantic. I gave a very short lightning talk about inspection of code generation
+with the tools already available in the toolchain. This post goes through the talk for
+those who didn&rsquo;t have the privilege to be at the conference. Slides are also
+available at <a href="https://go-talks.appspot.com/github.com/rakyll/talks/gcinspect/talk.slide">go-talks</a>.</em></p>
+
+<p>Throughout this article, we will use the following program:</p>
+
+<pre><code>package main
+
+import &quot;fmt&quot;
+
+func main() {
+    sum := 1 + 1
+    fmt.Printf(&quot;sum: %v\n&quot;, sum)
+}
+</code></pre>
+
+<h3 id="toolchain">Toolchain</h3>
+
+<p>Go build is a command that encapsulates tons of things for the user.
+But, it also provides more detailed information about what it does if you ask for it.
+<code>-x</code> is a flag that makes go build output what is being invoked.
+If you want to see what the components of the toolchain are,
+which sequence they are invoked and which flags being used, use <code>-x</code>.</p>
+
+<pre><code>$ go build -x
+WORK=/var/folders/00/1b8h8000h01000cxqpysvccm005d21/T/go-build190726544
+mkdir -p $WORK/hello/_obj/
+mkdir -p $WORK/hello/_obj/exe/
+cd /Users/jbd/src/hello
+/Users/jbd/go/pkg/tool/darwin_amd64/compile -o $WORK/hello.a -trimpath $WORK -p main -complete -buildid d934a5702088e0fe5c931a55ff26bec87b80cbdc -D _/Users/jbd/src/hello -I $WORK -pack ./hello.go
+cd .
+/Users/jbd/go/pkg/tool/darwin_amd64/link -o $WORK/hello/_obj/exe/a.out -L $WORK -extld=clang -buildmode=exe -buildid=d934a5702088e0fe5c931a55ff26bec87b80cbdc $WORK/hello.a
+mv $WORK/hello/_obj/exe/a.out hello
+</code></pre>
+
+<h3 id="intermediate-assembly">Intermediate assembly</h3>
+
+<p>In Go, there is an intermediate assembly phase before generating the actual arch-specific assembly.
+The compiler takes some Go files, generates the intermediate instructions and escalates it to the <code>obj</code> package to generate the machine code.
+If you are curious about what compiler generates in this phase, <code>-S</code> makes the compiler dump the output.</p>
+
+<p>The intermediate assembly is generally a good reference to understand the cost of a Go line.
+Or it could be be a great reference if you want to replace, let&rsquo;s say, a Go function with a more optimized assembly equivalent.</p>
+
+<p>You are seeing the output for the main.main here.</p>
+
+<pre><code>$ go build -gcflags=&quot;-S&quot;
+# hello
+&quot;&quot;.main t=1 size=179 args=0x0 locals=0x60
+    0x0000 00000 (/Users/jbd/src/hello/hello.go:5)  TEXT    &quot;&quot;.main(SB), $96-0
+    0x0000 00000 (/Users/jbd/src/hello/hello.go:5)  MOVQ    (TLS), CX
+    0x0009 00009 (/Users/jbd/src/hello/hello.go:5)  CMPQ    SP, 16(CX)
+    0x000d 00013 (/Users/jbd/src/hello/hello.go:5)  JLS 169
+    0x0013 00019 (/Users/jbd/src/hello/hello.go:5)  SUBQ    $96, SP
+    0x0017 00023 (/Users/jbd/src/hello/hello.go:5)  MOVQ    BP, 88(SP)
+    0x001c 00028 (/Users/jbd/src/hello/hello.go:5)  LEAQ    88(SP), BP
+    0x0021 00033 (/Users/jbd/src/hello/hello.go:5)  FUNCDATA    $0, gclocals·69c1753bd5f81501d95132d08af04464(SB)
+    0x0021 00033 (/Users/jbd/src/hello/hello.go:5)  FUNCDATA    $1, gclocals·e226d4ae4a7cad8835311c6a4683c14f(SB)
+    0x0021 00033 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $2, &quot;&quot;.autotmp_1+64(SP)
+    0x002a 00042 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $0, &quot;&quot;.autotmp_0+72(SP)
+    0x0033 00051 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $0, &quot;&quot;.autotmp_0+80(SP)
+    0x003c 00060 (/Users/jbd/src/hello/hello.go:7)  LEAQ    type.int(SB), AX
+    0x0043 00067 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, (SP)
+    0x0047 00071 (/Users/jbd/src/hello/hello.go:7)  LEAQ    &quot;&quot;.autotmp_1+64(SP), AX
+    0x004c 00076 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, 8(SP)
+    0x0051 00081 (/Users/jbd/src/hello/hello.go:7)  PCDATA  $0, $1
+    0x0051 00081 (/Users/jbd/src/hello/hello.go:7)  CALL    runtime.convT2E(SB)
+    0x0056 00086 (/Users/jbd/src/hello/hello.go:7)  MOVQ    16(SP), AX
+    0x005b 00091 (/Users/jbd/src/hello/hello.go:7)  MOVQ    24(SP), CX
+    0x0060 00096 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, &quot;&quot;.autotmp_0+72(SP)
+    0x0065 00101 (/Users/jbd/src/hello/hello.go:7)  MOVQ    CX, &quot;&quot;.autotmp_0+80(SP)
+    0x006a 00106 (/Users/jbd/src/hello/hello.go:7)  LEAQ    go.string.&quot;sum: %v\n&quot;(SB), AX
+    0x0071 00113 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, (SP)
+    0x0075 00117 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $8, 8(SP)
+    0x007e 00126 (/Users/jbd/src/hello/hello.go:7)  LEAQ    &quot;&quot;.autotmp_0+72(SP), AX
+    0x0083 00131 (/Users/jbd/src/hello/hello.go:7)  MOVQ    AX, 16(SP)
+    0x0088 00136 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $1, 24(SP)
+    0x0091 00145 (/Users/jbd/src/hello/hello.go:7)  MOVQ    $1, 32(SP)
+    0x009a 00154 (/Users/jbd/src/hello/hello.go:7)  PCDATA  $0, $1
+    0x009a 00154 (/Users/jbd/src/hello/hello.go:7)  CALL    fmt.Printf(SB)
+    0x009f 00159 (/Users/jbd/src/hello/hello.go:8)  MOVQ    88(SP), BP
+    0x00a4 00164 (/Users/jbd/src/hello/hello.go:8)  ADDQ    $96, SP
+    0x00a8 00168 (/Users/jbd/src/hello/hello.go:8)  RET
+    0x00a9 00169 (/Users/jbd/src/hello/hello.go:8)  NOP
+    0x00a9 00169 (/Users/jbd/src/hello/hello.go:5)  PCDATA  $0, $-1
+    0x00a9 00169 (/Users/jbd/src/hello/hello.go:5)  CALL    runtime.morestack_noctxt(SB)
+    0x00ae 00174 (/Users/jbd/src/hello/hello.go:5)  JMP 0
+    ...
+</code></pre>
+
+<p>If you would like to learn more insights about the intermediate assembly and why
+it is significant in Go, I highly recommend
+<a href="https://www.youtube.com/watch?v=KINIAgRpkDA">Rob Pike&rsquo;s The Design of the Go Assembler</a>
+from GopherCon this year.</p>
+
+<h3 id="disassembler">Disassembler</h3>
+
+<p>As I mentioned, <code>-S</code> is only for the intermediate assembly. The actual machine representation is available in the final artifact.
+You can use a disassembler to examine what&rsquo;s inside.
+Use <code>go tool objdump</code> with a binary or library. You probably also want to use <code>-s</code> to focus by symbol name.
+In this example, I am dumping the main.main. This is the actual assembly generated for <code>darwin/amd64</code>.</p>
+
+<pre><code>$ go tool objdump -s main.main hello
+TEXT main.main(SB) /Users/jbd/src/hello/hello.go
+    hello.go:5  0x2040  65488b0c25a0080000  GS MOVQ GS:0x8a0, CX
+    hello.go:5  0x2049  483b6110            CMPQ 0x10(CX), SP
+    hello.go:5  0x204d  0f8696000000        JBE 0x20e9
+    hello.go:5  0x2053  4883ec60            SUBQ $0x60, SP
+    hello.go:5  0x2057  48896c2458          MOVQ BP, 0x58(SP)
+    hello.go:5  0x205c  488d6c2458          LEAQ 0x58(SP), BP
+    hello.go:7  0x2061  48c744244002000000  MOVQ $0x2, 0x40(SP)
+    hello.go:7  0x206a  48c744244800000000  MOVQ $0x0, 0x48(SP)
+    hello.go:7  0x2073  48c744245000000000  MOVQ $0x0, 0x50(SP)
+    hello.go:7  0x207c  488d053d4d0800      LEAQ 0x84d3d(IP), AX
+    ...
+</code></pre>
+
+<h3 id="symbols">Symbols</h3>
+
+<p>Sometimes, all you need is to check the symbols rather than understand the code or data sections.
+Similar to the general-purpose nm tool, Go distributes an nm which allows you to list the symbols in an artifact with annotations and size.
+Pretty handy if you want to see what&rsquo;s in and being exported from a Go binary or library.</p>
+
+<pre><code>$ go tool nm hello
+...
+f4760 B __cgo_init
+f4768 B __cgo_notify_runtime_init_done
+f4770 B __cgo_thread_start
+4fb70 T __rt0_amd64_darwin
+4e220 T _gosave
+4fb90 T _main
+ad1e0 R _masks
+4fd00 T _nanotime
+4e480 T _setg_gcc
+ad2e0 R _shifts
+624a0 T errors.(*errorString).Error
+62400 T errors.New
+52470 T fmt.(*buffer).WriteRune
+...
+</code></pre>
+
+<h3 id="optimizations">Optimizations</h3>
+
+<p>With the contribution of the new SSA backend, the team contributed a tool that visualizes all the SSA passes.
+Set the GOSSAFUNC env variable with a func name and run the go build command.
+It will generate an ssa.html file that shows all the steps the compiler has gone through to optimize your code.</p>
+
+<pre><code>$ GOSSAFUNC=main go build &amp;&amp; open ssa.html
+</code></pre>
+
+<p>Here, there is a visualization of all the passes applied to the main function.</p>
+
+<p><img src="/img/ssa.png" alt="SSA optimizations" /></p>
+
+<p>The Go compiler can also annotate the inlining and escape analysis.
+If you pass the <code>-m=2</code> flag to the compiler, it will output the optimizations or annotations related to these two.
+Here we see the <code>net/context</code> package related inlining operations and escape analysis.</p>
+
+<pre><code>$ go build -gcflags=&quot;-m&quot; golang.org/x/net/context
+# golang.org/x/net/context
+../golang.org/x/net/context/context.go:140: can inline Background as: func() Context { return background }
+../golang.org/x/net/context/context.go:149: can inline TODO as: func() Context { return todo }
+../golang.org/x/net/context/go17.go:32: cannot inline WithCancel: non-leaf function
+../golang.org/x/net/context/go17.go:46: cannot inline WithDeadline: non-leaf function
+../golang.org/x/net/context/go17.go:61: cannot inline WithTimeout: non-leaf function
+../golang.org/x/net/context/go17.go:62: inlining call to time.Time.Add method(time.Time) func(time.Duration) time.Time { time.t·2.sec += int64(time.d·3 / time.Duration(1000000000)); var time.nsec·4 int32; time.nsec·4 = &lt;N&gt;; time.nsec·4 = time.t·2.nsec + int32(time.d·3 % time.Duration(1000000000)); if time.nsec·4 &gt;= int32(1000000000) { time.t·2.sec++; time.nsec·4 -= int32(1000000000) } else { if time.nsec·4 &lt; int32(0) { time.t·2.sec--; time.nsec·4 += int32(1000000000) } }; time.t·2.nsec = time.nsec·4; return time.t·2 }
+../golang.org/x/net/context/go17.go:70: cannot inline WithValue: non-leaf function
+../golang.org/x/net/context/context.go:141: background escapes to heap
+../golang.org/x/net/context/context.go:141:     from ~r0 (return) at ../golang.org/x/net/context/context.go:140
+../golang.org/x/net/context/context.go:150: todo escapes to heap
+../golang.org/x/net/context/context.go:150:     from ~r0 (return) at ../golang.org/x/net/context/context.go:149
+../golang.org/x/net/context/go17.go:33: parent escapes to heap
+../golang.org/x/net/context/go17.go:33:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:33
+../golang.org/x/net/context/go17.go:32: leaking param: parent
+../golang.org/x/net/context/go17.go:32:     from parent (interface-converted) at ../golang.org/x/net/context/go17.go:33
+../golang.org/x/net/context/go17.go:32:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:33
+../golang.org/x/net/context/go17.go:47: parent escapes to heap
+../golang.org/x/net/context/go17.go:47:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:47
+../golang.org/x/net/context/go17.go:46: leaking param: parent
+../golang.org/x/net/context/go17.go:46:     from parent (interface-converted) at ../golang.org/x/net/context/go17.go:47
+../golang.org/x/net/context/go17.go:46:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:47
+../golang.org/x/net/context/go17.go:46: leaking param: deadline
+../golang.org/x/net/context/go17.go:46:     from deadline (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:46
+../golang.org/x/net/context/go17.go:48: ctx escapes to heap
+../golang.org/x/net/context/go17.go:48:     from ~r2 (return) at ../golang.org/x/net/context/go17.go:46
+../golang.org/x/net/context/go17.go:61: leaking param: parent
+../golang.org/x/net/context/go17.go:61:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:61
+../golang.org/x/net/context/go17.go:71: parent escapes to heap
+../golang.org/x/net/context/go17.go:71:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:71
+../golang.org/x/net/context/go17.go:70: leaking param: parent
+../golang.org/x/net/context/go17.go:70:     from parent (interface-converted) at ../golang.org/x/net/context/go17.go:71
+../golang.org/x/net/context/go17.go:70:     from parent (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:71
+../golang.org/x/net/context/go17.go:70: leaking param: key
+../golang.org/x/net/context/go17.go:70:     from key (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:70
+../golang.org/x/net/context/go17.go:70: leaking param: val
+../golang.org/x/net/context/go17.go:70:     from val (passed to function[unknown]) at ../golang.org/x/net/context/go17.go:70
+../golang.org/x/net/context/go17.go:71: context.WithValue(parent, key, val) escapes to heap
+../golang.org/x/net/context/go17.go:71:     from ~r3 (return) at ../golang.org/x/net/context/go17.go:70
+&lt;autogenerated&gt;:1: leaking param: .this
+&lt;autogenerated&gt;:1:  from .this.Deadline() (receiver in indirect call) at &lt;autogenerated&gt;:1
+&lt;autogenerated&gt;:2: leaking param: .this
+&lt;autogenerated&gt;:2:  from .this.Done() (receiver in indirect call) at &lt;autogenerated&gt;:2
+&lt;autogenerated&gt;:3: leaking param: .this
+&lt;autogenerated&gt;:3:  from .this.Err() (receiver in indirect call) at &lt;autogenerated&gt;:3
+&lt;autogenerated&gt;:4: leaking param: key
+&lt;autogenerated&gt;:4:  from .this.Value(key) (parameter to indirect call) at &lt;autogenerated&gt;:4
+&lt;autogenerated&gt;:4: leaking param: .this
+&lt;autogenerated&gt;:4:  from .this.Value(key) (receiver in indirect call) at &lt;autogenerated&gt;:4
+</code></pre>
+
+<p>You can use <code>-m</code> to see a less verbose output without reasonings, but <a href="https://twitter.com/Dr2chase/status/788353223522455552">David Chase</a> says
+even though <code>-m=2</code> is not perfect, it is often useful.</p>
+
+<p>It is worth it to mention that you often need to disable optimizations to have a simpler view of what&rsquo;s going on, since optimization can change the sequence of operations, add code, remove code or apply transformations to the code.
+With optimizations, it gets harder to map a Go line to the optimized output and it gets harder to do perf testing where you end up changing more than one thing at a time.
+Disabling optimizations is possible with <code>-N</code>, and disabling inlining is possible with <code>-l</code>.</p>
+
+<pre><code>$ go build -gcflags=&quot;-l -N&quot;
+</code></pre>
+
+<p>Once optimizations are disabled, you can debug without being affected by transformations or do perf
+testing without being affected more than one change at a time.</p>
+
+<h3 id="lexer">Lexer</h3>
+
+<p>If you are working on the lexer, the compiler provides a flag to debug
+the lexer as it goes through the source files.</p>
+
+<pre><code>$ go build -gcflags=&quot;-x&quot;
+# hello
+lex: PACKAGE
+lex: ident main
+lex: implicit semi
+lex: IMPORT
+lex: string literal
+lex: implicit semi
+lex: FUNC
+lex: ident main
+./hello.go:5 lex: TOKEN '('
+./hello.go:5 lex: TOKEN ')'
+./hello.go:5 lex: TOKEN '{'
+lex: ident sum
+./hello.go:6 lex: TOKEN COLAS
+lex: integer literal
+./hello.go:6 lex: TOKEN '+'
+lex: integer literal
+lex: implicit semi
+lex: ident fmt
+./hello.go:7 lex: TOKEN '.'
+lex: ident Printf
+./hello.go:7 lex: TOKEN '('
+lex: string literal
+./hello.go:7 lex: TOKEN ','
+lex: ident sum
+./hello.go:7 lex: TOKEN ')'
+lex: implicit semi
+./hello.go:8 lex: TOKEN '}'
+lex: implicit semi
+</code></pre>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/human-first/">
+        Keeping Go a human-first language
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Oct 11, 2016</span>
+
+    <p><em>Disclaimer: I forked my opinions on this one from a barely readable Twitter thread
+and wanted to write it down how I feel about keeping the language internals away
+from the users, especially from the newcomers. This is not a skill-level concern,
+it is a core goal of Go to provide a high-level programming language that saves users from
+excessive mental overhead. Note that these
+are personal opinions and are not written on the behalf of a group.</em></p>
+
+<p>Go is a highly opiniated language when it comes to API design,
+readability and human-first approach.
+It is critical to understand these aspects and the history of the language
+before deep diving into more.</p>
+
+<p>Go is created at Google to make engineers more productive and do more without
+mental overload. Go wishes that behavior is predictable from a human perspective,
+rather than humans are being enforced to think like machines to be efficient and productive.
+Go sets the same high bar for its runtime. Go wishes to be good enough
+to be doing the right for the most of the time &ndash; anything else can be optimized.</p>
+
+<p>It is highly critical for us to keep Go users having
+high expectations that things will work out of the box, and escalating major problems
+to the team where the promise is not matching the actual behavior. Go is far away from being
+a perfect language. It is important not to be sold so quickly and participate in the future of the
+language if you are already skilled to understand the internals and their pitfalls.</p>
+
+<p>I encourage our users to <a href="https://golang.org/issues/new">report bugs</a> rather than creating
+extensive documentation around how to hack the current limitations for the short-term gain.
+There is much space for improvement in Go and the team desperately needs actual feedback from
+actual users to commit work in the right direction.
+Go needs to understand its users rather than users having to understand
+every aspect of the language. This is the only scalable
+approach.</p>
+
+<p>Maybe along the way, our core goal of creating a human-first language will
+be challenged, but I believe Go has proven that a language can be high-level,
+precise and performant at the same time. I see no reason we should give up on this
+so quickly. I apologize on the behalf of everyone involved in Go for a long time
+to forget that this specific language goal needs to keep being communicated better.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/go-tool-flags/">
+        Go tooling essentials
+      </a>
+    </h1>
+
+    <span class="post-date">Sun, Sep 25, 2016</span>
+
+    
+
+<p>New to the Go tools? Or do you want to expand your knowledge? This article is
+about the flags for the Go tools everyone should know.</p>
+
+<p><em>Disclaimer: This article might be slightly biased. This is a collection of
+flags I personally use and flags people around me having trouble finding references for.
+If you have more ideas, ping me on <a href="https://twitter.com/rakyll">Twitter</a>.</em></p>
+
+<h3 id="go-build-x">$ go build -x</h3>
+
+<p><code>-x</code> lists all the commands go build invokes.</p>
+
+<p>If you are curious about the Go toolchain, or using a cross-C compiler and
+wondering about flags passed to the external compiler, or suspicious about
+a linker bug; use <code>-x</code> to see all the invocations.</p>
+
+<pre><code>$ go build -x
+WORK=/var/folders/00/1b8h8000h01000cxqpysvccm005d21/T/go-build600909754
+mkdir -p $WORK/hello/perf/_obj/
+mkdir -p $WORK/hello/perf/_obj/exe/
+cd /Users/jbd/src/hello/perf
+/Users/jbd/go/pkg/tool/darwin_amd64/compile -o $WORK/hello/perf.a -trimpath $WORK -p main -complete -buildid bbf8e880e7dd4114f42a7f57717f9ea5cc1dd18d -D _/Users/jbd/src/hello/perf -I $WORK -pack ./perf.go
+cd .
+/Users/jbd/go/pkg/tool/darwin_amd64/link -o $WORK/hello/perf/_obj/exe/a.out -L $WORK -extld=clang -buildmode=exe -buildid=bbf8e880e7dd4114f42a7f57717f9ea5cc1dd18d $WORK/hello/perf.a
+mv $WORK/hello/perf/_obj/exe/a.out perf
+</code></pre>
+
+<h3 id="go-build-gcflags">$ go build -gcflags</h3>
+
+<p>Used to pass flags to the Go compiler. <code>go tool compile -help</code> lists all
+the flags that can be passed to the compiler.</p>
+
+<p>For example, to disable compiler optimizations and inlining, you can use
+the following the gcflags.</p>
+
+<pre><code>$ go build -gcflags=&quot;-N -l&quot;
+</code></pre>
+
+<h3 id="go-test-v">$ go test -v</h3>
+
+<p>It provides chatty output for the testing. It prints the test name,
+its status (failed or passed), how much it took to run the test, any logs
+from the test case, etc.</p>
+
+<p>go test without the <code>-v</code> flag is highly quiet, I always use it with <code>-v</code> turned on.
+Sample output:</p>
+
+<pre><code>$ go test -v context
+=== RUN   TestBackground
+--- PASS: TestBackground (0.00s)
+=== RUN   TestTODO
+--- PASS: TestTODO (0.00s)
+=== RUN   TestWithCancel
+--- PASS: TestWithCancel (0.10s)
+=== RUN   TestParentFinishesChild
+--- PASS: TestParentFinishesChild (0.00s)
+=== RUN   TestChildFinishesFirst
+--- PASS: TestChildFinishesFirst (0.00s)
+=== RUN   TestDeadline
+--- PASS: TestDeadline (0.16s)
+=== RUN   TestTimeout
+--- PASS: TestTimeout (0.16s)
+=== RUN   TestCanceledTimeout
+--- PASS: TestCanceledTimeout (0.10s)
+...
+PASS
+ok  	context	2.426s
+</code></pre>
+
+<h3 id="go-test-race">$ go test -race</h3>
+
+<p><a href="https://blog.golang.org/race-detector">Go&rsquo;s race detector</a> is available
+from the Go tools via <code>-race</code>. go test also supports this flag and reports races.
+Use this flag during development to detect the races.</p>
+
+<h3 id="go-test-run">$ go test -run</h3>
+
+<p>You can filter tests to run by regex and the <code>-run</code> flag. The following command
+will only <a href="https://blog.golang.org/examples">test examples</a>.</p>
+
+<pre><code>$ go test -run=Example
+</code></pre>
+
+<h3 id="go-test-coverprofile">$ go test -coverprofile</h3>
+
+<p>You can output a cover profile as you are testing a package, then use go tool to
+visualize them on a browser.</p>
+
+<pre><code>$ go test -coverprofile=c.out &amp;&amp; go tool cover -html=c.out
+</code></pre>
+
+<p>The command above will create a coverage profile and open the results page in
+the browser. The visualized results will look like the page below:</p>
+
+<p><img src="/img/context-coverage.png" alt="context coverage" /></p>
+
+<h3 id="go-test-exec">$ go test -exec</h3>
+
+<p>It is a lesser known feature in Go that you can intercept the tools with another
+program by using the <code>-exec</code> flag. This flag allows you to delegate some work to an
+external program from the Go tool.</p>
+
+<p>A commonly required scenario for this flag is when you need more than just executing
+the tests on the host machine. The Android builder for Go, uses <code>-exec</code> to push the
+test binaries to an Android device by using <code>adb</code> and collects the results.
+<a href="https://github.com/golang/go/blob/master/misc/android/go_android_exec.go">Android exec program</a>
+can be used as a reference.</p>
+
+<h3 id="go-get-u">$ go get -u</h3>
+
+<p>If you run go-get for a package that is already in your GOPATH, go-get
+is not going to update the package to its latest version.
+<code>-u</code> forces the tool to sync with the latest version of the repo.</p>
+
+<p>If you are a library author, you might like to write your installation
+instructions with a <code>-u</code> flag, e.g. the way <a href="https://github.com/golang/lint#installation">golint</a> does.</p>
+
+<pre><code>$ go get -u github.com/golang/lint/golint
+</code></pre>
+
+<h3 id="go-get-d">$ go get -d</h3>
+
+<p>If you just want to clone a repo to your GOPATH and skip the building
+and installation phase, use <code>-d</code>. It downloads the package and stops
+before trying to build or install it.</p>
+
+<p>I often use it as a replacement for git clone for repos with vanity URLs,
+because it clones the repo to its proper GOPATH.
+For example,</p>
+
+<pre><code>$ go get -d golang.org/x/oauth2/...
+</code></pre>
+
+<p>will clone the package to $GOPATH/src/golang.org/x/oauth2. Given golang.org/x/oauth2 is a
+vanity URL, go-getting the repo is useful rather than trying to figure out
+where the actual repo is (go.googlesource.com/oauth2).</p>
+
+<h3 id="go-get-t">$ go get -t</h3>
+
+<p>If your package has additional dependencies for tests, <code>-t</code> will allow you to
+download them during go-get.
+If you don&rsquo;t pass <code>-t</code>, go get will only download the dependencies for your non-test code.</p>
+
+<h3 id="go-list-f">$ go list -f</h3>
+
+<p>Allows you to list Go packages with a custom format. It is highly useful
+for writing bash scripts.</p>
+
+<p>The following command will print the dependencies of the runtime package:</p>
+
+<pre><code>go list -f '{{.Deps}}' runtime
+[runtime/internal/atomic runtime/internal/sys unsafe]
+</code></pre>
+
+<p>More formatting ideas can be found at
+<a href="http://dave.cheney.net/2014/09/14/go-list-your-swiss-army-knife">Dave Cheney&rsquo;s article</a> on <code>go list</code>.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/examples-coverage/">
+        Examples coverage
+      </a>
+    </h1>
+
+    <span class="post-date">Thu, Sep 8, 2016</span>
+
+    <p>Go programming language provides many unique good features to <a href="https://blog.golang.org/examples">
+write and maintain examples</a> for your packages backed by the testing tools.</p>
+
+<p>As an addition to the test coverage and test coverage report, <code>go test</code>
+also can provide coverage for testable examples.</p>
+
+<p>Use the following commands in your package to use the
+<code>-run</code> flag to only the match the example tests and view the results
+in your browser.</p>
+
+<pre><code>$ go test -v -run=Example -coverprofile=c.out &amp;&amp; go tool cover -html=c.out
+</code></pre>
+
+<p>Please note that the coverage is reported for Examples with an Output block.
+Examples without an &ldquo;Output&rdquo; block will not be tested and reported.</p>
+
+<p>Here is what the <a href="/att/example-coverage.html">coverage</a> looks like
+for the strings package from the stdlib.</p>
+
+<p>High example coverage is probably not a necessary signal
+and not all lines are supposed to be documented with an example
+but it might give you an idea whether you are missing out a significant
+non-obvious case that needs to be documented
+more comprehensively.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/parallelize-test-tables/">
+        Parallelize your table-driven tests
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Sep 6, 2016</span>
+
+    <p>With Go 1.7, testing package supports sub-tests that allows you to run
+multiple smaller tests from a test case. Each sub test is reported
+independently in the <code>go test</code> output. More information about these
+recent additions can be found at <a href="https://speakerdeck.com/mpvl/advanced-testing-concepts-for-go-1-dot-7">Marcel van Lohuizen&rsquo;s recent talk</a>
+from GolangUK 2016.</p>
+
+<p>These additions to Go 1.7 enabled reporting and other testing.T
+functionality for subtests. One of the biggest contributions of the
+recent changes is to be able to use these features for table-driven tests.</p>
+
+<p>The other important feature it enables is to be able to parallelize the
+subtests (where makes sense) by using (*testing.T).Parallel().</p>
+
+<pre><code class="language-go">func TestFoo(t *testing.T) {
+	tc := []struct {
+		dur time.Duration
+	}{
+		{time.Second},
+		{2 * time.Second},
+		{3 * time.Second},
+		{4 * time.Second},
+	}
+	for _, tt := range tc {
+		tt := tt
+		t.Run(&quot;&quot;, func(st *testing.T) {
+			st.Parallel()
+			time.Sleep(tt.dur)
+		})
+	}
+}
+</code></pre>
+
+<p>The test suite above will run roughly in 4 seconds rather than 10 seconds.
+TestFoo#01, TestFoo#02, TestFoo#03 and TestFoo#04 will begin at the same
+time, will wait for <code>tt.dur</code> and be completed.</p>
+
+<pre><code>$ go test -v
+=== RUN   TestFoo
+=== RUN   TestFoo/#00
+=== RUN   TestFoo/#01
+=== RUN   TestFoo/#02
+=== RUN   TestFoo/#03
+--- PASS: TestFoo (0.00s)
+    --- PASS: TestFoo/#00 (1.00s)
+    --- PASS: TestFoo/#01 (2.00s)
+    --- PASS: TestFoo/#02 (3.00s)
+    --- PASS: TestFoo/#03 (4.00s)
+PASS
+ok  	hello/subtests	4.020s
+</code></pre>
+
+<p>If you have table driven that are free from races and are majorly blocked
+by anything other than your CPU, consider parallelizing them with the new sub tests.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/instruments/">
+        Using Instruments to profile Go programs
+      </a>
+    </h1>
+
+    <span class="post-date">Fri, Sep 2, 2016</span>
+
+    <p>Apple has a suite of instrumentation and tracing tools for performance
+analysis available as a part of their Xcode tooling set. In this article,
+we will use <a href="https://developer.apple.com/library/prerelease/content/documentation/DeveloperTools/Conceptual/InstrumentsUserGuide/">Instruments</a>
+to record and analyze the CPU profile of a Go program.</p>
+
+<p>Instruments also provide a large set of macOS-specific tracing and profiling
+if you have performance issues specifically on darwin.</p>
+
+<p>Some of these specific profiles are:</p>
+
+<ul>
+<li>System trace: Collects comprehensive information about system calls,
+scheduling, user-kernel space transitions. (Available only on OSX.)</li>
+<li>System usage: Gives very detailed output about I/O system activity.
+(Available only on iOS.)</li>
+<li>File Activity: Monitors file and directory activity such as open/close,
+permission modifications, creation, copying and moving.</li>
+</ul>
+
+<p>Instruments provide a rich and very easy to use UI to display profiles.
+I highly recommend it as an addition to existing profiler UIs and visualizers.</p>
+
+<p>Now, let&rsquo;s profile a Go program.</p>
+
+<p>Launch the Instruments app and select &ldquo;Time Profiler&rdquo;.</p>
+
+<p>Create a target with your Go binary and arguments and env variables
+you want to start the binary with. In this tutorial, I will use the
+following program.</p>
+
+<pre><code>go get -u github.com/rakyll/hey
+</code></pre>
+
+<p>We will use <code>hey</code> to make 10000 requests with 200 goroutines
+to the target provided in the arguments.</p>
+
+<p>The target I have for <code>hey</code> looks like what&rsquo;s below.</p>
+
+<p><img src="/img/instruments-target.png" alt="Instruments target" /></p>
+
+<p>Once you have a target, you can click on the record button to start
+recording samples. Once enough samples are collected, stop or it will
+eventually stop when the program finishes.</p>
+
+<p><img src="/img/instruments-results.png" alt="Instruments results" /></p>
+
+<p>You can filter by symbol name, user vs kernel callstacks, time span,
+physical or logical CPU and more. You can also double click any of the symbols listed
+to jump to the source code.</p>
+
+<p>Please note that Go programs cannot work with every profile available
+on Instruments. But there are a few profiles that absolutely can improve
+your profiling experience. With stack frame pointers enabled by default in Go 1.7,
+it became easier for tools like Instruments to capture backtraces more efficiently.</p>
+
+<p>Happy profiling!</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/grpc-streaming/">
+        Bidirectional gRPC streaming for Go
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Aug 30, 2016</span>
+
+    <p><em>Disclaimer: This article is not about a core Go package or tool but <a href="http://www.grpc.io/">gRPC</a>.</em></p>
+
+<p>gRPC provides support for implementing streaming endpoints as well as
+streaming support in their clients. Bidirectional streaming is useful
+if you want both server and client to be able to communicate
+to the other side independently in a full duplex fashion.</p>
+
+<p>In this article, I will dig into how to use the streaming gRPC
+Go client to talk to a streaming API endpoint.</p>
+
+<p>I am not expecting the readers to implement a server, hence I will use an
+existing service.
+Google has recently released the <a href="https://cloud.google.com/speech/">Cloud Speech API</a>
+which allows its users
+to caption their audio input. Speech API also supports a bidirectional
+streaming endpoint where you can sent audio data continuously as you are
+waiting on more responses from the server on another incoming channel.</p>
+
+<p>Initialize a client:</p>
+
+<pre><code class="language-go">stream, err := speech.NewSpeechClient(conn).StreamingRecognize(ctx)
+if err != nil {
+    log.Fatal(err)
+}
+</code></pre>
+
+<p>We want to pipe the stdin to the API as we are printing the results.
+Therefore, we will need two goroutines, one sending audio data to the
+service and another retrieving the results.</p>
+
+<p>The program will read from os.Stdin into an intermediate buffer and
+will immediately push the buffer to the service.</p>
+
+<pre><code class="language-go">go func() {
+    // pipe stdin to the API
+    buf := make([]byte, 1024)
+    for {
+        n, err := os.Stdin.Read(buf)
+        if err == io.EOF {
+            return // nothing else to pipe, kill this goroutine
+        }
+        if err != nil {
+            // TODO: handle the error
+            continue
+        }
+        if err = stream.Send(&amp;speech.StreamingRecognizeRequest{
+            StreamingRequest: &amp;speech.StreamingRecognizeRequest_AudioContent{
+                AudioContent: buf[:n],
+            },
+        }); err != nil {
+            // TODO: handle the error
+        }
+    }
+}()
+</code></pre>
+
+<p>At the same time, the program will start reading the responses in the
+main goroutine and print the captions as service pushes them:</p>
+
+<pre><code class="language-go">for {
+    resp, err := stream.Recv()
+    if err == io.EOF {
+        break
+    }
+    if err != nil {
+        // TODO: handle the error
+        continue
+    }
+    if resp.Error != nil {
+        // TODO: handle the error
+        continue
+    }
+    for _, result := range resp.Results {
+        fmt.Printf(&quot;result: %+v\n&quot;, result)
+    }
+}
+</code></pre>
+
+<p>The full reference is living in a <a href="https://gist.github.com/rakyll/e7082fdcbdb18ee32997aa602ca164d6">gist</a>
+where you can learn more about the initializing of the gRPC connection and more.</p>
+
+<p>Please note that the same pattern of sending and receiving can be applied to
+work with any gRPC bidirectional streaming client.</p>
+
+
+  </div>
+  
+  
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/eg/">
+        Apply transformations to Go code with eg
+      </a>
+    </h1>
+
+    <span class="post-date">Sat, Aug 27, 2016</span>
+
+    <p>If you are willing to make large scale refactoring in your
+Go programs, automating the refactoring tasks is more desirable than
+manual editing. <code>eg</code> is a program that allows you to perform transformations
+based on template Go files.</p>
+
+<p>To install the tool, run the following:</p>
+
+<pre><code>$ go get golang.org/x/tools/cmd/eg
+</code></pre>
+
+<p><code>eg</code> requires a template file to look for which transformation it should
+apply to your source code. What&rsquo;s nice is that the template file is a Go file
+with little annotations.</p>
+
+<p>Consider the following Go program:</p>
+
+<pre><code class="language-go">$ cat $GOPATH/src/hello/hello.go
+package hello
+
+import &quot;time&quot;
+
+// ExtendWith50000ns adds 50000ns to t.
+func ExtendWith50000ns(t time.Time) time.Time {
+	return t.Add(time.Duration(50000))
+}
+</code></pre>
+
+<p>Assume you want to eliminate the unnecessary time.Duration casting at ExtendWith50000ns
+and as a good practice, you would also like to add a unit to the duration rather than
+just passing 50000.</p>
+
+<p><code>eg</code> requires a template file where you define before and afters that represents the
+transformation.</p>
+
+<pre><code class="language-go">$ cat T.template
+package template
+
+import (
+    &quot;time&quot;
+)
+
+func before(t time.Time, d time.Duration) time.Time {
+    // if already time.Duration, do not cast.
+    return t.Add(time.Duration(d))
+}
+
+func after(t time.Time, d time.Duration) time.Time  {
+    return t.Add(d * time.Nanosecond)
+}
+</code></pre>
+
+<p>And run the <code>eg</code> command on your hello package to apply it at every occurrence of this pattern.</p>
+
+<pre><code>$ eg -w -t T.template hello
+=== /Users/jbd/src/hello/hello.go (1 matches)
+</code></pre>
+
+<p>Voila!</p>
+
+<p>The file now contains a duration that is not casted unnecessarily and it has a unit.</p>
+
+<pre><code class="language-go">$ cat $GOPATH/src/hello/hello.go
+package hello
+
+import &quot;time&quot;
+
+// ExtendWith50000ns adds 50000ns to t.
+func ExtendWith50000ns(t time.Time) time.Time {
+	return t.Add(50000 * time.Nanosecond)
+}
+</code></pre>
+
+<p>Note: There are many <a href="https://github.com/golang/tools/tree/master/refactor/eg/testdata">.template files</a>
+underneath the package for testing purposes but they can also be used as a
+reference how to write other transformation templates.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/swift/">
+        Calling Go from Swift
+      </a>
+    </h1>
+
+    <span class="post-date">Sat, Oct 3, 2015</span>
+
+    <p><em>Note: Swift bindings are highly experimental and subject to change.
+This work must currently be classified as preliminary work and we will
+be improving APIs in the long term.</em></p>
+
+<p>As a part of the Go Mobile, we have announced tools and packages that
+make language bindings from Java to Go and Objective-C to Go available.
+A relatively new and less documented aspect of the bindings is the
+availability of the Swift to Go calls. This tutorial will explain you
+how to make your initial Swift to Go function invocation.</p>
+
+<p>Grab the gomobile command and initialize it.</p>
+
+<pre><code>$ go get golang.org/x/mobile/cmd/gomobile
+$ gomobile init
+</code></pre>
+
+<p>In this tutorial, we will use an example Go package from the mobile repo
+called hello to generate bindings for. The hello package exports a function
+called Greetings and we will invoke this particular function from a
+Swift-based iOS app. Go get the example hello package and run <code>gomobile bind</code>
+to generate a framework bundle.</p>
+
+<pre><code>$ go get golang.org/x/mobile/example/bind/hello/...
+$ gomobile bind -target=ios golang.org/x/mobile/example/bind/hello
+</code></pre>
+
+<p>The command above is going to generate a bundle called Hello.framework on the
+current working directory which includes a multi-arch C library and a header file.</p>
+
+<p>The next step is to launch Xcode and open your existing Swift-based iOS app project.
+Drag and drop the Hello.framework to the project.
+This step will also automatically make the framework library linked to the final app product.</p>
+
+<p><img src="/img/swift-xcode.png" alt="Xcode drag and drop" /></p>
+
+<p>Once the framework bundle is imported, you are good to import the
+Hello module and invoke GoHelloGreetings which is a proxy function for
+hello.Greetings.</p>
+
+<pre><code>import UIKit
+import Hello
+class ViewController: UIViewController {
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        println(Hello.GoHelloGreetings(&quot;gopher&quot;))
+    }
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+    }
+}
+</code></pre>
+
+<p>Build and run it on your test device or the iOS simulator.
+Enjoy making your first call to Go from Swift. Please note that this is
+preliminary work and we would like to make changes to improve the APIs in the long term.
+More information and tutorials about Go Mobile are available at
+the <a href="https://golang.org/wiki/Mobile">wiki</a>.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/cross-compilation/">
+        Go cross compilation
+      </a>
+    </h1>
+
+    <span class="post-date">Tue, Sep 8, 2015</span>
+
+    
+
+<p>Note: This article extends <a href="http://dave.cheney.net/2015/03/03/cross-compilation-just-got-a-whole-lot-better-in-go-1-5">Dave Cheney’s Go 1.5 cross compilers</a> post.</p>
+
+<p>Cross compilers got easier with Go 1.5.
+You don’t have to bootstrap the standard library and toolchain as you
+used to do prior to 1.5.</p>
+
+<h3 id="if-cgo-is-not-required">If cgo is not required</h3>
+
+<p>The go tool won’t require any bootstrapping if cgo is not required.
+That allows you to target the following program to any GOOS/GOARCH without
+requiring you to do any additional work. Invoke <code>go build</code>.</p>
+
+<pre><code>$ cat main.go
+package main
+import &quot;fmt&quot;
+func main() {
+    fmt.Println(&quot;hello world&quot;)
+}
+</code></pre>
+
+<p>In order to target android/arm, run the following command.</p>
+
+<pre><code>$ GOOS=android GOARCH=arm GOARM=7 go build .
+</code></pre>
+
+<p>The produced binary is targeting ARMv7 processors that runs Android.
+All possible GOOS and GOARCH values are listed on the <a href="https://golang.org/doc/install/source#environment">environment docs</a>.</p>
+
+<h3 id="if-cgo-is-required">If cgo is required</h3>
+
+<p>If you need to have cgo enabled, the go tool allows you to provide
+custom C and C++ compilers via CC and CXX environment variables.</p>
+
+<pre><code>$ CGO_ENABLED=1 CC=android-armeabi-gcc CXX=android-armeabi-g++ \
+    GOOS=android GOARCH=arm GOARM=7 go build .
+</code></pre>
+
+<p>The toolchain will invoke android-armeabi-gcc and android-armeabi-g++
+if it is required to compile any part of the package with a C or C++ compiler.
+Consider the following program with a slightly different main function.
+Rather than outputting &ldquo;hello world&rdquo; to the standard I/O,
+it will use Android system libraries to write &ldquo;hello world&rdquo; to the system log.</p>
+
+<pre><code>$ cat main.go
+// +build android
+
+package main
+
+// #cgo LDFLAGS: -llog
+//
+// #include &lt;android/log.h&gt;
+//
+// void hello() {
+//   __android_log_print(
+//     ANDROID_LOG_INFO, &quot;MyProgram&quot;, &quot;hello world&quot;);
+// }
+import &quot;C&quot;
+func main() {
+    C.hello()
+}
+</code></pre>
+
+<p>If you build the program with the command above and examine the build
+with -x, you can observe that cgo is delegating the C compilation to
+arm-linux-androideabi-gcc.</p>
+
+<pre><code>$ CGO_ENABLED=1 \
+CC=arm-linux-androideabi-gcc \
+CXX=arm-linux-androideabi-g++ \
+GOOS=android GOARCH=arm GOARM=7 go build -x .
+...
+CGO_LDFLAGS=”-g” “-O2” “-llog” /Users/jbd/go/pkg/tool/darwin_amd64/cgo -objdir $WORK/github.com/rakyll/hello/_obj/ -importpath github.com/rakyll/hello — -I $WORK/github.com/rakyll/hello/_obj/ main.go
+arm-linux-androideabi-gcc -I . -fPIC -marm -pthread -fmessage-length=0 -print-libgcc-file-name
+arm-linux-androideabi-gcc -I . -fPIC -marm -pthread -fmessage-length=0 -I $WORK/github.com/rakyll/hello/_obj/ -g -O2 -o $WORK/github.com/rakyll/hello/_obj/_cgo_main.o -c $WORK/github.com/rakyll/hello/_obj/_cgo_main.c
+...
+</code></pre>
+
+<h3 id="pre-building-the-standard-library">Pre-building the standard library</h3>
+
+<p>The go tool also provides a utility if you would like to pre-build the
+standard library, targeting a specific GOOS and GOARCH.</p>
+
+<pre><code>$ CGO_ENABLED=1 \
+    CC=arm-linux-androideabi-gcc \
+    CXX=arm-linux-androideabi-g++ \
+    GOOS=android GOARCH=arm GOARM=7 go install std
+</code></pre>
+
+<p>The standard library targeting android/armv7 will be available at $GOROOT/pkg/android_arm.</p>
+
+<pre><code>$ ls $GOROOT/pkg/android_arm
+archive    fmt.a      math       runtime.a
+bufio.a    go         math.a     sort.a
+bytes.a    hash       mime       strconv.a
+compress   hash.a     mime.a     strings.a
+container  html       net        sync
+crypto     html.a     net.a      sync.a
+crypto.a   image      os         syscall.a
+database   image.a    os.a       testing
+debug      index      path       testing.a
+encoding   internal   path.a     text
+encoding.a io         reflect.a  time.a
+errors.a   io.a       regexp     unicode
+expvar.a   log        regexp.a   unicode.a
+flag.a     log.a      runtime
+</code></pre>
+
+<p>If you prefer not to pre-build and install the standard library to the GOROOT,
+required libraries will be built while building user packages.
+But, the standard libraries builds are not preserved for future use at this
+stage and they will be rebuilt each time you run <code>go build</code>.</p>
+
+
+  </div>
+  
+  
+  
+  <div class="post">
+    <h1 class="post-title">
+      <a href="https://rakyll.org/interface-pollution/">
+        Interface pollution in Go
+      </a>
+    </h1>
+
+    <span class="post-date">Sat, Oct 18, 2014</span>
+
+    <p>If there was a single powerful language feature in Go, it’d be the interfaces.
+The internals of Go contain strong combinations of useful ideas from various type
+systems and inevitably they ring the curiosity bells. I recently surveyed Github
+for Go interface declarations, and the results indicated that Go users pollute
+the environment with interfaces no one needs or will use.</p>
+
+<p>Don’t export any interfaces until you have to.</p>
+
+<p>Interfaces are great, but interface pollution is not so. You’re likely to come to
+Go from a language (if not from a dynamic language) that generates a static dispatch
+table during compilation, the compiler require you to explicitly tell the interfaces
+a type wants to implement. That’s how the complier can generate a vtable with pointers
+to all available virtual functions. If your background is in C++ or Java, you’re likely
+to have some baggage around initiating your codebase with abstract types and work on the
+concrete implementation as a follow-up exercise. This is not how you do it in Go.
+Introduce concrete types and don’t export any interfaces unless you have to encourage
+external packages to implement one. io package is a good starting point to study some
+of the the best practices. It exports interfaces because it also needs to export
+generic-use functions like Copy.</p>
+
+<pre><code>func Copy(dst Writer, src Reader) (written int64, err error)
+</code></pre>
+
+<p>Should your package export generic functionality? If the answer is a “maybe”,
+you’re likely to be polluting your package with an interface declaration.
+Justify the need of multiple implementations, likeliness of them to interact
+back with your package and act accordingly.</p>
+
+<p>Go doesn’t have a traditional dispatch table, and can rely on the interface values
+during a method dispatch. It’s literally more of a freestyle dispatcher mechanism
+that requires some work during interface value assignment — it generates a tiny lookup
+hash-table for the concrete type it’s pointing to. The assignment is not insanely
+expensive, so it’s a fair exchange for a more pleasant type system.
+Ian Lance Taylor has <a href="http://www.airs.com/blog/archives/277">a great blog post about the internals</a>
+if you’re looking for further reading.</p>
+
+<p>If a user requires some level of “inversion of control”, an on-the-fly interface
+definition in their own scope would just work. This possibility minimizes the
+presumptions you have to make about the way your package is being consumed and
+the initial abstractions you have to work on.</p>
+
+<p>It also applies to the testability concerns, you don’t have to provide interfaces
+to help the user to write their own stubs. Earlier today, I got a request to export
+an interface from the pubsub package to make it more mockable. Rather than doing so,
+the preferable way is to tell your user to introduce an interface that focuses on the
+calls they want to write a stub for. Point to the actual implementation via an interface value.</p>
+
+<pre><code>type acknowledger interface {
+    Ack(sub string, id ...string) error
+}
+
+type mockClient struct{}
+
+func (c *mockClient) Ack(sub string, id ...string) error {
+    return nil
+}
+
+var acker acknowledger = pubsub.New(...)
+
+acker = &amp;mockClient{} // in the test package
+</code></pre>
+
+<p>Noteworthy that, in Go, the standard library defines tiny interfaces you happen to
+implement without effort and is doing a good job at encouraging the developers to write
+compatible code with the rest of the standard library — and the other third party packages.
+Adopt what’s available in the standard library where possible and document accordingly.</p>
+
+<p>Go fascinates me each time I deeply reevaluate my experience with the interfaces.
+Given the chance of minimal fragmentation in interfaces, this is how a programming
+language make software, that isn’t designed to work together, work well together.</p>
+
+
+  </div>
+  
+  
+  
+  
+</div>
+</div>
+
+  </body>
+</html>

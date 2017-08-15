@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Perf on Go, the unwritten parts</title>
+    <link>https://rakyll.org/tags/perf/</link>
+    <description>Recent content in Perf on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
+    <lastBuildDate>Mon, 19 Dec 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/perf/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Mutex profile</title>
+      <link>https://rakyll.org/mutexprofile/</link>
+      <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/mutexprofile/</guid>
+      <description>Go 1.8 introduces a new profile, the contended mutex profile, that allows you to capture a fraction of the stack traces of goroutines with contended mutexes.
+You need to set the sampling fraction by calling runtime.SetMutexProfileFraction to a value above zero to enable collection.
+Consider the following program:
+import _ &amp;quot;net/http/pprof&amp;quot; var mu sync.Mutex var items = make(map[int]struct{}) runtime.SetMutexProfileFraction(5) for i := 0; i &amp;lt; 1000*1000; i++ { go func(i int) { mu.</description>
+    </item>
+    
+  </channel>
+</rss>

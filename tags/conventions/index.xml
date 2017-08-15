@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Conventions on Go, the unwritten parts</title>
+    <link>https://rakyll.org/tags/conventions/</link>
+    <description>Recent content in Conventions on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
+    <lastBuildDate>Thu, 08 Dec 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/conventions/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Deprecation notices in Go</title>
+      <link>https://rakyll.org/deprecated/</link>
+      <pubDate>Thu, 08 Dec 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/deprecated/</guid>
+      <description>In Go, for a long time, we didn&amp;rsquo;t have a convention to label the deprecated APIs. In the past years, there is new convention emerged to add deprecation notices to the docs.
+Today, standard library uses this specific format.
+As an example, Go 1.8 deprecates sql/driver.Execer and adds a deprecation notice to its godoc.
+// Execer is an optional interface that may be implemented by a Conn. // // If a Conn does not implement Execer, the sql package&#39;s DB.</description>
+    </item>
+    
+  </channel>
+</rss>

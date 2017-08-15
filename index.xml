@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Go, the unwritten parts</title>
+    <link>https://rakyll.org/</link>
+    <description>Recent content on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
+    <lastBuildDate>Tue, 18 Jul 2017 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The future of latency profiling in Go</title>
+      <link>https://rakyll.org/latency-profiling/</link>
+      <pubDate>Tue, 18 Jul 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/latency-profiling/</guid>
+      <description>Note: This article contains non-finalized ideas; we may end up not implementing any of this but ideally we should do work towards the direction explained here.
+Go is the language to write servers, Go is the language to write microservices. Yet, we haven&amp;rsquo;t done much in the past for the latency analysis, and observability/diagnostics of request/RPC performance.
+GopherCon 2017 was an opportunity for me to discuss our roadmap for latency analysis.</description>
+    </item>
+    
+    <item>
+      <title>Go&#39;s work-stealing scheduler</title>
+      <link>https://rakyll.org/scheduler/</link>
+      <pubDate>Sun, 16 Jul 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/scheduler/</guid>
+      <description>Go scheduler&amp;rsquo;s job is to distribute runnable goroutines over multiple worker OS threads that runs on one or more processors. In multi-threaded computation, two paradigms have emerged in scheduling: work sharing and work stealing.
+ Work-sharing: When a processor generates new threads, it attempts to migrate some of them to the other processors with the hopes of them being utilized by the idle/underutilized processors. Work-stealing: An underutilized processor actively looks for other processor&amp;rsquo;s threads and &amp;ldquo;steal&amp;rdquo; some.</description>
+    </item>
+    
+    <item>
+      <title>Profiler labels in Go</title>
+      <link>https://rakyll.org/profiler-labels/</link>
+      <pubDate>Mon, 03 Jul 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/profiler-labels/</guid>
+      <description>Go 1.9 is introducing profiler labels, a way to add arbitrary key-values to the samples collected by the CPU profiler. CPU profilers collect and output hot spots where the CPU spent most time in when executing. A typical CPU profiler output is primarily reports the location of these spots as function name, source file/line, etc. By looking at the data, you can also examine which parts of the code invoked these spots.</description>
+    </item>
+    
+    <item>
+      <title>Custom pprof profiles</title>
+      <link>https://rakyll.org/custom-profiles/</link>
+      <pubDate>Fri, 30 Jun 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/custom-profiles/</guid>
+      <description>Go provides several pprof profiles out of thet box to gather profiling data from Go programs.
+The builtin profiles provided by the runtime/pprof package:
+ profile: CPU profile determines where a program spends its time while actively consuming CPU cycles (as opposed while sleeping or waiting for I/O). heap: Heap profile reports the currently live allocations; used to monitor current memory usage or check for memory leaks. threadcreate: Thread creation profile reports the sections of the program that lead the creation of new OS threads.</description>
+    </item>
+    
+    <item>
+      <title>Debugging Go core dumps</title>
+      <link>https://rakyll.org/coredumps/</link>
+      <pubDate>Mon, 22 May 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/coredumps/</guid>
+      <description>Debugging is highly useful to examine the execution flow and to understand the current state of a program.
+Core files is a file that contains the memory dump of a running process and its process status. It is primarily used for post-mortem debugging of a program, as well as to understand a program&amp;rsquo;s state while it is still running. These two cases make debugging of core dumps a good diagnostics aid to postmortem and analyze production services.</description>
+    </item>
+    
+    <item>
+      <title>Automatic Stackdriver Tracing for gRPC</title>
+      <link>https://rakyll.org/grpc-trace/</link>
+      <pubDate>Wed, 22 Mar 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/grpc-trace/</guid>
+      <description>In monolithic systems, it is relatively easy to collect diagnostic data from the building blocks of a program. All modules live within one process and share common resources to report logs and errors.
+Once you are distributing your system into microservices, it becomes harder to follow a call starting from the user&amp;rsquo;s entry point until a response is served. To address this problem, Google invented Dapper to instrument and analyze its production services.</description>
+    </item>
+    
+    <item>
+      <title>Naming tests to self-document</title>
+      <link>https://rakyll.org/naming-tests-to-doc/</link>
+      <pubDate>Fri, 03 Feb 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/naming-tests-to-doc/</guid>
+      <description>Go doesn&amp;rsquo;t specifically enforce you how you choose your test names. Tests are a significant contributors for the maintainability of your code. Tests not just providing correctness checking but also are useful in self documenting your code and its usage. On top of that, tests are the single best source to read about responsibilities of a type, function, etc. This is where naming tests better can help the internal documentation and therefore the maintainability of your code.</description>
+    </item>
+    
+    <item>
+      <title>Style guideline for Go packages</title>
+      <link>https://rakyll.org/style-packages/</link>
+      <pubDate>Sat, 14 Jan 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/style-packages/</guid>
+      <description>Go is about naming and organization as much as everything else in the language. Well-organized Go code is easy to discover, use and read. Well-organized code is as critical as well designed APIs. The location, name, and the structure of your packages are the first elements your users see and interact with.
+This document&amp;rsquo;s goal is to guide you with common good practices not to set rules. You will always need to use your own judgement to pick the most elegant solution for your specific case.</description>
+    </item>
+    
+    <item>
+      <title>Go 1.8 development stats</title>
+      <link>https://rakyll.org/go18cls/</link>
+      <pubDate>Wed, 11 Jan 2017 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/go18cls/</guid>
+      <description>Go 1.8 is going to to launched in February 2017. There is a sizable list of new features and improvements on the release notes. While these notes is the best summary to see what has happened in the last 6 months, I will try to give you some stats to give you a sense of the size of the work. I have examined all the changes merged into the tree during the Go 1.</description>
+    </item>
+    
+    <item>
+      <title>Mutex profile</title>
+      <link>https://rakyll.org/mutexprofile/</link>
+      <pubDate>Mon, 19 Dec 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/mutexprofile/</guid>
+      <description>Go 1.8 introduces a new profile, the contended mutex profile, that allows you to capture a fraction of the stack traces of goroutines with contended mutexes.
+You need to set the sampling fraction by calling runtime.SetMutexProfileFraction to a value above zero to enable collection.
+Consider the following program:
+import _ &amp;quot;net/http/pprof&amp;quot; var mu sync.Mutex var items = make(map[int]struct{}) runtime.SetMutexProfileFraction(5) for i := 0; i &amp;lt; 1000*1000; i++ { go func(i int) { mu.</description>
+    </item>
+    
+    <item>
+      <title>The default GOPATH</title>
+      <link>https://rakyll.org/default-gopath/</link>
+      <pubDate>Wed, 14 Dec 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/default-gopath/</guid>
+      <description>Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.
+The requirement of setting a GOPATH has been a major issue for Go users who installed the Go tools for the first time and got the &amp;ldquo;you have to set a GOPATH&amp;rdquo; error in their initial experience with the tools. Explaining the GOPATH is and instructing how to set this env variable were both distracting new users away from using Go.</description>
+    </item>
+    
+    <item>
+      <title>HTTP/2 Server Push</title>
+      <link>https://rakyll.org/http2push/</link>
+      <pubDate>Sat, 10 Dec 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/http2push/</guid>
+      <description>Go 1.8 is going to feature support for HTTP/2 server push.
+HTTP/2 has many features designed to make the Web faster. One of those features is the server push, the ability to send resources before the client asks for it. This feature enables websites to push assets like JavaScript and CSS files before waiting for the web page to be loaded and asking for those resources.
+net/http package will support server push by exposing a Pusher API that will be supported by HTTP/2 ResponseWriters.</description>
+    </item>
+    
+    <item>
+      <title>Deprecation notices in Go</title>
+      <link>https://rakyll.org/deprecated/</link>
+      <pubDate>Thu, 08 Dec 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/deprecated/</guid>
+      <description>In Go, for a long time, we didn&amp;rsquo;t have a convention to label the deprecated APIs. In the past years, there is new convention emerged to add deprecation notices to the docs.
+Today, standard library uses this specific format.
+As an example, Go 1.8 deprecates sql/driver.Execer and adds a deprecation notice to its godoc.
+// Execer is an optional interface that may be implemented by a Conn. // // If a Conn does not implement Execer, the sql package&#39;s DB.</description>
+    </item>
+    
+    <item>
+      <title>Using contexts to avoid leaking goroutines</title>
+      <link>https://rakyll.org/leakingctx/</link>
+      <pubDate>Tue, 25 Oct 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/leakingctx/</guid>
+      <description>The context package makes it possible to manage a chain of calls within the same call path by signaling context&amp;rsquo;s Done channel.
+In this article, we will examine how to use the context package to avoid leaking goroutines.
+Assume, you have a function that starts a goroutine internally. Once this function is called, the caller may not be able to terminate the goroutine started by the function.
+// gen is a broken generator that will leak a goroutine.</description>
+    </item>
+    
+    <item>
+      <title>Debugging code generation in Go</title>
+      <link>https://rakyll.org/codegen/</link>
+      <pubDate>Sat, 15 Oct 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/codegen/</guid>
+      <description>Last week, I was at dotGo, participating one of the finest Go conferences and catching up with gophers from the other side of the Atlantic. I gave a very short lightning talk about inspection of code generation with the tools already available in the toolchain. This post goes through the talk for those who didn&amp;rsquo;t have the privilege to be at the conference. Slides are also available at go-talks.</description>
+    </item>
+    
+    <item>
+      <title>Keeping Go a human-first language</title>
+      <link>https://rakyll.org/human-first/</link>
+      <pubDate>Tue, 11 Oct 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/human-first/</guid>
+      <description>Disclaimer: I forked my opinions on this one from a barely readable Twitter thread and wanted to write it down how I feel about keeping the language internals away from the users, especially from the newcomers. This is not a skill-level concern, it is a core goal of Go to provide a high-level programming language that saves users from excessive mental overhead. Note that these are personal opinions and are not written on the behalf of a group.</description>
+    </item>
+    
+    <item>
+      <title>Go tooling essentials</title>
+      <link>https://rakyll.org/go-tool-flags/</link>
+      <pubDate>Sun, 25 Sep 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/go-tool-flags/</guid>
+      <description>New to the Go tools? Or do you want to expand your knowledge? This article is about the flags for the Go tools everyone should know.
+Disclaimer: This article might be slightly biased. This is a collection of flags I personally use and flags people around me having trouble finding references for. If you have more ideas, ping me on Twitter.
+$ go build -x -x lists all the commands go build invokes.</description>
+    </item>
+    
+    <item>
+      <title>Examples coverage</title>
+      <link>https://rakyll.org/examples-coverage/</link>
+      <pubDate>Thu, 08 Sep 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/examples-coverage/</guid>
+      <description>Go programming language provides many unique good features to write and maintain examples for your packages backed by the testing tools.
+As an addition to the test coverage and test coverage report, go test also can provide coverage for testable examples.
+Use the following commands in your package to use the -run flag to only the match the example tests and view the results in your browser.
+$ go test -v -run=Example -coverprofile=c.</description>
+    </item>
+    
+    <item>
+      <title>Parallelize your table-driven tests</title>
+      <link>https://rakyll.org/parallelize-test-tables/</link>
+      <pubDate>Tue, 06 Sep 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/parallelize-test-tables/</guid>
+      <description>With Go 1.7, testing package supports sub-tests that allows you to run multiple smaller tests from a test case. Each sub test is reported independently in the go test output. More information about these recent additions can be found at Marcel van Lohuizen&amp;rsquo;s recent talk from GolangUK 2016.
+These additions to Go 1.7 enabled reporting and other testing.T functionality for subtests. One of the biggest contributions of the recent changes is to be able to use these features for table-driven tests.</description>
+    </item>
+    
+    <item>
+      <title>Using Instruments to profile Go programs</title>
+      <link>https://rakyll.org/instruments/</link>
+      <pubDate>Fri, 02 Sep 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/instruments/</guid>
+      <description>Apple has a suite of instrumentation and tracing tools for performance analysis available as a part of their Xcode tooling set. In this article, we will use Instruments to record and analyze the CPU profile of a Go program.
+Instruments also provide a large set of macOS-specific tracing and profiling if you have performance issues specifically on darwin.
+Some of these specific profiles are:
+ System trace: Collects comprehensive information about system calls, scheduling, user-kernel space transitions.</description>
+    </item>
+    
+    <item>
+      <title>Bidirectional gRPC streaming for Go</title>
+      <link>https://rakyll.org/grpc-streaming/</link>
+      <pubDate>Tue, 30 Aug 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/grpc-streaming/</guid>
+      <description>Disclaimer: This article is not about a core Go package or tool but gRPC.
+gRPC provides support for implementing streaming endpoints as well as streaming support in their clients. Bidirectional streaming is useful if you want both server and client to be able to communicate to the other side independently in a full duplex fashion.
+In this article, I will dig into how to use the streaming gRPC Go client to talk to a streaming API endpoint.</description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>https://rakyll.org/about/</link>
+      <pubDate>Sat, 27 Aug 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/about/</guid>
+      <description>I started this blog to fill the gaps in knowledge transmission and provide useful everyday tips about the Go programming language, its packages and tools.
+About me I am an engineer working on the Go programming language.
+I am primarily focused on Go&amp;rsquo;s diagnostics tools and libraries.
+Before Go, I worked on various platform teams and API infrastructure at Google for about four years. And before joining to Google, for the first eight years of my career, I worked for companies of various sizes mostly focusing on developer platforms and technical infrastructure.</description>
+    </item>
+    
+    <item>
+      <title>Apply transformations to Go code with eg</title>
+      <link>https://rakyll.org/eg/</link>
+      <pubDate>Sat, 27 Aug 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/eg/</guid>
+      <description>If you are willing to make large scale refactoring in your Go programs, automating the refactoring tasks is more desirable than manual editing. eg is a program that allows you to perform transformations based on template Go files.
+To install the tool, run the following:
+$ go get golang.org/x/tools/cmd/eg  eg requires a template file to look for which transformation it should apply to your source code. What&amp;rsquo;s nice is that the template file is a Go file with little annotations.</description>
+    </item>
+    
+    <item>
+      <title>Calling Go from Swift</title>
+      <link>https://rakyll.org/swift/</link>
+      <pubDate>Sat, 03 Oct 2015 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/swift/</guid>
+      <description>Note: Swift bindings are highly experimental and subject to change. This work must currently be classified as preliminary work and we will be improving APIs in the long term.
+As a part of the Go Mobile, we have announced tools and packages that make language bindings from Java to Go and Objective-C to Go available. A relatively new and less documented aspect of the bindings is the availability of the Swift to Go calls.</description>
+    </item>
+    
+    <item>
+      <title>Go cross compilation</title>
+      <link>https://rakyll.org/cross-compilation/</link>
+      <pubDate>Tue, 08 Sep 2015 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/cross-compilation/</guid>
+      <description>Note: This article extends Dave Cheney’s Go 1.5 cross compilers post.
+Cross compilers got easier with Go 1.5. You don’t have to bootstrap the standard library and toolchain as you used to do prior to 1.5.
+If cgo is not required The go tool won’t require any bootstrapping if cgo is not required. That allows you to target the following program to any GOOS/GOARCH without requiring you to do any additional work.</description>
+    </item>
+    
+    <item>
+      <title>Interface pollution in Go</title>
+      <link>https://rakyll.org/interface-pollution/</link>
+      <pubDate>Sat, 18 Oct 2014 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/interface-pollution/</guid>
+      <description>If there was a single powerful language feature in Go, it’d be the interfaces. The internals of Go contain strong combinations of useful ideas from various type systems and inevitably they ring the curiosity bells. I recently surveyed Github for Go interface declarations, and the results indicated that Go users pollute the environment with interfaces no one needs or will use.
+Don’t export any interfaces until you have to.
+Interfaces are great, but interface pollution is not so.</description>
+    </item>
+    
+    <item>
+      <title>Archive</title>
+      <link>https://rakyll.org/archive/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/archive/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

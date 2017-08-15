@@ -1,0 +1,138 @@
+	<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-us" lang="en-us">
+<head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta name="generator" content="Hugo 0.24-DEV" />
+
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  
+  <title>The future of latency profiling in Go &middot; Go, the unwritten parts</title>
+  
+
+  
+  <link rel="stylesheet" href="https://rakyll.org/css/poole.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/syntax.css">
+  <link rel="stylesheet" href="https://rakyll.org/css/hyde.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+  <link href="https://fonts.googleapis.com/css?family=PT+Serif" rel="stylesheet">
+
+  
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144-precomposed.png">
+  <link rel="shortcut icon" type="image/png" href="/favicon.png">
+
+  
+  <link href="https://rakyll.org/index.xml" rel="alternate" type="application/rss+xml" title="Go, the unwritten parts" />
+</head>
+
+	<body class=" layout-reverse">
+		<div class="sidebar">
+  <div class="container sidebar-sticky">
+
+
+    <div class="sidebar-about">
+      <a href="https://rakyll.org/"><h1>Go, the unwritten parts</h1></a>
+      <p class="lead">
+      Articles mostly about Go and what I am currently working on.
+      Conventions, best practices, little known practical tips.
+      </p>
+      <p>by <a href="https://twitter.com/rakyll">JBD</a></p>
+    </div>
+
+    <ul class="sidebar-nav">
+      <li><a href="/">Home</a> </li>
+      <li><a href="/archive/">Archive</a></li>
+      <li><a href="/about/">About</a></li>
+      <li><a href="https://github.com/rakyll/">GitHub</a></li>
+      
+    </ul>
+
+    <p class="small">
+      Subscribe to the <a rel="license" href="/index.xml">feed</a>.
+    </p>
+
+    <p class="small">
+      This work is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+      The blog is served by the amazing <a href="https://gohugo.io">Hugo</a>.
+    </p>
+  </div>
+</div>
+
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83257159-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+
+
+		<div class="content container">
+			<div class="post">
+			 	<h1>The future of latency profiling in Go</h1>
+			  <span class="post-date">Tue, Jul 18, 2017</span>
+			      
+
+<p><em>Note: This article contains non-finalized ideas; we may end up not implementing any of this but ideally we should do work towards the direction explained here.</em></p>
+
+<p>Go is the language to write servers, Go is the language to write microservices. Yet, we haven&rsquo;t done much in the past for the latency analysis, and observability/diagnostics of request/RPC performance.</p>
+
+<p>GopherCon 2017 was an opportunity for me to discuss our roadmap for latency analysis. I have talked many whose main job is to provide instrumentation solutions to the ecosystem.
+A few common problems have been pointed out by pretty much everyone I talked to:</p>
+
+<ol>
+<li>Instrumentation requires manual labor. Go code cannot be auto-instrumented by intercepting calls.</li>
+<li>Lack of a standard library package; third party packages cannot provide out-of-the-box instrumentation without external dependencies.</li>
+<li>Dropped traces; libraries don&rsquo;t know how to propagate traces to the outside world. We need a <code>context.Context</code> key to propagate traces and be able to discover the current trace by looking into the incoming context.</li>
+<li>Lack of standard library support; e.g. packages like <code>database/sql</code> can be instrumented to create spans for each ExecContext if the given context has already has a trace ID.</li>
+<li>Lack of diagnostics data available from runtime per trace ID. It would be ideal to be able to record runtime events (e.g. scheduling events) with trace IDs and then pull them to further investigate low-level runtime events happened in the lifetime of a request.</li>
+</ol>
+
+<p>Apart from the Go-specific issues, we often came back to the problem of the wild fragmentation in the tracing community and how the lack of the compatibility among tracing backends damage the possibility of establishing more in the library space.
+There is not much we can do beyond the boundaries of Go other than advocating for a requirement to fix fragmentation which I already personally do.</p>
+
+<h2 id="instrumentation">Instrumentation</h2>
+
+<p>We are currently not interested to solve (1) in a fashion other languages do by providing primitives that can intercept every call. Initially there is a lot to be done by creating a common instrumentation library and putting manual spans in place. A common instrumentation layer also solves the problems explained at (2) and (3).</p>
+
+<p>To address these items, we will propose a package with a trace context representation, FromContext/NewContext to propagate trace context via context.Context, and a small API to create/end/annotate spans.</p>
+
+<p>Users will be able to start and stop trace collection in a Go program dynamically; and export collected trace data.</p>
+
+<p>Users will need to write transformation code if they would like to follow an existing distributed trace (e.g. an existing Zipkin trace propagated via an incoming HTTP request&rsquo;s header).</p>
+
+<p>Once we establish a package, we can revise the standard library packages to see where we can inject out-of-the-box instrumentation. Some existing ideas:</p>
+
+<ul>
+<li><code>database/sql</code>: A span can be created for each ExecContext and finished when exec is completed to measure latency.</li>
+<li><code>os/exec</code>: A span can be created for CommandContext to measure command exec latency.</li>
+<li><code>net/http</code>: http.Transport can create spans for outgoing requests.</li>
+</ul>
+
+<p>The next steps for <code>net/http</code> is to be able to propagate traces via http.Request. Ideally we want http.Transport to inject the right trace context header to the outgoing requests and http.Handlers to extract trace contexts into req.Context. The wild fragmentation in the tracing backends don&rsquo;t help us much here. Each backend requires a different encoding/decoding to serialize/deserialize trace contexts and different HTTP headers to put them in place. There is an ongoing effort to <a href="https://github.com/TraceContext/tracecontext-spec/pull/1/files">unify</a> things in this area and we will wait for it rather than trying to meet the backend-specific requirements.</p>
+
+<p>There is also an experimental work to annotate runtime events recorded by the execution tracer with trace IDs, which will address the basic requirements of (5). If you need to collect more precise data on what else is happening in the lifetime of a trace, you will be optionally record runtime events and attach them to the current trace.</p>
+
+<h2 id="visualization">Visualization</h2>
+
+<p>Nothing has been planned so far to visualize the per-node data. We expect the exported data can be transformed into the data format of the user&rsquo;s existing distributed tracing backend and visualized there. For those who are looking for a local env setup, I suggest <a href="https://github.com/openzipkin/docker-zipkin#running">Zipkin</a> given it is very easy to run it locally as a standalone service. I am in also favor of maintaining high-quality transformation drivers for Zipkin or OpenTracing somewhere outside of the standard lib.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>We have clearer idea what we want to achieve in the scope of Go for latency profiling. The next steps are converting these ideas into proposals and discuss them with the broader Go community, give feedback to the tracing community for the standardization efforts, and create awareness of these concepts and tools.</p>
+
+			</div>
+
+			<p>If you have any suggestions or comments, please ping <a href="https://twitter.com/rakyll">@rakyll<a/>.</p>
+
+			
+
+		</div>
+
+  </body>
+</html>

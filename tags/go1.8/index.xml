@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Go1.8 on Go, the unwritten parts</title>
+    <link>https://rakyll.org/tags/go1.8/</link>
+    <description>Recent content in Go1.8 on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
+    <lastBuildDate>Wed, 14 Dec 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/go1.8/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>The default GOPATH</title>
+      <link>https://rakyll.org/default-gopath/</link>
+      <pubDate>Wed, 14 Dec 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/default-gopath/</guid>
+      <description>Go 1.8 will set a default GOPATH if the GOPATH env variable is not set.
+The requirement of setting a GOPATH has been a major issue for Go users who installed the Go tools for the first time and got the &amp;ldquo;you have to set a GOPATH&amp;rdquo; error in their initial experience with the tools. Explaining the GOPATH is and instructing how to set this env variable were both distracting new users away from using Go.</description>
+    </item>
+    
+    <item>
+      <title>HTTP/2 Server Push</title>
+      <link>https://rakyll.org/http2push/</link>
+      <pubDate>Sat, 10 Dec 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/http2push/</guid>
+      <description>Go 1.8 is going to feature support for HTTP/2 server push.
+HTTP/2 has many features designed to make the Web faster. One of those features is the server push, the ability to send resources before the client asks for it. This feature enables websites to push assets like JavaScript and CSS files before waiting for the web page to be loaded and asking for those resources.
+net/http package will support server push by exposing a Pusher API that will be supported by HTTP/2 ResponseWriters.</description>
+    </item>
+    
+  </channel>
+</rss>

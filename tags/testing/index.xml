@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Testing on Go, the unwritten parts</title>
+    <link>https://rakyll.org/tags/testing/</link>
+    <description>Recent content in Testing on Go, the unwritten parts</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <managingEditor>rakyll@rakyll.org (Jaana Burcu Dogan)</managingEditor>
+    <webMaster>rakyll@rakyll.org (Jaana Burcu Dogan)</webMaster>
+    <lastBuildDate>Tue, 06 Sep 2016 11:27:27 -0400</lastBuildDate>
+    
+	<atom:link href="https://rakyll.org/tags/testing/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Parallelize your table-driven tests</title>
+      <link>https://rakyll.org/parallelize-test-tables/</link>
+      <pubDate>Tue, 06 Sep 2016 11:27:27 -0400</pubDate>
+      <author>rakyll@rakyll.org (Jaana Burcu Dogan)</author>
+      <guid>https://rakyll.org/parallelize-test-tables/</guid>
+      <description>With Go 1.7, testing package supports sub-tests that allows you to run multiple smaller tests from a test case. Each sub test is reported independently in the go test output. More information about these recent additions can be found at Marcel van Lohuizen&amp;rsquo;s recent talk from GolangUK 2016.
+These additions to Go 1.7 enabled reporting and other testing.T functionality for subtests. One of the biggest contributions of the recent changes is to be able to use these features for table-driven tests.</description>
+    </item>
+    
+  </channel>
+</rss>
